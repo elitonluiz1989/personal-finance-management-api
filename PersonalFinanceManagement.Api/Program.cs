@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using PersonalFinanceManagement.Api.Services;
 using PersonalFinanceManagement.Application.Contracts;
 using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Services;
 using PersonalFinanceManagement.Domain.Users.Specifications;
@@ -28,6 +29,7 @@ void AddServices(WebApplicationBuilder builder)
 {
     DefaultDBContext.Configure(builder.Services, builder.Configuration.GetConnectionString("Default"));
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+    builder.Services.AddScoped<INotificationService, NotificationService>();
 
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 

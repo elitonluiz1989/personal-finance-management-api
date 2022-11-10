@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Api.Attributes;
+using PersonalFinanceManagement.Api.Controllers.Base;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Dtos;
@@ -8,12 +9,18 @@ using PersonalFinanceManagement.Domain.Users.Filters;
 
 namespace PersonalFinanceManagement.Api.Controllers.Users
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class UserController : Controller
+    public class UserController : BaseApiController
     {
+        public UserController(
+            INotificationService notificationService,
+            IUnitOfWork unitOfWork
+        )
+            : base(notificationService, unitOfWork)
+        {
+        }
+
         [HttpGet()]
-        [Authorized(UserRoleEnum.Administrator)]
+        [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Get(
             [FromQuery] UserFilter filter,
             [FromServices] IUserSpecification specification
@@ -25,7 +32,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         }
 
         [HttpPost]
-        [Authorized(UserRoleEnum.Administrator)]
+        [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Post(
             [FromBody] UserStoreDto dto,
             [FromServices] IUserStore store,
@@ -33,13 +40,12 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         )
         {
             await store.Store(dto);
-            unitOfWork.Commit();
-
-            return Ok(true);
+            
+            return ResponseWithCommit();
         }
 
         [HttpDelete("{id}")]
-        [Authorized(UserRoleEnum.Administrator)]
+        [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Patch(
             int id,
             [FromServices] IUserDeleter deleter,
@@ -47,9 +53,8 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         )
         {
             await deleter.Delete(id);
-            unitOfWork.Commit();
-
-            return Ok(true);
+            
+            return ResponseWithCommit();
         }
     }
 }

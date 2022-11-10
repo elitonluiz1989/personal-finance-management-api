@@ -1,12 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PersonalFinanceManagement.Api.Controllers.Base;
 using PersonalFinanceManagement.Application.Contracts;
 using PersonalFinanceManagement.Application.Dtos.Authentication;
+using PersonalFinanceManagement.Domain.Base.Contracts;
 
 namespace PersonalFinanceManagement.Api.Controllers.Auth
 {
-    public class AuthenticationController : Controller
+    public class AuthenticationController : BaseApiController
     {
+        public AuthenticationController(
+            INotificationService notificationService,
+            IUnitOfWork unitOfWork
+        )
+            : base(notificationService, unitOfWork)
+        {
+        }
 
         [HttpPost("Authenticate")]
         [AllowAnonymous]
