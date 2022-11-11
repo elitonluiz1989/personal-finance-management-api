@@ -1,4 +1,4 @@
-﻿using PersonalFinanceManagement.Domain.Base.Contracts;
+﻿using System.Text.Json.Serialization;
 
 namespace PersonalFinanceManagement.Domain.Base.Dtos
 {
@@ -7,6 +7,7 @@ namespace PersonalFinanceManagement.Domain.Base.Dtos
     {
         public TId Id { get; set; }
 
+        [JsonIgnore]
         public bool IsRecorded => Id.Equals(default(TId)) is false;
     }
 }

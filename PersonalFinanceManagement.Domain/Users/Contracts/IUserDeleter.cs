@@ -1,7 +1,8 @@
-﻿namespace PersonalFinanceManagement.Domain.Users.Contracts
+﻿using PersonalFinanceManagement.Domain.Base.Contracts;
+
+namespace PersonalFinanceManagement.Domain.Users.Contracts
 {
-    public interface IUserDeleter
+    public interface IUserDeleter : IBaseDeleter<int>
     {
-        Task Delete(int id);
     }
 }

@@ -1,64 +1,82 @@
 ﻿using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Dtos;
+using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Dtos;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Users.Services
 {
-    public class UserStore : IUserStore
+    public class UserStore : BaseStore<User, int>, IUserStore
     {
-        private readonly IUserRepository _userRepository;
-
-        public UserStore(IUserRepository userRepository)
+        public UserStore(
+            INotificationService notificationService, 
+            IUserRepository repository
+        )
+            : base(notificationService, repository)
         {
-            _userRepository = userRepository;
         }
 
-        public async Task Store(UserStoreDto dto)
+        protected override async Task<User?> SetEntity<TDto>(TDto dto)
         {
-            if (dto is null)
-                throw new ArgumentNullException(nameof(dto));
+            var userDto = ConvertDto(dto);
 
-            var user = await DefineUser(dto);
+            if (userDto is null || _notificationService.HasNotifications())
+                return null;
 
-            if (user.Validate() is false)
-                throw new Exception("Error");
+            if (userDto.IsRecorded)
+                return await UpdateUser(userDto);
 
-            if (user.IsRecorded is false)
-                _userRepository.Save(user);
+            return CreateUser(userDto);
         }
 
-        private async Task<User> DefineUser(UserStoreDto dto)
+        private static User CreateUser(UserStoreDto userDto)
         {
-            if (dto.IsRecorded)
+            return new User()
             {
-                var user = await _userRepository.Find(dto.Id);
+                UserName = userDto.UserName,
+                Name = userDto.Name,
+                Email = userDto.Email,
+                Password = userDto.HashedPassword,
+                Role = userDto.Role
+            };
+        }
 
-                if (user is null)
-                    throw new ArgumentNullException(nameof(user));
+        private async Task<User?> UpdateUser(UserStoreDto userDto)
+        {
+            var user = await _repository.Find(userDto.Id);
 
-                if (!string.IsNullOrEmpty(dto.UserName))
-                    user.Name = dto.Name;
+            if (user is null) {
+                _notificationService.AddNotification($"{nameof(user)} is null");
 
-                if (!string.IsNullOrEmpty(dto.Name))
-                    user.Name = dto.Name;
+                return null;
+            }            
 
-                if (!string.IsNullOrEmpty(dto.Password))
-                    user.Password = dto.HashedPassword;
+            if (!string.IsNullOrEmpty(userDto.UserName))
+                user.Name = userDto.Name;
 
-                if (user.Role.Equals(dto.Role) is false)
-                    user.Role = dto.Role;
+            if (!string.IsNullOrEmpty(userDto.Name))
+                user.Name = userDto.Name;
 
-                return user;
+            if (!string.IsNullOrEmpty(userDto.Password))
+                user.Password = userDto.HashedPassword;
+
+            if (user.Role.Equals(userDto.Role) is false)
+                user.Role = userDto.Role;
+
+            return user;
+        }
+
+        private UserStoreDto? ConvertDto<TDto>(TDto dto) where TDto : RecordedDto<int>
+        {
+            var userDto = dto as UserStoreDto;
+
+            if (userDto is null)
+            {
+                _notificationService.AddNotification($"{nameof(userDto)} is null");
             }
 
-            return new User() {
-                UserName = dto.UserName,
-                Name = dto.Name,
-                Email = dto.Email,
-                Password = dto.HashedPassword,
-                Role = dto.Role
-            };
+            return userDto;
         }
     }
 }

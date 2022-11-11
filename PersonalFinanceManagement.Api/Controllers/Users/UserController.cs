@@ -40,6 +40,9 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         )
         {
             await store.Store(dto);
+
+            if (HasNotifications())
+                return ResponseWithNotifications();
             
             return ResponseWithCommit();
         }
@@ -53,7 +56,10 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         )
         {
             await deleter.Delete(id);
-            
+
+            if (HasNotifications())
+                return ResponseWithNotifications();
+
             return ResponseWithCommit();
         }
     }

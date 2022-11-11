@@ -1,9 +1,8 @@
-﻿using PersonalFinanceManagement.Domain.Users.Dtos;
+﻿using PersonalFinanceManagement.Domain.Base.Contracts;
 
 namespace PersonalFinanceManagement.Domain.Users.Contracts
 {
-    public interface IUserStore
+    public interface IUserStore : IBaseStore<int>
     {
-        Task Store(UserStoreDto dto);
     }
 }

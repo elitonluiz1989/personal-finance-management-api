@@ -1,24 +1,26 @@
-﻿using PersonalFinanceManagement.Domain.Users.Contracts;
+﻿using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Services;
+using PersonalFinanceManagement.Domain.Users.Contracts;
+using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Users.Services
 {
-    public class UserDeleter : IUserDeleter
+    public class UserDeleter : BaseDeleter<User, int>, IUserDeleter
     {
-        private readonly IUserRepository _repository;
-
-        public UserDeleter(IUserRepository repository)
+        public UserDeleter(
+            INotificationService notificationService,
+            IUserRepository repository
+        )
+            : base(notificationService, repository)
         {
-            _repository = repository;
         }
 
-        public async Task Delete(int id)
+        protected override void Validate(IEntity? entity)
         {
-            var user = await _repository.Find(id);
+            if (entity is User)
+                return;
 
-            if (user is null)
-                throw new ArgumentNullException(nameof(user));
-
-            _repository.Delete(user);
+            _notificationService.AddNotification($"{nameof(entity)} is null");
         }
     }
 }
