@@ -2,16 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PersonalFinanceManagement.Api.Services;
-using PersonalFinanceManagement.Application.Contracts;
-using PersonalFinanceManagement.Domain.Base.Contracts;
-using PersonalFinanceManagement.Domain.Base.Services;
-using PersonalFinanceManagement.Domain.Users.Contracts;
-using PersonalFinanceManagement.Domain.Users.Services;
-using PersonalFinanceManagement.Domain.Users.Specifications;
+using PersonalFinanceManagement.Api;
 using PersonalFinanceManagement.Infra.Data.Contexts;
-using PersonalFinanceManagement.Infra.Data.Helpers;
-using PersonalFinanceManagement.Infra.Data.Repositories.Users;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,15 +20,7 @@ app.Run();
 void AddServices(WebApplicationBuilder builder)
 {
     DefaultDBContext.Configure(builder.Services, builder.Configuration.GetConnectionString("Default"));
-    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-    builder.Services.AddScoped<INotificationService, NotificationService>();
-
-    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-    builder.Services.AddScoped<IUserRepository, UserRepository>();
-    builder.Services.AddScoped<IUserSpecification, UserSpecification>();
-    builder.Services.AddScoped<IUserStore, UserStore>();
-    builder.Services.AddScoped<IUserDeleter, UserDeleter>();
+    IoCService.Configure(builder.Services);
 }
 
 void ConfigureServices(WebApplicationBuilder builder)
