@@ -22,23 +22,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public virtual List<Installment> Installments { get; set; } = new List<Installment>();
         public virtual List<Transaction> Transactions { get; set; } = new List<Transaction>();
 
-        public Balance(
-            int userId,
-            BalanceTypeEnum type,
-            BalanceStatusEnum status,
-            decimal value,
-            bool financed,
-            short? numberOfInstallments
-        )
-        {
-            UserId = userId;
-            Type = type;
-            Status = status;
-            Value = value;
-            Financed = financed;
-            NumberOfInstallments = numberOfInstallments;
-        }
-
         public void SetRegistrationDates()
         {
             if (IsRecorded)
@@ -62,7 +45,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
                 return;
 
             Validator.RuleFor(p => UserId)
-                .GreaterThan(0);
+                .GreaterThan(0)
+                .When(p => User is null);
+
+            Validator.RuleFor(p => User)
+                .NotNull()
+                .When(p => UserId == default);
 
             Validator.RuleFor(p => Type)
                 .IsInEnum();
@@ -75,6 +63,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
             Validator.RuleFor(p => Financed)
                 .NotNull();
+
+            Validator.RuleFor<int?>(p => NumberOfInstallments)
+                .NotNull()
+                .GreaterThan(0)
+                .When(p => Financed is true);
 
             Validator.RuleFor(p => CreatedAt)
                 .NotNull();

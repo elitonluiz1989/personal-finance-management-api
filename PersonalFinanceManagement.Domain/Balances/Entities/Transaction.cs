@@ -16,19 +16,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
         public virtual Balance? Balance { get; set; }
 
-        public Transaction(
-            int balanceId,
-            TransactionTypeEnum type,
-            short reference,
-            DateTime date,
-            decimal value
-        )
+        public Transaction()
         {
-            BalanceId = balanceId;
-            Type = type;
-            Reference = reference;
-            Date = date;
-            Value = value;
         }
 
         public void SetAsDeleted()

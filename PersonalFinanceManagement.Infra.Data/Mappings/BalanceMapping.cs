@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PersonalFinanceManagement.Domain.Balances.Entities;
-using PersonalFinanceManagement.Domain.Balances.Enums;
 
 namespace PersonalFinanceManagement.Infra.Data.Mappings
 {
@@ -40,7 +39,8 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.HasOne(p => p.User)
                 .WithMany(o => o.Balances)
-                .HasForeignKey(p => p.UserId);
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Ignore(p => p.Errors);
         }

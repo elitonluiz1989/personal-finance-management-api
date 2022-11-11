@@ -2,7 +2,7 @@
 {
     public enum TransactionTypeEnum
     {
-        Payment,
-        Due
+        Credit = 1,
+        Debt
     }
 }

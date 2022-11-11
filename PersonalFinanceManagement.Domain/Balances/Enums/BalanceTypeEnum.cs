@@ -2,7 +2,7 @@
 {
     public enum BalanceTypeEnum
     {
-        Credit,
-        Due
+        Credit = 1,
+        Debt
     }
 }

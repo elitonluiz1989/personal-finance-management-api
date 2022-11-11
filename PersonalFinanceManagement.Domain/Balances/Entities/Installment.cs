@@ -14,17 +14,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
         public virtual Balance? Balance { get; set; }
 
-        public Installment(
-            int balanceId,
-            short reference,
-            short number,
-            decimal value
-        )
+        public Installment()
         {
-            BalanceId = balanceId;
-            Reference = reference;
-            Number = number;
-            Value = value;
         }
 
         public void SetAsDeleted()

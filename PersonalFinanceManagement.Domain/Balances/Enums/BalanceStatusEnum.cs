@@ -2,7 +2,7 @@
 {
     public enum BalanceStatusEnum
     {
-        Open,
+        Open = 1,
         Closed
     }
 }
