@@ -2,19 +2,20 @@
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Entities
 {
     public class Transaction : Entity<int>, IEntityWithSoftDelete
     {
-        public int BalanceId { get; set; }
+        public int UserId { get; set; }
         public TransactionTypeEnum Type { get; set; }
-        public short Reference { get; set; }
         public DateTime Date { get; set; }
         public decimal Value { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public virtual Balance? Balance { get; set; }
+        public virtual User? User { get; set; }
+        public virtual List<TransactionItem> Items { get; set; } = new();
 
         public Transaction()
         {
@@ -30,14 +31,16 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             if (Validator is null)
                 return;
 
-            Validator.RuleFor(p => BalanceId)
-                .GreaterThan(0);
+            Validator.RuleFor(p => UserId)
+                .GreaterThan(0)
+                .When(p => User is null);
+
+            Validator.RuleFor(p => User)
+                .NotNull()
+                .When(p => UserId <= 0 );
 
             Validator.RuleFor(p => Type)
                 .IsInEnum();
-
-            Validator.RuleFor<int>(p => Reference)
-                .GreaterThan(0);
 
             Validator.RuleFor(p => Value)
                 .GreaterThan(0);

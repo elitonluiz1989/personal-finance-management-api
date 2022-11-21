@@ -21,9 +21,6 @@ namespace PersonalFinanceManagement.Domain.Users.Specifications
             if (filter.Id > 0)
                 query = query.Where(p => p.Id == filter.Id);
 
-            if (filter.Guid != default)
-                query = query.Where(p => p.Guid == filter.Guid);
-
             if (!string.IsNullOrEmpty(filter.UserName))
                 query = query.Where(p => p.UserName == filter.UserName);
 
@@ -40,7 +37,6 @@ namespace PersonalFinanceManagement.Domain.Users.Specifications
             return await query.Select(s => new UserDto()
             {
                 Id = s.Id,
-                Guid = s.Guid,
                 UserName = s.UserName,
                 Name =  s.Name,
                 Email = s.Email,

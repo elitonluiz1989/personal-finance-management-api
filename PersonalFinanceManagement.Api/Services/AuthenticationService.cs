@@ -40,7 +40,6 @@ namespace PersonalFinanceManagement.Api.Services
 
             var userDto = new UserDto()
             {
-                Guid = user.Guid,
                 UserName = user.UserName,
                 Name = user.Name,
                 Email = user.Email,

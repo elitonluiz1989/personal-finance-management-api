@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PersonalFinanceManagement.Domain.Balances.Contracts;
+using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
+using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Filters;
 
 namespace PersonalFinanceManagement.Domain.Balances.Specifications
@@ -31,10 +32,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 query = query.Where(p => filter.Status.Contains(p.Status));
 
             if (filter.Financed.HasValue)
-                query = query.Where(p =>  p.Financed == filter.Financed);
+                query = query.Where(p => p.Financed == filter.Financed);
 
-            if (filter.NumberOfInstallments.HasValue)
-                query = query.Where(p => p.NumberOfInstallments == p.NumberOfInstallments);
+            if (filter.InstallmentsNumber.HasValue)
+                query = query.Where(p => p.InstallmentsNumber == p.InstallmentsNumber);
 
             return await query.Select(s => new BalanceDto()
             {
@@ -44,9 +45,46 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 Status = s.Status,
                 Value = s.Value,
                 Financed = s.Financed,
-                NumberOfInstallments = s.NumberOfInstallments
+                InstallmentsNumber = s.InstallmentsNumber,
+                Installments = s.Installments
+                    .Select(i => GetInstallment(i))
+                    .ToList()
             })
             .ToListAsync();
+        }
+
+        private static InstallmentDto GetInstallment(Installment installment)
+        {
+            return new InstallmentDto()
+            {
+                Id = installment.Id,
+                BalanceId = installment.BalanceId,
+                Reference = installment.Reference,
+                Number = installment.Number,
+                Value = installment.Value,
+                AmountPaid = installment.AmountPaid,
+                Items = installment.Items.Select(ti => new TransactionItemDto()
+                {
+                    TransactionId = ti.TransactionId,
+                    Transaction = GetTransaction(ti.Transaction),
+                    PartiallyPaid = ti.PartiallyPaid
+                })
+                .ToList()
+            };
+        }
+
+        private static TransactionDto? GetTransaction(Transaction? transaction)
+        {
+            if (transaction is null)
+                return default;
+
+            return new TransactionDto()
+            {
+                Id = transaction.Id,
+                Type = transaction.Type,
+                Date = transaction.Date,
+                Value = transaction.Value
+            };
         }
     }
 }

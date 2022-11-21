@@ -39,6 +39,15 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
 
         public void Delete(TEntity entity)
         {
+            if (entity.IsRecorded && entity.WithSoftDelete)
+            {
+                ((IEntityWithSoftDelete)entity).SetAsDeleted();
+
+                Update(entity);
+
+                return;
+            }
+
             DetachLocalEntity(entity);
 
             DBContenxt.Set<TEntity>().Remove(entity);
@@ -63,8 +72,15 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
 
         public void Save(TEntity entity)
         {
-            if (!entity.Id.Equals(default(TKey)))
+            if (entity.WithRegistrationDates)
+                ((IEntityWithRegistrationDates)entity).SetRegistrationDates();
+
+            if (entity.IsRecorded)
+            {
                 Update(entity);
+
+                return;
+            }
 
             Insert(entity);
         }

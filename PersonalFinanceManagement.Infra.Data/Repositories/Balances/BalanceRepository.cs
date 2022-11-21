@@ -1,4 +1,4 @@
-﻿using PersonalFinanceManagement.Domain.Balances.Contracts;
+﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 

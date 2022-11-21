@@ -12,26 +12,28 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.Type)
-                .IsRequired();
+            builder.Property(p => p.Id)
+                .HasColumnOrder(1);
 
-            builder.Property(p => p.Reference)
+            builder.Property(p => p.UserId)
+                .HasColumnOrder(2);
+
+            builder.Property(p => p.Type)
+                .HasColumnOrder(3)
                 .IsRequired();
 
             builder.Property(p => p.Date)
+                .HasColumnOrder(4)
                 .HasColumnType("date")
                 .IsRequired();
 
             builder.Property(p => p.Value)
+                .HasColumnOrder(5)
                 .IsRequired();
 
             builder.Property(p => p.DeletedAt)
+                .HasColumnOrder(6)
                 .IsRequired(false);
-
-            builder.HasOne(p => p.Balance)
-                .WithMany(o => o.Transactions)
-                .HasForeignKey(p => p.BalanceId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Ignore(p => p.Errors);
         }

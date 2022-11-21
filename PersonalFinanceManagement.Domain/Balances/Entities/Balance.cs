@@ -9,18 +9,24 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
     public class Balance : Entity<int>, IEntityWithRegistrationDates, IEntityWithSoftDelete
     {
         public int UserId { get; set; }
+        public string Name { get; set; } = string.Empty;
         public BalanceTypeEnum Type { get; set; }
         public BalanceStatusEnum Status { get; set; }
+        public DateTime Date { get; set; }
         public decimal Value { get; set; }
         public bool Financed { get; set; }
-        public short? NumberOfInstallments { get; set; }
+        public short? InstallmentsNumber { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpadtedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
         public virtual User? User { get; set; }
         public virtual List<Installment> Installments { get; set; } = new List<Installment>();
-        public virtual List<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+        public Balance()
+        {
+            Status = BalanceStatusEnum.Open;
+        }
 
         public void SetRegistrationDates()
         {
@@ -58,13 +64,16 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             Validator.RuleFor(p => Status)
                 .IsInEnum();
 
+            Validator.RuleFor(p => Date)
+                .NotEqual(default(DateTime));
+
             Validator.RuleFor(p => Value)
                 .GreaterThan(0);
 
             Validator.RuleFor(p => Financed)
                 .NotNull();
 
-            Validator.RuleFor<int?>(p => NumberOfInstallments)
+            Validator.RuleFor<int?>(p => InstallmentsNumber)
                 .NotNull()
                 .GreaterThan(0)
                 .When(p => Financed is true);

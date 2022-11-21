@@ -12,6 +12,8 @@ namespace PersonalFinanceManagement.Domain.Base.Entites
 
         public virtual TId Id { get; set; }
         public bool IsRecorded => Id.Equals(default(TId)) is false;
+        public bool WithRegistrationDates => this is IEntityWithRegistrationDates;
+        public bool WithSoftDelete => this is IEntityWithSoftDelete;
 
         protected Entity()
         {

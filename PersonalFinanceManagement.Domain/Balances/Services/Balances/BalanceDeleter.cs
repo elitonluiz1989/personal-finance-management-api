@@ -1,9 +1,9 @@
-﻿using PersonalFinanceManagement.Domain.Balances.Contracts;
+﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 
-namespace PersonalFinanceManagement.Domain.Balances.Services
+namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
 {
     public class BalanceDeleter : BaseDeleter<Balance, int>, IBalanceDeleter
     {
@@ -11,7 +11,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services
             INotificationService notificationService,
             IBalanceRepository repository
         )
-            :base(notificationService, repository)
+            : base(notificationService, repository)
         {
         }
 
@@ -29,11 +29,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Services
                 _notificationService.AddNotification("Balance has installments and can't to deleted.");
 
                 return;
-            }
-
-            if (balance.Transactions.Any())
-            {
-                _notificationService.AddNotification("Balance has installments and can't to deleted.");
             }
         }
     }

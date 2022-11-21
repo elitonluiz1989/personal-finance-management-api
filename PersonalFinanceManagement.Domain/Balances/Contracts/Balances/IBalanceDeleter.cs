@@ -1,4 +1,4 @@
-﻿namespace PersonalFinanceManagement.Domain.Balances.Contracts
+﻿namespace PersonalFinanceManagement.Domain.Balances.Contracts.Balances
 {
     public interface IBalanceDeleter
     {

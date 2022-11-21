@@ -9,6 +9,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Filters
         public List<BalanceTypeEnum> Types { get; set; } = new List<BalanceTypeEnum>();
         public List<BalanceStatusEnum> Status { get; set; } = new List<BalanceStatusEnum>();
         public bool? Financed { get; set; }
-        public short? NumberOfInstallments { get; set; }
+        public short? InstallmentsNumber { get; set; }
     }
 }
