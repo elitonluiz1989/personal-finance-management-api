@@ -1,20 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PersonalFinanceManagement.Domain.Balances.Entities;
-using PersonalFinanceManagement.Domain.Balances.Enums;
 
 namespace PersonalFinanceManagement.Infra.Data.Mappings
 {
-    internal class BalanceMapping : IEntityTypeConfiguration<Balance>
+    internal class BalanceMapping : BaseMapping<Balance, int>, IEntityTypeConfiguration<Balance>
     {
         public void Configure(EntityTypeBuilder<Balance> builder)
         {
             builder.ToTable("Balances");
 
-            builder.HasKey(p => p.Id);
-
-            builder.Property(p => p.Id)
-                .HasColumnOrder(0);
+            BaseConfigure(builder);
 
             builder.Property(p => p.UserId)
                 .HasColumnOrder(1);
@@ -48,8 +44,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .IsRequired();
 
             builder.Property(p => p.InstallmentsNumber)
-                .HasColumnOrder(8)
-                .IsRequired(false);
+                .HasColumnOrder(8);
 
             builder.Property(p => p.CreatedAt)
                 .HasColumnOrder(9)
@@ -67,8 +62,6 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .WithMany(o => o.Balances)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Ignore(p => p.Errors);
         }
     }
 }

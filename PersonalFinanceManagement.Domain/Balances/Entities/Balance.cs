@@ -15,13 +15,14 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public DateTime Date { get; set; }
         public decimal Value { get; set; }
         public bool Financed { get; set; }
-        public short? InstallmentsNumber { get; set; }
+        public short InstallmentsNumber { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpadtedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
         public virtual User? User { get; set; }
         public virtual List<Installment> Installments { get; set; } = new List<Installment>();
+        public virtual List<RefinancedBalance> RefinancedBalances { get; set; } = new List<RefinancedBalance>();
 
         public Balance()
         {
@@ -70,16 +71,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             Validator.RuleFor(p => Value)
                 .GreaterThan(0);
 
-            Validator.RuleFor(p => Financed)
-                .NotNull();
-
-            Validator.RuleFor<int?>(p => InstallmentsNumber)
-                .NotNull()
+            Validator.RuleFor<int>(p => InstallmentsNumber)
                 .GreaterThan(0)
                 .When(p => Financed is true);
-
-            Validator.RuleFor(p => CreatedAt)
-                .NotNull();
         }
     }
 }

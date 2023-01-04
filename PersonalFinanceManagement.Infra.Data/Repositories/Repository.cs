@@ -8,23 +8,23 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
         where TEntity : Entity<TKey>
         where TKey : struct
     {
-        protected readonly IDBContext DBContenxt;
+        protected readonly IDBContext Context;
 
         public Repository(IDBContext dbContext)
         {
-            DBContenxt = dbContext;
+            Context = dbContext;
         }
 
         public void Insert(TEntity entity)
         {
-            DBContenxt.Set<TEntity>().Add(entity);
+            Context.Set<TEntity>().Add(entity);
         }
 
         public void Update(TEntity entity)
         {
             DetachLocalEntity(entity);
 
-            DBContenxt.Entry(entity).State = EntityState.Modified;
+            Context.Entry(entity).State = EntityState.Modified;
         }
 
         public async Task Delete(TKey id)
@@ -39,23 +39,36 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
 
         public void Delete(TEntity entity)
         {
-            if (entity.IsRecorded && entity.WithSoftDelete)
+            if (VerifyIfIsSoftDelete(entity))
             {
-                ((IEntityWithSoftDelete)entity).SetAsDeleted();
-
-                Update(entity);
+                SetAsDeleted(entity);
 
                 return;
             }
 
             DetachLocalEntity(entity);
 
-            DBContenxt.Set<TEntity>().Remove(entity);
+            Context.Set<TEntity>().Remove(entity);
+        }
+
+        public void Delete(IEnumerable<TEntity> entities)
+        {
+            if (VerifyIfIsSoftDelete(entities.First()))
+            {
+                foreach (var entity in entities)
+                {
+                    SetAsDeleted(entity);
+                }
+
+                return;
+            }
+
+            Context.Set<TEntity>().RemoveRange(entities);
         }
 
         public IQueryable<TEntity> Query()
         {
-            return DBContenxt.Set<TEntity>();
+            return Context.Set<TEntity>();
         }
 
         public async Task<IEnumerable<TEntity>> All()
@@ -66,7 +79,7 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
         public async Task<TEntity?> Find(TKey id)
         {
             var query = Query();
-            
+
             return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
@@ -76,21 +89,27 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
                 ((IEntityWithRegistrationDates)entity).SetRegistrationDates();
 
             if (entity.IsRecorded)
-            {
-                Update(entity);
-
                 return;
-            }
 
             Insert(entity);
         }
 
+        private static bool VerifyIfIsSoftDelete(TEntity entity)
+        {
+            return entity.IsRecorded && entity.WithSoftDelete;
+        }
+
+        private void SetAsDeleted(TEntity entity)
+        {
+            ((IEntityWithSoftDelete)entity).SetAsDeleted();
+        }
+
         private void DetachLocalEntity(TEntity entity)
         {
-            var localContextEntity = DBContenxt.Set<TEntity>().Local.FirstOrDefault(e => e.Id.Equals(entity.Id));
+            var localContextEntity = Context.Set<TEntity>().Local.FirstOrDefault(e => e.Id.Equals(entity.Id));
 
             if (localContextEntity is not null)
-                DBContenxt.Entry(localContextEntity).State = EntityState.Detached;
+                Context.Entry(localContextEntity).State = EntityState.Detached;
         }
     }
 }

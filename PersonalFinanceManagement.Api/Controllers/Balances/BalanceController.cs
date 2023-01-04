@@ -38,7 +38,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
             [FromServices] IBalanceStore store
         )
         {
-            await store.Store(dto);
+            await store.Store(dto, AuthUserId);
 
             if (HasNotifications())
                 return ResponseWithNotifications();

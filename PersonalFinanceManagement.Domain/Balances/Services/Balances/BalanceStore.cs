@@ -12,13 +12,13 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
     public class BalanceStore : Store<Balance, int>, IBalanceStore
     {
         private readonly IUserRepository _userRepository;
-        private readonly IBalanceInstallmentStoreService _balanceInstallmentStoreService;
+        private readonly IBalanceInstallmentStore _balanceInstallmentStoreService;
 
         public BalanceStore(
             INotificationService notificationService,
             IBalanceRepository repository,
             IUserRepository userRepository,
-            IBalanceInstallmentStoreService balanceInstallmentStoreService
+            IBalanceInstallmentStore balanceInstallmentStoreService
         )
             : base(notificationService, repository)
         {
@@ -26,33 +26,35 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             _balanceInstallmentStoreService = balanceInstallmentStoreService;
         }
 
-        public async Task Store(BalanceDto dto)
+        public async Task Store(BalanceDto dto, int userId, bool fromRefinance = false)
         {
             if (ValidateDto(dto) is false)
                 return;
 
-            var balance = await SetBalance(dto);
+            dto.UserId = userId;
 
-            if (balance is null || ValidateEntity(balance) is false)
+            var balance = await SetBalance(dto, fromRefinance);
+
+            if (ValidateEntity(balance) is false || balance is null)
                 return;
 
-            await FinanceBalance(balance, dto);
+            await FinanceBalance(balance, dto, fromRefinance);
 
-            if (_notificationService.HasNotifications())
+            if (HasNotifications)
                 return;
 
             SaveEntity(balance);
         }
 
 
-        protected async Task<Balance?> SetBalance(BalanceDto dto)
+        protected async Task<Balance?> SetBalance(BalanceDto dto, bool fromRefinance = false)
         {
-            if (_notificationService.HasNotifications())
+            if (HasNotifications)
                 return null;
 
             if (dto.IsRecorded)
-                return await UpdateBalance(dto);
-                
+                return await UpdateBalance(dto, fromRefinance);
+
             return await CreateBalance(dto);
         }
 
@@ -60,7 +62,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
         {
             var user = await GetUser(balanceDto.UserId);
 
-            if (_notificationService.HasNotifications())
+            if (HasNotifications)
                 return null;
 
             return new Balance()
@@ -69,20 +71,20 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
                 Name = balanceDto.Name,
                 Type = balanceDto.Type,
                 Status = balanceDto.Status,
-                Date= balanceDto.Date,
+                Date = balanceDto.Date,
                 Value = balanceDto.Value,
                 Financed = balanceDto.Financed,
-                InstallmentsNumber = balanceDto.InstallmentsNumber,
+                InstallmentsNumber = balanceDto.InstallmentsNumberValidate
             };
         }
 
-        private async Task<Balance?> UpdateBalance(BalanceDto balanceDto)
+        private async Task<Balance?> UpdateBalance(BalanceDto balanceDto, bool fromRefinance = false)
         {
             var balance = await _repository.Find(balanceDto.Id);
 
             if (balance is null)
             {
-                _notificationService.AddNotification($"{nameof(balance)} is null");
+                AddNotification($"{nameof(balance)} is null");
 
                 return null;
             }
@@ -96,6 +98,21 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             if (balanceDto.Status != default && balance.Status != balanceDto.Status)
                 balance.Status = balanceDto.Status;
 
+            if (fromRefinance)
+            {
+                if (balance.Date != balanceDto.Date)
+                    balance.Date = balanceDto.Date;
+
+                if (balance.Value != balanceDto.Value)
+                    balance.Value = balanceDto.Value;
+
+                if (balance.Financed != balanceDto.Financed)
+                    balance.Financed = balanceDto.Financed;
+
+                if (balance.InstallmentsNumber != balanceDto.InstallmentsNumber)
+                    balance.InstallmentsNumber = balanceDto.InstallmentsNumber;
+            }
+
             return balance;
         }
 
@@ -104,14 +121,14 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             var user = await _userRepository.Find(userId);
 
             if (user is null)
-                _notificationService.AddNotification($"{nameof(user)} is null");
+                AddNotification($"{nameof(user)} is null");
 
             return user;
         }
 
-        private async Task FinanceBalance(Balance balance, BalanceDto dto)
+        private async Task FinanceBalance(Balance balance, BalanceDto dto, bool fromRefinance = false)
         {
-            if (balance.IsRecorded)
+            if (balance.IsRecorded && fromRefinance is false)
                 return;
 
             await _balanceInstallmentStoreService.Store(balance, dto.Financed, dto.InstallmentsNumber);

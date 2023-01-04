@@ -4,19 +4,18 @@ using PersonalFinanceManagement.Domain.Base.Entites;
 
 namespace PersonalFinanceManagement.Domain.Base.Services
 {
-    public abstract class Store<TEntity, TKey>
+    public abstract class Store<TEntity, TKey> : NotifiableService
         where TEntity : Entity<TKey>
         where TKey : struct
     {
-        protected readonly INotificationService _notificationService;
         protected readonly IRepository<TEntity, TKey> _repository;
 
         public Store(
             INotificationService notificationService,
             IRepository<TEntity, TKey> repository
         )
+            : base(notificationService)
         {
-            _notificationService = notificationService;
             _repository = repository;
         }
 
@@ -25,19 +24,19 @@ namespace PersonalFinanceManagement.Domain.Base.Services
             if (dto is not null)
                 return true;
 
-            _notificationService.AddNotification($"{nameof(dto)} is null");
+            NotificationService.AddNotification($"{nameof(dto)} is null");
 
             return false;
         }
 
         protected bool ValidateEntity(TEntity? entity)
         {
-            if (entity is null || _notificationService.HasNotifications())
+            if (entity is null || HasNotifications)
                 return false;
 
             if (entity.Validate() is false)
             {
-                _notificationService.AddNotification(entity.Errors);
+                NotificationService.AddNotification(entity.Errors);
 
                 return false;
             }
@@ -48,13 +47,7 @@ namespace PersonalFinanceManagement.Domain.Base.Services
         protected void SaveEntity(TEntity? entity)
         {
             if (entity is null ||
-                _notificationService.HasNotifications() is true)
-                return;
-
-            if (entity.WithRegistrationDates)
-                ((IEntityWithRegistrationDates)entity).SetRegistrationDates();
-
-            if (entity.IsRecorded is true )
+                HasNotifications is true)
                 return;
 
             _repository.Save(entity);

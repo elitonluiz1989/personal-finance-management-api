@@ -39,7 +39,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Date = table.Column<DateTime>(type: "date", nullable: false),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Financed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    InstallmentsNumber = table.Column<short>(type: "smallint", nullable: true),
+                    InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpadtedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -104,6 +104,42 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefinancedBalances",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    BalanceId = table.Column<int>(type: "int", nullable: false),
+                    OriginalDate = table.Column<DateTime>(type: "date", nullable: false),
+                    OriginalValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OriginalFinanced = table.Column<bool>(type: "bit", nullable: false),
+                    OriginalInstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
+                    Date = table.Column<DateTime>(type: "date", nullable: false),
+                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Financed = table.Column<bool>(type: "bit", nullable: false),
+                    InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefinancedBalances", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefinancedBalances_Balances_BalanceId",
+                        column: x => x.BalanceId,
+                        principalTable: "Balances",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RefinancedBalances_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TransactionItems",
                 columns: table => new
                 {
@@ -141,6 +177,16 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 column: "BalanceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefinancedBalances_BalanceId",
+                table: "RefinancedBalances",
+                column: "BalanceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefinancedBalances_UserId",
+                table: "RefinancedBalances",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TransactionItems_InstallmentId",
                 table: "TransactionItems",
                 column: "InstallmentId");
@@ -170,6 +216,9 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "RefinancedBalances");
+
             migrationBuilder.DropTable(
                 name: "TransactionItems");
 

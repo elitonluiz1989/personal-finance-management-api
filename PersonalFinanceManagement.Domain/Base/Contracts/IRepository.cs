@@ -10,6 +10,7 @@ namespace PersonalFinanceManagement.Domain.Base.Contracts
         void Update(TEntity entity);
         Task Delete(TKey id);
         void Delete(TEntity entity);
+        void Delete(IEnumerable<TEntity> entities);
         IQueryable<TEntity> Query();
         Task<IEnumerable<TEntity>> All();
         Task<TEntity?> Find(TKey id);

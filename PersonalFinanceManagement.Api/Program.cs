@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PersonalFinanceManagement.Api;
+using PersonalFinanceManagement.Api.Middlewares;
 using PersonalFinanceManagement.Infra.Data.Contexts;
 using System.Text;
 
@@ -98,6 +99,8 @@ async Task ConfigureApplication(WebApplication app)
 
     app.UseAuthentication();
     app.UseAuthorization();
+
+    app.UseMiddleware<JwtMiddleware>();
 
     app.MapControllers();
 

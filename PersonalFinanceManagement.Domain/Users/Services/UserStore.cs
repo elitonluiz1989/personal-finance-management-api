@@ -10,7 +10,7 @@ namespace PersonalFinanceManagement.Domain.Users.Services
     public class UserStore : BaseStore<User, int>, IUserStore
     {
         public UserStore(
-            INotificationService notificationService, 
+            INotificationService notificationService,
             IUserRepository repository
         )
             : base(notificationService, repository)
@@ -21,7 +21,7 @@ namespace PersonalFinanceManagement.Domain.Users.Services
         {
             var userDto = ConvertDto(dto);
 
-            if (userDto is null || _notificationService.HasNotifications())
+            if (userDto is null || HasNotifications)
                 return null;
 
             if (userDto.IsRecorded)
@@ -46,11 +46,12 @@ namespace PersonalFinanceManagement.Domain.Users.Services
         {
             var user = await _repository.Find(userDto.Id);
 
-            if (user is null) {
-                _notificationService.AddNotification($"{nameof(user)} is null");
+            if (user is null)
+            {
+                AddNotification($"{nameof(user)} is null");
 
                 return null;
-            }            
+            }
 
             if (!string.IsNullOrEmpty(userDto.UserName))
                 user.Name = userDto.Name;
@@ -72,9 +73,7 @@ namespace PersonalFinanceManagement.Domain.Users.Services
             var userDto = dto as UserStoreDto;
 
             if (userDto is null)
-            {
-                _notificationService.AddNotification($"{nameof(userDto)} is null");
-            }
+                AddNotification($"{nameof(userDto)} is null");
 
             return userDto;
         }

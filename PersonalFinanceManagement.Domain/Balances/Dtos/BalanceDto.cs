@@ -1,10 +1,12 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Dtos;
+using System.Text.Json.Serialization;
 
 namespace PersonalFinanceManagement.Domain.Balances.Dtos
 {
     public record BalanceDto : RecordedDto<int>
     {
+        [JsonIgnore]
         public int UserId { get; set; }
         public string Name { get; set; } = string.Empty;
         public BalanceTypeEnum Type { get; set; }
@@ -12,7 +14,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public DateTime Date { get; set; }
         public decimal Value { get; set; }
         public bool Financed { get; set; }
-        public short? InstallmentsNumber { get; set; }
+        public short InstallmentsNumber { get; set; }
         public List<InstallmentDto> Installments { get; set; } = new();
+
+        public short InstallmentsNumberValidate => Financed ? InstallmentsNumber : (short)1;
     }
 }

@@ -12,7 +12,7 @@ using PersonalFinanceManagement.Infra.Data.Contexts;
 namespace PersonalFinanceManagement.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultDBContext))]
-    [Migration("20221121011613_CreateInitialTables")]
+    [Migration("20230104222231_CreateInitialTables")]
     partial class CreateInitialTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,7 +51,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasDefaultValue(false)
                         .HasColumnOrder(7);
 
-                    b.Property<short?>("InstallmentsNumber")
+                    b.Property<short>("InstallmentsNumber")
                         .HasColumnType("smallint")
                         .HasColumnOrder(8);
 
@@ -93,39 +93,39 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<decimal>("AmountPaid")
                         .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(6);
 
                     b.Property<int>("BalanceId")
                         .HasColumnType("int")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(1);
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(7);
 
                     b.Property<short>("Number")
                         .HasColumnType("smallint")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(3);
 
                     b.Property<int>("Reference")
                         .HasColumnType("int")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(2);
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(1)
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(4);
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(5);
 
                     b.HasKey("Id");
 
@@ -134,34 +134,102 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.ToTable("Installments", (string)null);
                 });
 
+            modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.RefinancedBalance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Active")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnOrder(11);
+
+                    b.Property<int>("BalanceId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(12);
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("date")
+                        .HasColumnOrder(7);
+
+                    b.Property<bool>("Financed")
+                        .HasColumnType("bit")
+                        .HasColumnOrder(9);
+
+                    b.Property<short>("InstallmentsNumber")
+                        .HasColumnType("smallint")
+                        .HasColumnOrder(10);
+
+                    b.Property<DateTime>("OriginalDate")
+                        .HasColumnType("date")
+                        .HasColumnOrder(3);
+
+                    b.Property<bool>("OriginalFinanced")
+                        .HasColumnType("bit")
+                        .HasColumnOrder(5);
+
+                    b.Property<short>("OriginalInstallmentsNumber")
+                        .HasColumnType("smallint")
+                        .HasColumnOrder(6);
+
+                    b.Property<decimal>("OriginalValue")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(4);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(8);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BalanceId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefinancedBalances", (string)null);
+                });
+
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("date")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(3);
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(5);
 
                     b.Property<int>("Type")
                         .HasColumnType("int")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(2);
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(1);
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(4);
 
                     b.HasKey("Id");
 
@@ -175,23 +243,23 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("InstallmentId")
                         .HasColumnType("int")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(2);
 
                     b.Property<bool>("PartiallyPaid")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false)
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(3);
 
                     b.Property<int>("TransactionId")
                         .HasColumnType("int")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(1);
 
                     b.HasKey("Id");
 
@@ -207,36 +275,36 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnOrder(1);
+                        .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(3);
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(1);
 
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(4);
 
                     b.Property<short>("Role")
                         .HasColumnType("smallint")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(5);
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(2);
 
                     b.HasKey("Id");
 
@@ -269,6 +337,25 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Balance");
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.RefinancedBalance", b =>
+                {
+                    b.HasOne("PersonalFinanceManagement.Domain.Balances.Entities.Balance", "Balance")
+                        .WithMany("RefinancedBalances")
+                        .HasForeignKey("BalanceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PersonalFinanceManagement.Domain.Users.Entities.User", "User")
+                        .WithMany("RefinancedBalances")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Balance");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.Transaction", b =>
@@ -304,6 +391,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.Balance", b =>
                 {
                     b.Navigation("Installments");
+
+                    b.Navigation("RefinancedBalances");
                 });
 
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.Installment", b =>
@@ -319,6 +408,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Users.Entities.User", b =>
                 {
                     b.Navigation("Balances");
+
+                    b.Navigation("RefinancedBalances");
 
                     b.Navigation("Transactions");
                 });

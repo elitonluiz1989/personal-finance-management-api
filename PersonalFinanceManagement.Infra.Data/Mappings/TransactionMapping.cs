@@ -4,38 +4,33 @@ using PersonalFinanceManagement.Domain.Balances.Entities;
 
 namespace PersonalFinanceManagement.Infra.Data.Mappings
 {
-    internal class TransactionMapping : IEntityTypeConfiguration<Transaction>
+    internal class TransactionMapping : BaseMapping<Transaction, int>, IEntityTypeConfiguration<Transaction>
     {
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
             builder.ToTable("Transactions");
 
-            builder.HasKey(p => p.Id);
-
-            builder.Property(p => p.Id)
-                .HasColumnOrder(1);
+            BaseConfigure(builder);
 
             builder.Property(p => p.UserId)
-                .HasColumnOrder(2);
+                .HasColumnOrder(1);
 
             builder.Property(p => p.Type)
-                .HasColumnOrder(3)
+                .HasColumnOrder(2)
                 .IsRequired();
 
             builder.Property(p => p.Date)
-                .HasColumnOrder(4)
+                .HasColumnOrder(3)
                 .HasColumnType("date")
                 .IsRequired();
 
             builder.Property(p => p.Value)
-                .HasColumnOrder(5)
+                .HasColumnOrder(4)
                 .IsRequired();
 
             builder.Property(p => p.DeletedAt)
-                .HasColumnOrder(6)
+                .HasColumnOrder(5)
                 .IsRequired(false);
-
-            builder.Ignore(p => p.Errors);
         }
     }
 }

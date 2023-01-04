@@ -2,7 +2,7 @@
 
 namespace PersonalFinanceManagement.Domain.Balances.Contracts.Installments
 {
-    public interface IBalanceInstallmentStoreService
+    public interface IBalanceInstallmentStore
     {
         Task Store(Balance balance, bool Financed, short? installmentsNumber);
     }

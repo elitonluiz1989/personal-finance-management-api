@@ -5,12 +5,12 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 
 namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 {
-    public class BalanceInstallmentStoreService : IBalanceInstallmentStoreService
+    public class BalanceInstallmentStore : IBalanceInstallmentStore
     {
         private readonly INotificationService _notificationService;
         private readonly IInstallmentStore _installmentStore;
 
-        public BalanceInstallmentStoreService(
+        public BalanceInstallmentStore(
             INotificationService notificationService,
             IInstallmentStore installmentStore
         )

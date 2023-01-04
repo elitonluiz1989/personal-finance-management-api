@@ -60,11 +60,12 @@ namespace PersonalFinanceManagement.Api.Services
             return _handler.CreateToken(descriptor);
         }
 
-        private SecurityTokenDescriptor CreateDescriptor(AuthenticationDto dto, User user)
+        private static SecurityTokenDescriptor CreateDescriptor(AuthenticationDto dto, User user)
         {
             var key = Encoding.ASCII.GetBytes(dto.AppSecret);
             var claims = new List<Claim>(2)
             {
+                new Claim(ClaimTypes.Sid, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Role, user.Role.GetHashCode().ToString())
             };

@@ -7,6 +7,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Base
     [Route("[controller]")]
     public abstract class BaseApiController : Controller
     {
+        protected int AuthUserId => GetAuthUserId();
         private readonly INotificationService _notificationService;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -34,6 +35,24 @@ namespace PersonalFinanceManagement.Api.Controllers.Base
             _unitOfWork.Commit();
 
             return Ok(true);
+        }
+
+        private int GetAuthUserId()
+        {
+            if (HttpContext is null)
+                return default;
+
+            var userIdValue = HttpContext.Items.FirstOrDefault(i => i.Key.ToString() == "UserId").Value;
+
+            if (userIdValue is null)
+                return default;
+
+            var success = int.TryParse(userIdValue.ToString(), out int userId);
+
+            if (success is false)
+                return default;
+
+            return userId;
         }
     }
 }

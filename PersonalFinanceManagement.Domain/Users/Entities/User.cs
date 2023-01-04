@@ -14,6 +14,7 @@ namespace PersonalFinanceManagement.Domain.Users.Entities
         public UserRoleEnum Role { get; set; }
 
         public virtual List<Balance> Balances { get; set; } = new List<Balance>();
+        public virtual List<RefinancedBalance> RefinancedBalances { get; set; } = new List<RefinancedBalance>();
         public virtual List<Transaction> Transactions { get; set; } = new List<Transaction>();
 
         public User()

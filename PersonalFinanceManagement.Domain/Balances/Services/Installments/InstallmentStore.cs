@@ -30,7 +30,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 
             if (balance is null)
             {
-                _notificationService.AddNotification($"{balance} is null");
+                AddNotification($"{balance} is null");
 
                 return;
             }
@@ -53,7 +53,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 
         private async Task<Installment?> SetInstallment(InstallmentStoreDto dto, Balance balance)
         {
-            if (_notificationService.HasNotifications())
+            if (HasNotifications)
                 return null;
 
             if (dto.IsRecorded)
@@ -62,10 +62,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             return CreateInstallment(dto, balance);
         }
 
-        private Installment? CreateInstallment(InstallmentStoreDto dto, Balance balance)
+        private static Installment? CreateInstallment(InstallmentStoreDto dto, Balance balance)
         {
             return new Installment()
             {
+                BalanceId = balance.Id,
                 Balance = balance,
                 Reference = dto.Reference,
                 Number = dto.Number,
@@ -79,7 +80,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 
             if (installment is null)
             {
-                _notificationService.AddNotification($"{nameof(installment)} is null");
+                AddNotification($"{nameof(installment)} is null");
 
                 return null;
             }

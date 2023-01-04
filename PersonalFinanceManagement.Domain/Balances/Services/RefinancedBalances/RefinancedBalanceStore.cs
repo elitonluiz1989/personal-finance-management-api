@@ -1,0 +1,191 @@
+﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
+using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
+using PersonalFinanceManagement.Domain.Balances.Contracts.RefinanceBalances;
+using PersonalFinanceManagement.Domain.Balances.Dtos;
+using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Services;
+using PersonalFinanceManagement.Domain.Users.Contracts;
+using PersonalFinanceManagement.Domain.Users.Entities;
+
+namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
+{
+    public class RefinancedBalanceStore : NotifiableService, IRefinancedBalanceStore
+    {
+        private readonly IBalanceRepository _balanceRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IInstallmentRepository _installmentRepository;
+        private readonly IRefinancedBalanceRepository _repository;
+        private readonly IBalanceStore _balanceStore;
+
+        public RefinancedBalanceStore(
+            INotificationService notificationService,
+            IBalanceRepository balanceRepository,
+            IUserRepository userRepository,
+            IInstallmentRepository installmentRepository,
+            IBalanceStore balanceStore,
+            IRefinancedBalanceRepository repository
+        )
+            : base(notificationService)
+        {
+            _balanceRepository = balanceRepository;
+            _userRepository = userRepository;
+            _installmentRepository = installmentRepository;
+            _balanceStore = balanceStore;
+            _repository = repository;
+        }
+
+        public async Task Store(RefinancedBalanceStoreDto dto, int userId)
+        {
+            if (ValidateDto(dto) is false)
+                return;
+
+            var balance = await _balanceRepository.FindWithInstallments(dto.BalanceId);
+
+            if (ValidateEntity(balance) is false || balance is null)
+                return;
+
+            dto.UserId = userId;
+
+            var refinancedBalance = await SetRefinancedBalance(dto, balance);
+
+            if (HasNotifications || refinancedBalance is null)
+                return;
+
+            SaveRefinancing(refinancedBalance);
+            await SaveNewBalance(balance, refinancedBalance);
+
+        }
+
+        private bool ValidateDto(RefinancedBalanceStoreDto dto)
+        {
+            if (dto is not null)
+                return true;
+
+            AddNotification($"${nameof(RefinancedBalanceStoreDto)} is null");
+
+            return false;
+        }
+
+        private bool ValidateEntity(Balance? balance)
+        {
+            if (balance is not null)
+                return true;
+
+            AddNotification($"{nameof(Balance)} is null");
+
+            return false;
+        }
+
+        private async Task<RefinancedBalance?> SetRefinancedBalance(RefinancedBalanceStoreDto dto, Balance balance)
+        {
+            await InactivatePreviousRefinancing(balance.Id);
+
+            var user = await _userRepository.Find(dto.UserId);
+
+            if (user is null)
+            {
+                AddNotification($"{nameof(User)} is null");
+
+                return null;
+            }
+
+            return new RefinancedBalance
+            {
+                User = user,
+                Balance = balance,
+                OriginalDate = balance.Date,
+                OriginalValue = balance.Value,
+                OriginalFinanced = balance.Financed,
+                OriginalInstallmentsNumber = balance.InstallmentsNumber,
+                Date = SetBalanceDate(balance, dto),
+                Value = SetBalanceValue(balance, dto),
+                Financed = SetBalanceFinanced(balance, dto),
+                InstallmentsNumber = SetInstallmentsNumber(balance, dto),
+                Active = true
+            };
+        }
+
+        private async Task InactivatePreviousRefinancing(int balanaceId)
+        {
+            var refinancedBalances = await _repository.GetAllByBalanceId(balanaceId);
+
+            if (refinancedBalances.Any() is false)
+                return;
+
+            foreach (var refinancedBalance in refinancedBalances)
+            {
+                refinancedBalance.Active = false;
+            }
+        }
+
+        private static DateTime SetBalanceDate(Balance balance, RefinancedBalanceStoreDto dto)
+        {
+            if (dto.Date.Equals(default) is false && balance.Date != dto.Date)
+                return dto.Date;
+
+            return balance.Date;
+        }
+
+        private static decimal SetBalanceValue(Balance balance, RefinancedBalanceStoreDto dto)
+        {
+            if (dto.Value.Equals(default) is false && balance.Value != dto.Value)
+                return dto.Value;
+
+            return balance.Value;
+        }
+
+        private static bool SetBalanceFinanced(Balance balance, RefinancedBalanceStoreDto dto)
+        {
+            return (balance.Financed != dto.Financed) ? dto.Financed : balance.Financed;
+        }
+
+        private static short SetInstallmentsNumber(Balance balance, RefinancedBalanceStoreDto dto)
+        {
+            if (dto.Financed is false)
+                return 1;
+
+            return (balance.InstallmentsNumber != dto.InstallmentsNumber) ? dto.InstallmentsNumber : balance.InstallmentsNumber;
+        }
+
+        private void SaveRefinancing(RefinancedBalance refinancedBalance)
+        {
+            if (refinancedBalance.Validate())
+                _repository.Save(refinancedBalance);
+
+            NotificationService.AddNotification(refinancedBalance.Errors);
+        }
+
+        private async Task SaveNewBalance(Balance balance, RefinancedBalance refinancedBalance)
+        {
+            DeleteOldInstallments(balance);
+
+            var balanceDto = CreateBalanceToRefinance(balance, refinancedBalance);
+
+            await _balanceStore.Store(balanceDto, refinancedBalance.UserId, true);
+        }
+
+        private void DeleteOldInstallments(Balance balance)
+        {
+            if (balance.Installments.Any() is false)
+                return;
+
+            _installmentRepository.Delete(balance.Installments);
+        }
+
+        private static BalanceDto CreateBalanceToRefinance(Balance balance, RefinancedBalance refinancedBalance)
+        {
+            return new BalanceDto()
+            {
+                Id = balance.Id,
+                Name = balance.Name,
+                Type = balance.Type,
+                Status = balance.Status,
+                Date = refinancedBalance.Date,
+                Value = refinancedBalance.Value,
+                Financed = refinancedBalance.Financed,
+                InstallmentsNumber = refinancedBalance.InstallmentsNumber
+            };
+        }
+    }
+}
