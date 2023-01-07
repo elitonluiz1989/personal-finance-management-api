@@ -7,7 +7,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 {
     public class RefinancedBalance : Entity<int>, IEntityWithRegistrationDates
     {
-        public int UserId { get; set; }
         public int BalanceId { get; set; }
         public DateTime OriginalDate { get; set; }
         public decimal OriginalValue { get; set; }
@@ -32,14 +31,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         {
             if (Validator is null)
                 return;
-
-            Validator.RuleFor(p => UserId)
-                .GreaterThan(0)
-                .When(p => User is null);
-
-            Validator.RuleFor(p => User)
-                .NotNull()
-                .When(p => UserId == default);
 
             Validator.RuleFor(p => BalanceId)
                 .GreaterThan(0)

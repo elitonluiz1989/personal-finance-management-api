@@ -31,10 +31,13 @@ namespace PersonalFinanceManagement.Domain.Base.Services
 
         protected bool ValidateEntity(TEntity? entity)
         {
-            if (entity is null || HasNotifications)
+            if (HasNotifications)
                 return false;
 
-            if (entity.Validate() is false)
+            if (ValidateNullableObject(entity) is false)
+                return false;
+
+            if (entity?.Validate() is false)
             {
                 NotificationService.AddNotification(entity.Errors);
 

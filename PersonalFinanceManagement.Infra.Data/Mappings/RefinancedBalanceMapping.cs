@@ -12,56 +12,48 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             BaseConfigure(builder);
 
-            builder.Property(p => p.UserId)
+            builder.Property(p => p.BalanceId)
                 .HasColumnOrder(1);
 
-            builder.Property(p => p.BalanceId)
-                .HasColumnOrder(2);
-
             builder.Property(p => p.OriginalDate)
-                .HasColumnOrder(3)
+                .HasColumnOrder(2)
                 .HasColumnType("date")
                 .IsRequired();
 
             builder.Property(p => p.OriginalValue)
-                .HasColumnOrder(4)
+                .HasColumnOrder(3)
                 .IsRequired();
 
             builder.Property(p => p.OriginalFinanced)
-                .HasColumnOrder(5)
+                .HasColumnOrder(4)
                 .IsRequired();
 
             builder.Property(p => p.OriginalInstallmentsNumber)
-                .HasColumnOrder(6);
+                .HasColumnOrder(5);
 
             builder.Property(p => p.Date)
-                .HasColumnOrder(7)
+                .HasColumnOrder(6)
                 .HasColumnType("date")
                 .IsRequired();
 
             builder.Property(p => p.Value)
-                .HasColumnOrder(8)
+                .HasColumnOrder(7)
                 .IsRequired();
 
             builder.Property(p => p.Financed)
-                .HasColumnOrder(9)
+                .HasColumnOrder(8)
                 .IsRequired();
 
             builder.Property(p => p.InstallmentsNumber)
-                .HasColumnOrder(10);
+                .HasColumnOrder(9);
 
             builder.Property(p => p.Active)
                 .HasDefaultValue(true)
-                .HasColumnOrder(11);
+                .HasColumnOrder(10);
 
             builder.Property(p => p.CreatedAt)
-                .HasColumnOrder(12)
+                .HasColumnOrder(11)
                 .IsRequired();
-
-            builder.HasOne(p => p.User)
-                .WithMany(o => o.RefinancedBalances)
-                .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.Balance)
                 .WithMany(o => o.RefinancedBalances)

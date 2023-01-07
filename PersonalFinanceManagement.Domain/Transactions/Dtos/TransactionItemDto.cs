@@ -1,4 +1,6 @@
-﻿namespace PersonalFinanceManagement.Domain.Balances.Dtos
+﻿using PersonalFinanceManagement.Domain.Balances.Dtos;
+
+namespace PersonalFinanceManagement.Domain.Transactions.Dtos
 {
     public class TransactionItemDto
     {

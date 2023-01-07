@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Api.Attributes;
 using PersonalFinanceManagement.Api.Controllers.Base;
+using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
+using PersonalFinanceManagement.Domain.Balances.Dtos;
+using PersonalFinanceManagement.Domain.Balances.Filters;
 using PersonalFinanceManagement.Domain.Base.Contracts;
-using PersonalFinanceManagement.Domain.Users.Contracts;
-using PersonalFinanceManagement.Domain.Users.Dtos;
 using PersonalFinanceManagement.Domain.Users.Enums;
-using PersonalFinanceManagement.Domain.Users.Filters;
 
-namespace PersonalFinanceManagement.Api.Controllers.Users
+namespace PersonalFinanceManagement.Api.Controllers.Balances
 {
-    public class UserController : BaseApiController
+    public class BalancesController : BaseApiController
     {
-        public UserController(
+        public BalancesController(
             INotificationService notificationService,
             IUnitOfWork unitOfWork
         )
@@ -20,10 +20,10 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         }
 
         [HttpGet()]
-        [RolesAuthorized(UserRoleEnum.Administrator)]
+        [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
         public async Task<IActionResult> Get(
-            [FromQuery] UserFilter filter,
-            [FromServices] IUserSpecification specification
+            [FromQuery] BalanceFilter filter,
+            [FromServices] IBalanceSpecification specification
         )
         {
             var results = await specification.Get(filter);
@@ -34,16 +34,15 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         [HttpPost]
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Post(
-            [FromBody] UserStoreDto dto,
-            [FromServices] IUserStore store,
-            [FromServices] IUnitOfWork unitOfWork
+            [FromBody] BalanceDto dto,
+            [FromServices] IBalanceStore store
         )
         {
             await store.Store(dto);
 
             if (HasNotifications())
                 return ResponseWithNotifications();
-            
+
             return ResponseWithCommit();
         }
 
@@ -51,8 +50,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Patch(
             int id,
-            [FromServices] IUserDeleter deleter,
-            [FromServices] IUnitOfWork unitOfWork
+            [FromServices] IBalanceDeleter deleter
         )
         {
             await deleter.Delete(id);

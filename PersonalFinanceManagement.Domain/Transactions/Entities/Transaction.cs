@@ -1,17 +1,19 @@
 ﻿using FluentValidation;
-using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Transactions.Enums;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
-namespace PersonalFinanceManagement.Domain.Balances.Entities
+namespace PersonalFinanceManagement.Domain.Transactions.Entities
 {
-    public class Transaction : Entity<int>, IEntityWithSoftDelete
+    public class Transaction : Entity<int>, IEntityWithRegistrationDates, IEntityWithSoftDelete
     {
         public int UserId { get; set; }
         public TransactionTypeEnum Type { get; set; }
         public DateTime Date { get; set; }
         public decimal Value { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpadtedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
         public virtual User? User { get; set; }
@@ -19,6 +21,18 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
         public Transaction()
         {
+        }
+
+        public void SetRegistrationDates()
+        {
+            if (IsRecorded)
+            {
+                UpadtedAt = DateTime.Now;
+            }
+            else
+            {
+                CreatedAt = DateTime.Now;
+            }            
         }
 
         public void SetAsDeleted()
@@ -37,7 +51,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
             Validator.RuleFor(p => User)
                 .NotNull()
-                .When(p => UserId <= 0 );
+                .When(p => UserId <= 0);
 
             Validator.RuleFor(p => Type)
                 .IsInEnum();

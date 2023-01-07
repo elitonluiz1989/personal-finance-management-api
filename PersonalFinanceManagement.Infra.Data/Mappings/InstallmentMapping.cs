@@ -33,12 +33,8 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnOrder(5)
                 .IsRequired();
 
-            builder.Property(p => p.AmountPaid)
-                .HasColumnOrder(6)
-                .IsRequired();
-
             builder.Property(p => p.DeletedAt)
-                .HasColumnOrder(7)
+                .HasColumnOrder(6)
                 .IsRequired(false);
 
             builder.HasOne(p => p.Balance)

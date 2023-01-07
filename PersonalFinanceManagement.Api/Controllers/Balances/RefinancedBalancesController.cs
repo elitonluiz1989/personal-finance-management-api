@@ -8,9 +8,9 @@ using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Api.Controllers.Balances
 {
-    public class RefinancedBalanceController : BaseApiController
+    public class RefinancedBalancesController : BaseApiController
     {
-        public RefinancedBalanceController(
+        public RefinancedBalancesController(
             INotificationService notificationService,
             IUnitOfWork unitOfWork
         )

@@ -34,11 +34,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             if (IsRecorded)
             {
                 UpadtedAt = DateTime.Now;
-
-                return;
             }
-
-            CreatedAt = DateTime.Now;
+            else
+            {
+                CreatedAt = DateTime.Now;
+            }
         }
 
         public void SetAsDeleted()

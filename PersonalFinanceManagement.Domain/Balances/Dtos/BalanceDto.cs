@@ -1,12 +1,10 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Dtos;
-using System.Text.Json.Serialization;
 
 namespace PersonalFinanceManagement.Domain.Balances.Dtos
 {
     public record BalanceDto : RecordedDto<int>
     {
-        [JsonIgnore]
         public int UserId { get; set; }
         public string Name { get; set; } = string.Empty;
         public BalanceTypeEnum Type { get; set; }

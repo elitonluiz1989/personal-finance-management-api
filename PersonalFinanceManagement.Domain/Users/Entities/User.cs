@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Transactions.Entities;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Domain.Users.Entities

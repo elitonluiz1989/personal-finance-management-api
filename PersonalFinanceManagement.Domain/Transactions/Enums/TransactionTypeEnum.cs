@@ -1,4 +1,4 @@
-﻿namespace PersonalFinanceManagement.Domain.Balances.Enums
+﻿namespace PersonalFinanceManagement.Domain.Transactions.Enums
 {
     public enum TransactionTypeEnum
     {

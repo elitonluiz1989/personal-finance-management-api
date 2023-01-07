@@ -26,12 +26,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             _balanceInstallmentStoreService = balanceInstallmentStoreService;
         }
 
-        public async Task Store(BalanceDto dto, int userId, bool fromRefinance = false)
+        public async Task Store(BalanceDto dto, bool fromRefinance = false)
         {
             if (ValidateDto(dto) is false)
                 return;
-
-            dto.UserId = userId;
 
             var balance = await SetBalance(dto, fromRefinance);
 

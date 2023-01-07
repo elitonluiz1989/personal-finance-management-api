@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Infra.Data.Mappings
 {
@@ -21,6 +21,10 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
             builder.Property(p => p.PartiallyPaid)
                 .HasColumnOrder(3)
                 .HasDefaultValue(false)
+                .IsRequired();
+
+            builder.Property(p => p.AmountPaid)
+                .HasColumnOrder(4)
                 .IsRequired();
 
             builder.HasOne(p => p.Transaction)

@@ -4,6 +4,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Contracts.Balances
 {
     public interface IBalanceStore
     {
-        Task Store(BalanceDto dto, int userId, bool fromRefinance = false);
+        Task Store(BalanceDto dto, bool fromRefinance = false);
     }
 }

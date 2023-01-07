@@ -6,7 +6,6 @@ using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Users.Contracts;
-using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
 {
@@ -45,8 +44,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
             if (ValidateEntity(balance) is false || balance is null)
                 return;
 
-            dto.UserId = userId;
-
             var refinancedBalance = await SetRefinancedBalance(dto, balance);
 
             if (HasNotifications || refinancedBalance is null)
@@ -81,18 +78,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
         {
             await InactivatePreviousRefinancing(balance.Id);
 
-            var user = await _userRepository.Find(dto.UserId);
-
-            if (user is null)
-            {
-                AddNotification($"{nameof(User)} is null");
-
-                return null;
-            }
-
             return new RefinancedBalance
             {
-                User = user,
                 Balance = balance,
                 OriginalDate = balance.Date,
                 OriginalValue = balance.Value,
@@ -162,7 +149,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
 
             var balanceDto = CreateBalanceToRefinance(balance, refinancedBalance);
 
-            await _balanceStore.Store(balanceDto, refinancedBalance.UserId, true);
+            await _balanceStore.Store(balanceDto, true);
         }
 
         private void DeleteOldInstallments(Balance balance)

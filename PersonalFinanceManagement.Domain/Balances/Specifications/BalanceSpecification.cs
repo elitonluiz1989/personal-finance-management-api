@@ -3,6 +3,8 @@ using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Filters;
+using PersonalFinanceManagement.Domain.Transactions.Dtos;
+using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Specifications
 {
@@ -62,7 +64,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 Reference = installment.Reference,
                 Number = installment.Number,
                 Value = installment.Value,
-                AmountPaid = installment.AmountPaid,
                 Items = installment.Items.Select(ti => new TransactionItemDto()
                 {
                     TransactionId = ti.TransactionId,

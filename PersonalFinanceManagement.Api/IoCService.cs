@@ -9,11 +9,14 @@ using PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances;
 using PersonalFinanceManagement.Domain.Balances.Specifications;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
+using PersonalFinanceManagement.Domain.Transactions.Contracts;
+using PersonalFinanceManagement.Domain.Transactions.Services;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Services;
 using PersonalFinanceManagement.Domain.Users.Specifications;
 using PersonalFinanceManagement.Infra.Data.Helpers;
 using PersonalFinanceManagement.Infra.Data.Repositories.Balances;
+using PersonalFinanceManagement.Infra.Data.Repositories.Transactions;
 using PersonalFinanceManagement.Infra.Data.Repositories.Users;
 
 namespace PersonalFinanceManagement.Api
@@ -43,6 +46,12 @@ namespace PersonalFinanceManagement.Api
 
             services.AddScoped<IRefinancedBalanceRepository, RefinancedBalanceRepository>();
             services.AddScoped<IRefinancedBalanceStore, RefinancedBalanceStore>();
+
+            services.AddScoped<ITransactionStore, TransactionStore>();
+            services.AddScoped<ITransactionItemManager, TransactionItemManager>();
+            services.AddScoped<ITransactionItemStore, TransactionItemStore>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
         }
     }
 }

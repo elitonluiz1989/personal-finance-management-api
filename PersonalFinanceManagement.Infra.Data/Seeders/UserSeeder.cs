@@ -54,7 +54,7 @@ namespace PersonalFinanceManagement.Infra.Data.Seeders
                     if (item.Key.Contains(nameof(user.Password)))
                         user.Password = Hash.Encrypt(item.Value);
 
-                    if (item.Key.Contains(user.Role.ToString()))
+                    if (item.Key.Contains(nameof(user.Role)))
                     {
                         var success = Enum.TryParse(item.Value, out UserRoleEnum userRole);
 

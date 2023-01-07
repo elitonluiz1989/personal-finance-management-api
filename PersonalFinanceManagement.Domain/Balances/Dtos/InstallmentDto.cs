@@ -1,4 +1,5 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
+using PersonalFinanceManagement.Domain.Transactions.Dtos;
 
 namespace PersonalFinanceManagement.Domain.Balances.Dtos
 {
@@ -11,7 +12,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
         public decimal Value { get; set; }
-        public decimal AmountPaid { get; set; }
         public List<TransactionItemDto> Items { get; set; } = new();
     }
 }

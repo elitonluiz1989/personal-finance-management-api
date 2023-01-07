@@ -2,6 +2,7 @@
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Entities
 {
@@ -12,7 +13,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
         public decimal Value { get; set; }
-        public decimal AmountPaid { get; set; }
         public DateTime? DeletedAt { get; set; }
 
         public virtual Balance? Balance { get; set; }
@@ -26,6 +26,18 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public void SetAsDeleted()
         {
             DeletedAt = DateTime.Now;
+        }
+
+        public decimal GetComputedValue()
+        {
+            var totalPaid = Items
+                ?.Where(i => i.PartiallyPaid)
+                ?.Sum(i => i.AmountPaid) ?? 0;
+
+            if (totalPaid > 0)
+                return Value - totalPaid;
+
+            return Value;
         }
 
         protected override void SetValitionRules()

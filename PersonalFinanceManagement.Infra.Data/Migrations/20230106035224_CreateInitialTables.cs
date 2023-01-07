@@ -65,7 +65,9 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Type = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpadtedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -89,7 +91,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Number = table.Column<short>(type: "smallint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -109,7 +110,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
                     BalanceId = table.Column<int>(type: "int", nullable: false),
                     OriginalDate = table.Column<DateTime>(type: "date", nullable: false),
                     OriginalValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -120,7 +120,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Financed = table.Column<bool>(type: "bit", nullable: false),
                     InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -135,8 +136,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         name: "FK_RefinancedBalances_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -147,7 +147,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TransactionId = table.Column<int>(type: "int", nullable: false),
                     InstallmentId = table.Column<int>(type: "int", nullable: false),
-                    PartiallyPaid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    PartiallyPaid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
