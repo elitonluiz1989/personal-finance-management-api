@@ -82,11 +82,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
             {
                 Balance = balance,
                 OriginalDate = balance.Date,
-                OriginalValue = balance.Value,
+                OriginalAmount = balance.Amount,
                 OriginalFinanced = balance.Financed,
                 OriginalInstallmentsNumber = balance.InstallmentsNumber,
                 Date = SetBalanceDate(balance, dto),
-                Value = SetBalanceValue(balance, dto),
+                Amount = SetBalanceValue(balance, dto),
                 Financed = SetBalanceFinanced(balance, dto),
                 InstallmentsNumber = SetInstallmentsNumber(balance, dto),
                 Active = true
@@ -116,10 +116,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
 
         private static decimal SetBalanceValue(Balance balance, RefinancedBalanceStoreDto dto)
         {
-            if (dto.Value.Equals(default) is false && balance.Value != dto.Value)
-                return dto.Value;
+            if (dto.Amount.Equals(default) is false && balance.Amount != dto.Amount)
+                return dto.Amount;
 
-            return balance.Value;
+            return balance.Amount;
         }
 
         private static bool SetBalanceFinanced(Balance balance, RefinancedBalanceStoreDto dto)
@@ -147,9 +147,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
         {
             DeleteOldInstallments(balance);
 
-            var balanceDto = CreateBalanceToRefinance(balance, refinancedBalance);
+            var balanceStoreDto = CreateBalanceToRefinance(balance, refinancedBalance);
 
-            await _balanceStore.Store(balanceDto, true);
+            await _balanceStore.Store(balanceStoreDto, true);
         }
 
         private void DeleteOldInstallments(Balance balance)
@@ -160,16 +160,15 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
             _installmentRepository.Delete(balance.Installments);
         }
 
-        private static BalanceDto CreateBalanceToRefinance(Balance balance, RefinancedBalance refinancedBalance)
+        private static BalanceStoreDto CreateBalanceToRefinance(Balance balance, RefinancedBalance refinancedBalance)
         {
-            return new BalanceDto()
+            return new BalanceStoreDto()
             {
                 Id = balance.Id,
                 Name = balance.Name,
                 Type = balance.Type,
-                Status = balance.Status,
                 Date = refinancedBalance.Date,
-                Value = refinancedBalance.Value,
+                Amount = refinancedBalance.Amount,
                 Financed = refinancedBalance.Financed,
                 InstallmentsNumber = refinancedBalance.InstallmentsNumber
             };

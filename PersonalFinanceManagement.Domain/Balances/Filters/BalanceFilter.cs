@@ -7,8 +7,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Filters
         public int Id { get; set; }
         public int UserId { get; set; }
         public List<BalanceTypeEnum> Types { get; set; } = new List<BalanceTypeEnum>();
-        public List<BalanceStatusEnum> Status { get; set; } = new List<BalanceStatusEnum>();
         public bool? Financed { get; set; }
         public short? InstallmentsNumber { get; set; }
+        public bool? Closed { get; set; }
     }
 }

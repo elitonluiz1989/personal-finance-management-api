@@ -9,11 +9,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
     {
         public int BalanceId { get; set; }
         public DateTime OriginalDate { get; set; }
-        public decimal OriginalValue { get; set; }
+        public decimal OriginalAmount { get; set; }
         public bool OriginalFinanced { get; set; }
         public short OriginalInstallmentsNumber { get; set; }
         public DateTime Date { get; set; }
-        public decimal Value { get; set; }
+        public decimal Amount { get; set; }
         public bool Financed { get; set; }
         public short InstallmentsNumber { get; set; }
         public bool Active { get; set; } = true;
@@ -43,10 +43,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             Validator.RuleFor(p => Date)
                 .NotEqual(default(DateTime));
 
-            Validator.RuleFor(p => OriginalValue)
+            Validator.RuleFor(p => OriginalAmount)
                 .GreaterThan(0);
 
-            Validator.RuleFor(p => Value)
+            Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
         }
     }

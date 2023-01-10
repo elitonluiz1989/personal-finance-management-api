@@ -30,22 +30,21 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             if (filter.Types.Any())
                 query = query.Where(p => filter.Types.Contains(p.Type));
 
-            if (filter.Status.Any())
-                query = query.Where(p => filter.Status.Contains(p.Status));
-
             if (filter.Financed.HasValue)
                 query = query.Where(p => p.Financed == filter.Financed);
 
             if (filter.InstallmentsNumber.HasValue)
                 query = query.Where(p => p.InstallmentsNumber == p.InstallmentsNumber);
 
+            if (filter.Closed.HasValue)
+                query = query.Where(p => p.Closed == filter.Closed);
+
             return await query.Select(s => new BalanceDto()
             {
                 Id = s.Id,
                 UserId = s.UserId,
                 Type = s.Type,
-                Status = s.Status,
-                Value = s.Value,
+                Amount = s.Amount,
                 Financed = s.Financed,
                 InstallmentsNumber = s.InstallmentsNumber,
                 Installments = s.Installments
@@ -63,12 +62,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 BalanceId = installment.BalanceId,
                 Reference = installment.Reference,
                 Number = installment.Number,
-                Value = installment.Value,
+                Amount = installment.Amount,
                 Items = installment.Items.Select(ti => new TransactionItemDto()
                 {
                     TransactionId = ti.TransactionId,
                     Transaction = GetTransaction(ti.Transaction),
-                    PartiallyPaid = ti.PartiallyPaid
+                    Type = ti.Type
                 })
                 .ToList()
             };
@@ -84,7 +83,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 Id = transaction.Id,
                 Type = transaction.Type,
                 Date = transaction.Date,
-                Value = transaction.Value
+                Amount = transaction.Amount
             };
         }
     }

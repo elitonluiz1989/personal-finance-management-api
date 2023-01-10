@@ -7,6 +7,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public int BalanceId { get; set; }
         public int Reference { get; set; }
         public short Number { get; set; }
-        public decimal Value { get; set; }
+        public decimal Amount { get; set; }
     }
 }

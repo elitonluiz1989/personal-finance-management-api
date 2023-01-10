@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
+using PersonalFinanceManagement.Domain.Transactions.Enums;
 
 namespace PersonalFinanceManagement.Infra.Data.Mappings
 {
@@ -18,13 +19,18 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
             builder.Property(p => p.InstallmentId)
                 .HasColumnOrder(2);
 
-            builder.Property(p => p.PartiallyPaid)
+            builder.Property(p => p.Type)
                 .HasColumnOrder(3)
+                .HasDefaultValue(TransactionItemTypeEnum.Standard)
+                .IsRequired();
+
+            builder.Property(p => p.PartiallyPaid)
+                .HasColumnOrder(4)
                 .HasDefaultValue(false)
                 .IsRequired();
 
             builder.Property(p => p.AmountPaid)
-                .HasColumnOrder(4)
+                .HasColumnOrder(5)
                 .IsRequired();
 
             builder.HasOne(p => p.Transaction)

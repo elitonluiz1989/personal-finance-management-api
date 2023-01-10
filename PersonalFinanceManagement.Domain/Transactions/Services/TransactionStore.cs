@@ -32,11 +32,14 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
             var transaction = await SetTransaction(dto);
 
-            if (ValidateEntity(transaction) is false || transaction is null)
+            if (ValidateNullableObject(transaction) is false || transaction is null)
                 return;
 
             if (ValidateTransationItemsRecord(dto, transaction))
                 await _transactionItemManager.Manage(dto, transaction);
+
+            if (HasNotifications || ValidateEntity(transaction) is false || transaction is null)
+                return;
 
             _repository.Save(transaction);
         }
@@ -61,7 +64,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 User = user,
                 Type = dto.Type,
                 Date = dto.Date,
-                Value = dto.Value
+                Amount = dto.Amount
             };
         }
 
@@ -88,8 +91,8 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             if (dto.Date != transaction.Date)
                 transaction.Date = dto.Date;
 
-            if (dto.Value != transaction.Value)
-                transaction.Value = dto.Value;
+            if (dto.Amount != transaction.Amount)
+                transaction.Amount = dto.Amount;
 
             return transaction;
         }
@@ -108,7 +111,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
         {
             var installmentsRequiredOnInsert = dto.IsRecorded is false && dto.InstallmentsIds.Any() is false;
             var installmentsRequiredOnUpdate = dto.IsRecorded &&
-                (transaction.Value != dto.Value || transaction.Type != dto.Type) &&
+                (transaction.Amount != dto.Amount || transaction.Type != dto.Type) &&
                 dto.InstallmentsIds.Any() is false;
 
             if (installmentsRequiredOnInsert || installmentsRequiredOnUpdate)

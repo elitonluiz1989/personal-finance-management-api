@@ -12,7 +12,7 @@ using PersonalFinanceManagement.Infra.Data.Contexts;
 namespace PersonalFinanceManagement.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultDBContext))]
-    [Migration("20230106035224_CreateInitialTables")]
+    [Migration("20230110061431_CreateInitialTables")]
     partial class CreateInitialTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,27 +33,31 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(5);
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(9);
+                        .HasColumnOrder(8);
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("date")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(4);
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(11);
+                        .HasColumnOrder(10);
 
                     b.Property<bool>("Financed")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false)
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(6);
 
                     b.Property<short>("InstallmentsNumber")
                         .HasColumnType("smallint")
-                        .HasColumnOrder(8);
+                        .HasColumnOrder(7);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -61,25 +65,17 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnOrder(2);
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnOrder(4);
-
                     b.Property<int>("Type")
                         .HasColumnType("int")
                         .HasColumnOrder(3);
 
                     b.Property<DateTime?>("UpadtedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(10);
+                        .HasColumnOrder(9);
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnOrder(1);
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(6);
 
                     b.HasKey("Id");
 
@@ -96,6 +92,10 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasColumnOrder(0);
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(5);
 
                     b.Property<int>("BalanceId")
                         .HasColumnType("int")
@@ -119,10 +119,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasDefaultValue(1)
                         .HasColumnOrder(4);
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(5);
-
                     b.HasKey("Id");
 
                     b.HasIndex("BalanceId");
@@ -145,6 +141,10 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasDefaultValue(true)
                         .HasColumnOrder(10);
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(7);
+
                     b.Property<int>("BalanceId")
                         .HasColumnType("int")
                         .HasColumnOrder(1);
@@ -165,6 +165,10 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasColumnType("smallint")
                         .HasColumnOrder(9);
 
+                    b.Property<decimal>("OriginalAmount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(3);
+
                     b.Property<DateTime>("OriginalDate")
                         .HasColumnType("date")
                         .HasColumnOrder(2);
@@ -177,16 +181,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasColumnType("smallint")
                         .HasColumnOrder(5);
 
-                    b.Property<decimal>("OriginalValue")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(3);
-
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(7);
 
                     b.HasKey("Id");
 
@@ -206,8 +202,13 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnOrder(4);
+
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(5);
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("date")
@@ -215,22 +216,19 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(7);
 
                     b.Property<int>("Type")
                         .HasColumnType("int")
                         .HasColumnOrder(2);
 
                     b.Property<DateTime?>("UpadtedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(6);
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
                         .HasColumnOrder(1);
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(4);
 
                     b.HasKey("Id");
 
@@ -250,7 +248,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     b.Property<decimal>("AmountPaid")
                         .HasColumnType("decimal(18,2)")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.Property<int>("InstallmentId")
                         .HasColumnType("int")
@@ -260,11 +258,17 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false)
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(4);
 
                     b.Property<int>("TransactionId")
                         .HasColumnType("int")
                         .HasColumnOrder(1);
+
+                    b.Property<int>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1)
+                        .HasColumnOrder(3);
 
                     b.HasKey("Id");
 

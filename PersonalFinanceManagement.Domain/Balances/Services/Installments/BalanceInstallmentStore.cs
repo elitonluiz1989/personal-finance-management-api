@@ -33,7 +33,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 
         private async Task CreateSingleInstallment(Balance balance)
         {
-            var installment = CreateInstallmentDto(balance.Date, balance.Value);
+            var installment = CreateInstallmentDto(balance.Date, balance.Amount);
 
             await _installmentStore.Store(installment, balance);
         }
@@ -41,14 +41,14 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
         private async Task FinanceBalance(Balance balance, short installmentsNumber)
         {
             short number = 1;
-            var financedValue = GetFinancedValue(balance.Value, installmentsNumber);
+            var (amount, remainingAmount) = GetFinancedValue(balance.Amount, installmentsNumber);
 
             while (number <= installmentsNumber)
             {
-                var installment = CreateInstallmentDto(balance.Date, financedValue.Value, number);
+                var installment = CreateInstallmentDto(balance.Date, amount, number);
 
-                if (number == installmentsNumber && financedValue.Remainder > 0)
-                    installment.Value += financedValue.Remainder;
+                if (number == installmentsNumber && remainingAmount > 0)
+                    installment.Amount += remainingAmount;
 
                 await _installmentStore.Store(installment, balance);
 
@@ -65,7 +65,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             {
                 Reference = GetReference(balanceDate, number),
                 Number = number,
-                Value = value
+                Amount = value
             };
         }
 
@@ -77,21 +77,21 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             return Convert.ToInt32(referenceString);
         }
 
-        private static (decimal Value, decimal Remainder) GetFinancedValue(decimal balanceValue, short installmentsNumber)
+        private static (decimal amount, decimal remainingAmount) GetFinancedValue(decimal balanceAmount, short installmentsNumber)
         {
-            var modulus = balanceValue % installmentsNumber;
-            var value = balanceValue / installmentsNumber;
-            var valueWithTwoDecimalPlaces = Math.Truncate(value * 100) / 100;
-            decimal remainder = 0;
+            var modulus = balanceAmount % installmentsNumber;
+            var amount = balanceAmount / installmentsNumber;
+            var valueWithTwoDecimalPlaces = Math.Truncate(amount * 100) / 100;
+            decimal remainingAmount = 0;
 
             if (modulus > 0)
             {
                 var totalFinancedValue = valueWithTwoDecimalPlaces * installmentsNumber;
 
-                remainder = balanceValue - totalFinancedValue;
+                remainingAmount = balanceAmount - totalFinancedValue;
             }
 
-            return (valueWithTwoDecimalPlaces, remainder);
+            return (valueWithTwoDecimalPlaces, remainingAmount);
         }
     }
 }

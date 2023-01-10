@@ -46,6 +46,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
             transactionItem.Transaction = transaction;
             transactionItem.InstallmentId = dto.InstallmentId;
+            transactionItem.Type = dto.Type;
             transactionItem.PartiallyPaid = dto.PartiallyPaid;
             transactionItem.AmountPaid = dto.AmountPaid;
 

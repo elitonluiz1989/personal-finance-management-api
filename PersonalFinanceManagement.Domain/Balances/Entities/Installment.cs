@@ -12,8 +12,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public int Reference { get; set; }
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
-        public decimal Value { get; set; }
+        public decimal Amount { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        public bool Active => Status != InstallmentStatusEnum.Paid;
 
         public virtual Balance? Balance { get; set; }
         public virtual List<TransactionItem> Items { get; set; } = new();
@@ -28,16 +30,16 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             DeletedAt = DateTime.Now;
         }
 
-        public decimal GetComputedValue()
+        public decimal GetAmountToTransactions()
         {
-            var totalPaid = Items
+            var totalPartiallyPaid = Items
                 ?.Where(i => i.PartiallyPaid)
                 ?.Sum(i => i.AmountPaid) ?? 0;
 
-            if (totalPaid > 0)
-                return Value - totalPaid;
+            if (totalPartiallyPaid > 0)
+                return Amount - totalPartiallyPaid;
 
-            return Value;
+            return Amount;
         }
 
         protected override void SetValitionRules()
@@ -56,7 +58,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             Validator.RuleFor(p => Reference)
                 .GreaterThan(0);
 
-            Validator.RuleFor(p => Value)
+            Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
         }
     }

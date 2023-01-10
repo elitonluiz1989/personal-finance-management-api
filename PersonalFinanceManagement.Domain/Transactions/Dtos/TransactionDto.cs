@@ -7,9 +7,10 @@ namespace PersonalFinanceManagement.Domain.Transactions.Dtos
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public UserDto? User { get; set; }
         public TransactionTypeEnum Type { get; set; }
         public DateTime Date { get; set; }
-        public decimal Value { get; set; }
+        public decimal Amount { get; set; }
+
+        public UserDto? User { get; set; }
     }
 }

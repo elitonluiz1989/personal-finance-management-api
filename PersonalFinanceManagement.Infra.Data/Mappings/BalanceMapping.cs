@@ -25,43 +25,41 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnOrder(3)
                 .IsRequired();
 
-            builder.Property(p => p.Status)
-                .HasColumnOrder(4)
-                .IsRequired();
-
             builder.Property(p => p.Date)
-                .HasColumnOrder(5)
+                .HasColumnOrder(4)
                 .HasColumnType("date")
                 .IsRequired();
 
-            builder.Property(p => p.Value)
-                .HasColumnOrder(6)
+            builder.Property(p => p.Amount)
+                .HasColumnOrder(5)
                 .IsRequired();
 
             builder.Property(p => p.Financed)
-                .HasColumnOrder(7)
+                .HasColumnOrder(6)
                 .HasDefaultValue(false)
                 .IsRequired();
 
             builder.Property(p => p.InstallmentsNumber)
-                .HasColumnOrder(8);
+                .HasColumnOrder(7);
 
             builder.Property(p => p.CreatedAt)
-                .HasColumnOrder(9)
+                .HasColumnOrder(8)
                 .IsRequired();
 
             builder.Property(p => p.UpadtedAt)
-                .HasColumnOrder(10)
+                .HasColumnOrder(9)
                 .IsRequired(false);
 
             builder.Property(p => p.DeletedAt)
-                .HasColumnOrder(11)
+                .HasColumnOrder(10)
                 .IsRequired(false);
 
             builder.HasOne(p => p.User)
                 .WithMany(o => o.Balances)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Ignore(p => p.Closed);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
                 Balance = balance,
                 Reference = dto.Reference,
                 Number = dto.Number,
-                Value = dto.Value
+                Amount = dto.Amount
             };
         }
 
@@ -91,8 +91,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             if (installment.Number != dto.Number)
                 installment.Number = dto.Number;
 
-            if (installment.Value != dto.Value)
-                installment.Value = dto.Value;
+            if (installment.Amount != dto.Amount)
+                installment.Amount = dto.Amount;
 
             return installment;
         }

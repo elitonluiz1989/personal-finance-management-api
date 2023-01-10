@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 
 namespace PersonalFinanceManagement.Infra.Data.Repositories.Balances
@@ -11,16 +12,18 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories.Balances
         {
         }
 
-        public async Task<Installment?> FindByUserIdWithTransactionItems(int balanceId, int userId)
+        public async Task<List<Installment>> ListWithTransactionItems(int[] ids, int userId)
         {
             return await Query()
                 .Include(i => i.Balance)
                 .Include(i => i.Items)
-                .FirstOrDefaultAsync(i => 
-                    i.Id == balanceId &&
+                .Where(i => 
+                    ids.Contains(i.Id) &&
+                    i.Status != InstallmentStatusEnum.Paid &&
                     i.Balance != null &&
                     i.Balance.UserId == userId
-                );
+                )
+                .ToListAsync();
         }
     }
 }

@@ -5,6 +5,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Contracts.Installments
 {
     public interface IInstallmentRepository : IRepository<Installment, int>
     {
-        Task<Installment?> FindByUserIdWithTransactionItems(int balanceId, int userId);
+        Task<List<Installment>> ListWithTransactionItems(int[] ids, int userId);
     }
 }

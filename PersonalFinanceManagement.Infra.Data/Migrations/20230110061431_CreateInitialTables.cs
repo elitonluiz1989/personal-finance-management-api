@@ -35,9 +35,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Financed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -64,10 +63,10 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpadtedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpadtedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -90,7 +89,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Reference = table.Column<int>(type: "int", nullable: false),
                     Number = table.Column<short>(type: "smallint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -112,11 +111,11 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BalanceId = table.Column<int>(type: "int", nullable: false),
                     OriginalDate = table.Column<DateTime>(type: "date", nullable: false),
-                    OriginalValue = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OriginalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OriginalFinanced = table.Column<bool>(type: "bit", nullable: false),
                     OriginalInstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Financed = table.Column<bool>(type: "bit", nullable: false),
                     InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
                     Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
@@ -147,6 +146,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TransactionId = table.Column<int>(type: "int", nullable: false),
                     InstallmentId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     PartiallyPaid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },

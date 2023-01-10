@@ -21,12 +21,7 @@ namespace PersonalFinanceManagement.Domain.Base.Services
 
         protected bool ValidateDto(RecordedDto<TKey> dto)
         {
-            if (dto is not null)
-                return true;
-
-            NotificationService.AddNotification($"{nameof(dto)} is null");
-
-            return false;
+            return ValidateNullableObject(dto);
         }
 
         protected bool ValidateEntity(TEntity? entity)

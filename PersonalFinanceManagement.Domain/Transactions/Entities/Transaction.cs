@@ -11,7 +11,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
         public int UserId { get; set; }
         public TransactionTypeEnum Type { get; set; }
         public DateTime Date { get; set; }
-        public decimal Value { get; set; }
+        public decimal Amount { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpadtedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
@@ -56,7 +56,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
             Validator.RuleFor(p => Type)
                 .IsInEnum();
 
-            Validator.RuleFor(p => Value)
+            Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
         }
     }

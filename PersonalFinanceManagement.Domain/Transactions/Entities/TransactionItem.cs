@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Transactions.Enums;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Entities
 {
@@ -8,6 +9,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
     {
         public int TransactionId { get; set; }
         public int InstallmentId { get; set; }
+        public TransactionItemTypeEnum Type { get; set; }
         public bool PartiallyPaid { get; set; }
         public decimal AmountPaid { get; set; }
 

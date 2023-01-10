@@ -17,5 +17,16 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories.Balances
                 .Include(b => b.Installments)
                 .FirstOrDefaultAsync(b => b.Id == balanceId);
         }
+
+        public async Task<List<Balance>> ListWithInstallmentsByIds(int[] ids, int userId)
+        {
+            return await Query()
+                .Include(b => b.Installments)
+                .Where(b =>
+                   ids.Contains(b.Id) &&
+                   b.UserId == userId
+                )
+                .ToListAsync();
+        }
     }
 }

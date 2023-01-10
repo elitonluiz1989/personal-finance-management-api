@@ -29,7 +29,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasDefaultValue(InstallmentStatusEnum.Created)
                 .IsRequired();
 
-            builder.Property(p => p.Value)
+            builder.Property(p => p.Amount)
                 .HasColumnOrder(5)
                 .IsRequired();
 
@@ -41,6 +41,8 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .WithMany(o => o.Installments)
                 .HasForeignKey(p => p.BalanceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Ignore(p => p.Active);
         }
     }
 }

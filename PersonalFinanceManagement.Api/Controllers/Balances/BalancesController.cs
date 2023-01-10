@@ -34,7 +34,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         [HttpPost]
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Post(
-            [FromBody] BalanceDto dto,
+            [FromBody] BalanceStoreDto dto,
             [FromServices] IBalanceStore store
         )
         {

@@ -26,7 +26,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             _balanceInstallmentStoreService = balanceInstallmentStoreService;
         }
 
-        public async Task Store(BalanceDto dto, bool fromRefinance = false)
+        public async Task Store(BalanceStoreDto dto, bool fromRefinance = false)
         {
             if (ValidateDto(dto) is false)
                 return;
@@ -45,7 +45,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
         }
 
 
-        protected async Task<Balance?> SetBalance(BalanceDto dto, bool fromRefinance = false)
+        protected async Task<Balance?> SetBalance(BalanceStoreDto dto, bool fromRefinance = false)
         {
             if (HasNotifications)
                 return null;
@@ -56,9 +56,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             return await CreateBalance(dto);
         }
 
-        private async Task<Balance?> CreateBalance(BalanceDto balanceDto)
+        private async Task<Balance?> CreateBalance(BalanceStoreDto dto)
         {
-            var user = await GetUser(balanceDto.UserId);
+            var user = await GetUser(dto.UserId);
 
             if (HasNotifications)
                 return null;
@@ -66,19 +66,18 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             return new Balance()
             {
                 User = user,
-                Name = balanceDto.Name,
-                Type = balanceDto.Type,
-                Status = balanceDto.Status,
-                Date = balanceDto.Date,
-                Value = balanceDto.Value,
-                Financed = balanceDto.Financed,
-                InstallmentsNumber = balanceDto.InstallmentsNumberValidate
+                Name = dto.Name,
+                Type = dto.Type,
+                Date = dto.Date,
+                Amount = dto.Amount,
+                Financed = dto.Financed,
+                InstallmentsNumber = dto.InstallmentsNumberValidate
             };
         }
 
-        private async Task<Balance?> UpdateBalance(BalanceDto balanceDto, bool fromRefinance = false)
+        private async Task<Balance?> UpdateBalance(BalanceStoreDto dto, bool fromRefinance = false)
         {
-            var balance = await _repository.Find(balanceDto.Id);
+            var balance = await _repository.Find(dto.Id);
 
             if (balance is null)
             {
@@ -87,28 +86,25 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
                 return null;
             }
 
-            if (balance.Name != balanceDto.Name)
-                balance.Name = balanceDto.Name;
+            if (balance.Name != dto.Name)
+                balance.Name = dto.Name;
 
-            if (balanceDto.Type != default && balance.Type != balanceDto.Type)
-                balance.Type = balanceDto.Type;
-
-            if (balanceDto.Status != default && balance.Status != balanceDto.Status)
-                balance.Status = balanceDto.Status;
+            if (dto.Type != default && balance.Type != dto.Type)
+                balance.Type = dto.Type;
 
             if (fromRefinance)
             {
-                if (balance.Date != balanceDto.Date)
-                    balance.Date = balanceDto.Date;
+                if (balance.Date != dto.Date)
+                    balance.Date = dto.Date;
 
-                if (balance.Value != balanceDto.Value)
-                    balance.Value = balanceDto.Value;
+                if (balance.Amount != dto.Amount)
+                    balance.Amount = dto.Amount;
 
-                if (balance.Financed != balanceDto.Financed)
-                    balance.Financed = balanceDto.Financed;
+                if (balance.Financed != dto.Financed)
+                    balance.Financed = dto.Financed;
 
-                if (balance.InstallmentsNumber != balanceDto.InstallmentsNumber)
-                    balance.InstallmentsNumber = balanceDto.InstallmentsNumber;
+                if (balance.InstallmentsNumber != dto.InstallmentsNumber)
+                    balance.InstallmentsNumber = dto.InstallmentsNumber;
             }
 
             return balance;
@@ -124,7 +120,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             return user;
         }
 
-        private async Task FinanceBalance(Balance balance, BalanceDto dto, bool fromRefinance = false)
+        private async Task FinanceBalance(Balance balance, BalanceStoreDto dto, bool fromRefinance = false)
         {
             if (balance.IsRecorded && fromRefinance is false)
                 return;

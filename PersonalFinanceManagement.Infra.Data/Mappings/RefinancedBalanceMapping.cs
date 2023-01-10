@@ -20,7 +20,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnType("date")
                 .IsRequired();
 
-            builder.Property(p => p.OriginalValue)
+            builder.Property(p => p.OriginalAmount)
                 .HasColumnOrder(3)
                 .IsRequired();
 
@@ -36,7 +36,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnType("date")
                 .IsRequired();
 
-            builder.Property(p => p.Value)
+            builder.Property(p => p.Amount)
                 .HasColumnOrder(7)
                 .IsRequired();
 

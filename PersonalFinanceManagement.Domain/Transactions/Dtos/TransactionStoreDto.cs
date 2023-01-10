@@ -8,7 +8,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Dtos
         public int UserId { get; set; }
         public TransactionTypeEnum Type { get; set; }
         public DateTime Date { get; set; }
-        public decimal Value { get; set; }
-        public List<short> InstallmentsIds { get; set; } = new();
+        public decimal Amount { get; set; }
+        public bool UseBalancesAsValue { get; set; }
+        public int[] BalancesIds { get; set; } = Array.Empty<int>();
+        public int[] InstallmentsIds { get; set; } = Array.Empty<int>();
     }
 }

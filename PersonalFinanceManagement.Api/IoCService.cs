@@ -48,8 +48,10 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<IRefinancedBalanceStore, RefinancedBalanceStore>();
 
             services.AddScoped<ITransactionStore, TransactionStore>();
-            services.AddScoped<ITransactionItemManager, TransactionItemManager>();
             services.AddScoped<ITransactionItemStore, TransactionItemStore>();
+            services.AddScoped<ITransactionItemManager, TransactionItemManager>();
+            services.AddScoped<IBalancesAsTransactionValueHandler, BalancesAsTransactionValueHandler>();
+            services.AddScoped<ITransactionItemStorageHandler, TransactionItemStorageHandler>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
         }

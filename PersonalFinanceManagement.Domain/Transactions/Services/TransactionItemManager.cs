@@ -1,8 +1,5 @@
-﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
-using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
-using PersonalFinanceManagement.Domain.Balances.Dtos;
+﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Entities;
-using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
@@ -13,55 +10,60 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 {
     public class TransactionItemManager : NotifiableService, ITransactionItemManager
     {
-        private readonly IBalanceStore _balanceStore;
-        private readonly ITransactionItemStore _transactionItemStore;
+        private readonly ITransactionItemStorageHandler _transactionItemStorageHandler;
+        private readonly IBalancesAsTransactionValueHandler _balancesAsTransactionValueHandler;
         private readonly IInstallmentRepository _installmentRepository;
         private readonly ITransactionItemRepository _transactionItemRepository;
 
         public TransactionItemManager(
             INotificationService notificationService,
-            IBalanceStore balanceStore,
-            ITransactionItemStore transactionItemStore,
+            ITransactionItemStorageHandler trasanctionItemStorageHandler,
+            IBalancesAsTransactionValueHandler balancesAsTransactionValueHandler,
             IInstallmentRepository installmentRepository,
             ITransactionItemRepository transactionItemRepository
         )
             : base(notificationService)
         {
-            _balanceStore = balanceStore;
-            _transactionItemStore = transactionItemStore;
+            _transactionItemStorageHandler = trasanctionItemStorageHandler;
+            _balancesAsTransactionValueHandler = balancesAsTransactionValueHandler;
             _installmentRepository = installmentRepository;
             _transactionItemRepository = transactionItemRepository;
         }
 
         public async Task Manage(TransactionStoreDto dto, Transaction transaction)
         {
+            if (Validate(dto, transaction) is false)
+                return;
+
             DeleteExistingItems(transaction);
 
-            var remainingValue = transaction.Value;
+            var installments = await GetInstallments(dto.InstallmentsIds, dto.UserId);
 
-            foreach (var installmentId in dto.InstallmentsIds)
+            if (HasNotifications)
+                return;
+
+            await HandleWhenToUseBalancesAsValue(dto, transaction, installments);
+
+            if (HasNotifications)
+                return;
+
+            var transactionItemStorageDto = new TransactionItemStorageDto()
             {
-                var installment = await GetInstallment(installmentId, dto.UserId);
+                UserId = dto.UserId,
+                Date = dto.Date,
+                Amount = transaction.Amount,
+                CanGenerateCredit = !dto.UseBalancesAsValue
+            };
 
-                if (installment is null)
-                    break;
+            await _transactionItemStorageHandler.Handle(transactionItemStorageDto, transaction, installments);
+        }
 
-                var transactionItemDto = new TransactionItemStoreDto()
-                {
-                    InstallmentId = installment.Id,
-                };
-                var result = ManageItemContent(transactionItemDto, installment, remainingValue);
+        private bool Validate(TransactionStoreDto dto, Transaction transaction)
+        {
+            if (ValidateNullableObject(dto) is false || ValidateNullableObject(transaction) is false)
+                return false;
 
-                remainingValue = result.remainingValue;
-
-                await _transactionItemStore.Store(transactionItemDto, transaction);
-
-                if (result.partiallyPaid || HasNotifications)
-                    break;
-            }
-
-            if (remainingValue > 0)
-                await CreateCreditBalance(dto, remainingValue);
+            return true;
         }
 
         private void DeleteExistingItems(Transaction transacation)
@@ -72,56 +74,55 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             _transactionItemRepository.Delete(transacation.Items);
         }
 
-        private async Task<Installment?> GetInstallment(int installmentId, int userId)
+        private async Task<List<Installment>> GetInstallments(int[] installmentsIds, int userId)
         {
-            var installment = await _installmentRepository.FindByUserIdWithTransactionItems(installmentId, userId);
+            var installments = await _installmentRepository.ListWithTransactionItems(installmentsIds, userId);
 
-            if (installment is null)
-                AddNotification($"{nameof(installment)} is null");
-
-            return installment;
-        }
-
-        private static (decimal remainingValue, bool partiallyPaid) ManageItemContent(
-            TransactionItemStoreDto transactionItemDto,
-            Installment installment,
-            decimal remainingValue
-        )
-        {
-            var value = installment.GetComputedValue();
-            var partiallyPaid = remainingValue < value;
-
-            transactionItemDto.PartiallyPaid = partiallyPaid;
-            installment.Status = partiallyPaid ? InstallmentStatusEnum.PartiallyPaid : InstallmentStatusEnum.Paid;
-
-            if (partiallyPaid)
+            if (installments is null || installments.Any() is false)
             {
-                transactionItemDto.AmountPaid = remainingValue;
-                remainingValue = 0;
-            }
-            else
-            {
-                transactionItemDto.AmountPaid = value;
-                remainingValue -= value;
+                AddNotification("None of the reported installment weren't found. Maybe they don't belong to the user or aren't active.");
+
+                return new();
             }
 
-            return (remainingValue, partiallyPaid);
+            var retrievedInstallmentsIds = installments.Select(i => i.Id).ToArray();
+            var unretrievedInstallmentsIds = installmentsIds.Where(i => retrievedInstallmentsIds.Contains(i) is false).ToArray();
+
+            if (unretrievedInstallmentsIds?.Any() is true)
+            {
+                var unretrievedIds = string.Join(", ", unretrievedInstallmentsIds);
+
+                AddNotification(
+                    $"The following list of reported installments IDs was not found. Maybe they don't belong to the user or aren't active: {unretrievedIds}"
+                );
+
+                return new();
+            }
+
+            return installments;
         }
 
-        private async Task CreateCreditBalance(TransactionStoreDto dto, decimal remainingValue)
+        private async Task HandleWhenToUseBalancesAsValue(TransactionStoreDto dto, Transaction transaction, List<Installment> installments)
         {
-            var balanceDto = new BalanceDto()
+            if (dto.UseBalancesAsValue is false)
+                return;
+
+            if (dto.BalancesIds is null || dto.BalancesIds.Any() is false)
+            {
+                AddNotification("Balances are required when marked to use them as transaction value.");
+
+                return;
+            }
+
+            var balancesAsTransactionValueDto = new BalancesAsTransactionValueDto()
             {
                 UserId = dto.UserId,
-                Name = $"Remaining payment balance of {dto.Date:dd/MM/yyyy}",
-                Type = BalanceTypeEnum.Credit,
-                Status = BalanceStatusEnum.Open,
                 Date = dto.Date,
-                Value = remainingValue,
-                Financed = false
+                Amount = installments.Sum(i => i.Amount),
+                BalancesIds = dto.BalancesIds
             };
 
-            await _balanceStore.Store(balanceDto);
+            transaction.Amount = await _balancesAsTransactionValueHandler.Handle(balancesAsTransactionValueDto, transaction);
         }
     }
 }
