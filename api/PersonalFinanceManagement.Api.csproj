@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PersonalFinanceManagement.Application\PersonalFinanceManagement.Application.csproj" />
-    <ProjectReference Include="..\PersonalFinanceManagement.Domain\PersonalFinanceManagement.Domain.csproj" />
-    <ProjectReference Include="..\PersonalFinanceManagement.Infra.Data\PersonalFinanceManagement.Infra.Data.csproj" />
+    <ProjectReference Include="..\application\PersonalFinanceManagement.Application.csproj" />
+    <ProjectReference Include="..\domain\PersonalFinanceManagement.Domain.csproj" />
+    <ProjectReference Include="..\infra.Data\PersonalFinanceManagement.Infra.Data.csproj" />
   </ItemGroup>
 
 </Project>

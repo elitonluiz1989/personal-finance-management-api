@@ -20,11 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PersonalFinanceManagement.Domain\PersonalFinanceManagement.Domain.csproj" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <ProjectReference Include="..\domain\PersonalFinanceManagement.Domain.csproj" />
   </ItemGroup>
 
 </Project>

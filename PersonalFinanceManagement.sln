@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Domain", "PersonalFinanceManagement.Domain\PersonalFinanceManagement.Domain.csproj", "{F1863485-C960-4C91-9A8C-ED94C4305FFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Domain", "domain\PersonalFinanceManagement.Domain.csproj", "{F1863485-C960-4C91-9A8C-ED94C4305FFE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Api", "PersonalFinanceManagement.Api\PersonalFinanceManagement.Api.csproj", "{5287F621-F6DC-4D7E-B4C9-264958355E9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Api", "api\PersonalFinanceManagement.Api.csproj", "{5287F621-F6DC-4D7E-B4C9-264958355E9F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Tests", "PersonalFinanceManagement.Tests\PersonalFinanceManagement.Tests.csproj", "{32897C83-FAB4-41AF-9ED5-75D745A51891}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Tests", "tests\PersonalFinanceManagement.Tests.csproj", "{32897C83-FAB4-41AF-9ED5-75D745A51891}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Infra.Data", "PersonalFinanceManagement.Infra.Data\PersonalFinanceManagement.Infra.Data.csproj", "{834DF45B-A8BB-42C7-8983-7ACF20729C4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Infra.Data", "infra.Data\PersonalFinanceManagement.Infra.Data.csproj", "{834DF45B-A8BB-42C7-8983-7ACF20729C4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceManagement.Application", "PersonalFinanceManagement.Application\PersonalFinanceManagement.Application.csproj", "{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceManagement.Application", "application\PersonalFinanceManagement.Application.csproj", "{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
