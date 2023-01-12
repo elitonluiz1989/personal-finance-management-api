@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Infra.Data", "infra.Data\PersonalFinanceManagement.Infra.Data.csproj", "{834DF45B-A8BB-42C7-8983-7ACF20729C4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceManagement.Application", "application\PersonalFinanceManagement.Application.csproj", "{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceManagement.Application", "application\PersonalFinanceManagement.Application.csproj", "{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "PersonalFinanceManagement.Web", "web\PersonalFinanceManagement.Web.esproj", "{0526B3B9-07E7-4691-8C7F-CC7A0862574C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,12 @@ Global
 		{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3A03716-1E81-4D3C-B1CF-186A3BCF5996}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0526B3B9-07E7-4691-8C7F-CC7A0862574C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0526B3B9-07E7-4691-8C7F-CC7A0862574C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0526B3B9-07E7-4691-8C7F-CC7A0862574C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0526B3B9-07E7-4691-8C7F-CC7A0862574C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0526B3B9-07E7-4691-8C7F-CC7A0862574C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0526B3B9-07E7-4691-8C7F-CC7A0862574C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
