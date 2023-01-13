@@ -1,30 +1,18 @@
+<script setup lang="ts">
+import AppHeader from "@/components/layout/header/AppHeader.vue";
+import { Env } from "./helpers/Env";
+
+const appTitle = Env.get("VUE_APP_TITLE");
+</script>
+
 <template>
-  <nav>
-    <router-link to="/">Home</router-link>
-  </nav>
+  <AppHeader :title="appTitle" />
 
-  <router-view />
+  <div class="layout-session container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <router-view />
+      </div>
+    </div>
+  </div>
 </template>
-
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
