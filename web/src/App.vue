@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AppHeader from "@/components/layout/header/AppHeader.vue";
-import { Env } from "./helpers/Env";
+import { Env } from "@/app/helpers/env";
+import AppHeader from "@/app/components/layout/header/app-header.component.vue";
 
 const appTitle = Env.get("VUE_APP_TITLE");
 </script>

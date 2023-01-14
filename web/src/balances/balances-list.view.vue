@@ -1,3 +1,3 @@
 <template>
-  <p>Home</p>
+  <p>Balances List</p>
 </template>

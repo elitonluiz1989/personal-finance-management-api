@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineProps } from "vue";
-import AppHeaderTitle from "./AppHeaderTitle.vue";
-import { IAppNavitem } from "./IAppNavItem";
+import AppHeaderTitle from "./app-header-title.component.vue";
+import { IAppNavitem } from "./app-nav-item.interface";
 
 type AppHeaderPropsType = {
   title: string;

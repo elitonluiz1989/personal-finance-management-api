@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import { BalancesRoutes } from "@/balances/balances.routes";
 
-const routes: Array<RouteRecordRaw> = [
+const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    name: "home",
-    component: HomeView,
+    redirect: () => "/balances",
   },
+  ...BalancesRoutes,
 ];
 
 const router = createRouter({
