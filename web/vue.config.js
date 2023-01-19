@@ -27,10 +27,15 @@ const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
-    https: {
-      key: fs.readFileSync(keyFilePath),
-      cert: fs.readFileSync(certFilePath),
+    server: {
+      type: "https",
+      options: {
+        key: fs.readFileSync(keyFilePath),
+        cert: fs.readFileSync(certFilePath),
+      },
     },
+    host: "localhost",
     port: 8080,
+    hot: true,
   },
 });

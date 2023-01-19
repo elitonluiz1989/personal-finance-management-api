@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Env } from "@/app/helpers/env";
 import AppHeader from "@/app/components/layout/header/app-header.component.vue";
+import { vueEnv } from "@/app/helpers/helpers";
 
-const appTitle = Env.get("VUE_APP_TITLE");
+const appTitle = vueEnv("TITLE");
 </script>
 
 <template>

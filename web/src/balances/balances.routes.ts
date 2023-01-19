@@ -8,7 +8,7 @@ export const BalancesRoutes: RouteRecordRaw[] = [
     path: "/balances",
     name: "balances",
     meta: {
-      authorized: [UserRoleEnum.Administrator],
+      authorized: [UserRoleEnum.administrator],
     },
     beforeEnter: [authenticationGuard],
     redirect: (): RouteLocationNamedRaw => ({ name: "balances.list" }),

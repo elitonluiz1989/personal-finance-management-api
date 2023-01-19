@@ -28,7 +28,9 @@ namespace PersonalFinanceManagement.Domain.Base.Services
             if (obj is not null)
                 return true;
 
-            AddNotification($"{nameof(obj)} is null");
+            Type type = typeof(T);
+
+            AddNotification($"{type.Name} is null");
 
             return false;
         }

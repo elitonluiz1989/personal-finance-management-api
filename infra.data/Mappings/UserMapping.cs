@@ -39,6 +39,14 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .IsRequired()
                 .HasConversion<short>();
 
+            builder.Property(p => p.RefreshToken)
+                .HasColumnOrder(6)
+                .IsRequired(false);
+
+            builder.Property(p => p.RefeshTokenExperitionTime)
+                .HasColumnOrder(7)
+                .IsRequired(false);
+
             builder.HasIndex(p => p.UserName)
                 .IsUnique();
 

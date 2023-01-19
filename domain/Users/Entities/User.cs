@@ -13,6 +13,8 @@ namespace PersonalFinanceManagement.Domain.Users.Entities
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public UserRoleEnum Role { get; set; }
+        public string? RefreshToken { get; set; } = string.Empty;
+        public DateTime? RefeshTokenExperitionTime { get; set; }
 
         public virtual List<Balance> Balances { get; set; } = new List<Balance>();
         public virtual List<RefinancedBalance> RefinancedBalances { get; set; } = new List<RefinancedBalance>();

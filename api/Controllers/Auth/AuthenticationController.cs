@@ -1,31 +1,54 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PersonalFinanceManagement.Api.Controllers.Base;
 using PersonalFinanceManagement.Application.Contracts;
 using PersonalFinanceManagement.Application.Dtos.Authentication;
+using PersonalFinanceManagement.Domain.Base.Contracts;
 
 namespace PersonalFinanceManagement.Api.Controllers.Auth
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthenticationController : Controller
+    public class AuthenticationController : BaseApiController
     {
+        public AuthenticationController(
+            INotificationService notificationService,
+            IUnitOfWork unitOfWork
+        )
+            : base(notificationService, unitOfWork)
+        {
+        }
+
         [HttpPost("Authenticate")]
         [AllowAnonymous]
-        public async Task<ActionResult<AuthenticatedDto>> Authenticate(
+        public async Task<IActionResult> Authenticate(
             [FromBody] AuthenticationDto dto,
             [FromServices] IConfiguration configuration,
             [FromServices] IAuthenticationService authenticationService
         )
         {
-            if (dto == null)
-                return BadRequest();
+            var result = await authenticationService.Authenticate(dto, configuration);
 
-            dto.AppSecret = configuration.GetValue<string>("Jwt:Secret");
-            dto.ExpirationDelay = configuration.GetValue<uint>("Jwt:ExprirationDelay");
+            if (HasNotifications())
+                return ResponseWithNotifications();
 
-            var result = await authenticationService.Authenticate(dto);
+            return ResponseWithCommit(result);
+        }
 
-            return Ok(result);
+        [HttpPost("Refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh(
+            [FromBody] AuthenticationRefreshDto dto,
+            [FromServices] IConfiguration configuration,
+            [FromServices] IAuthenticationService authenticationService
+        )
+        {
+            var result = await authenticationService.Refresh(dto, configuration);
+
+            if (HasNotifications())
+                return ResponseWithNotifications();
+
+            return ResponseWithCommit(result);
         }
     }
 }

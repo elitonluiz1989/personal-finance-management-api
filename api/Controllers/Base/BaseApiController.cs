@@ -37,6 +37,13 @@ namespace PersonalFinanceManagement.Api.Controllers.Base
             return Ok(true);
         }
 
+        protected IActionResult ResponseWithCommit<T>(T result)
+        {
+            _unitOfWork.Commit();
+
+            return Ok(result);
+        }
+
         private int GetAuthUserId()
         {
             if (HttpContext is null)
