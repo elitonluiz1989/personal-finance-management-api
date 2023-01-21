@@ -1,4 +1,4 @@
-import { IIndexable } from "../types";
+import { IIndexable, StoreResourcesItem } from "../types";
 
 function hasKey<T extends object>(obj: T, key: PropertyKey): key is keyof T {
   return key in obj;
@@ -25,10 +25,20 @@ export function isNullOrWhiteSpace(value: string | null | undefined): boolean {
   return isNullOrUndefined(value) || value?.trim()?.length === 0;
 }
 
-export function env(key: string): string | undefined {
-  return process.env[key];
+export function env(key: string, defaultValue = ""): string {
+  return process.env[key] ?? defaultValue;
 }
 
-export function vueEnv(key: string): string | undefined {
-  return env(`VUE_APP_${key}`);
+export function vueEnv(key: string, defaultValue = ""): string {
+  return env(`VUE_APP_${key}`, defaultValue);
+}
+
+export function createStoreResourceItem(
+  namespace: string,
+  value: string
+): StoreResourcesItem {
+  return {
+    value: value,
+    namespaced: `${namespace}/${value}`,
+  };
 }

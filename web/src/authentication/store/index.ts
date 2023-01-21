@@ -1,4 +1,4 @@
-import { Module } from "vuex";
+import { ActionContext, Module } from "vuex";
 import { AuthenticationState } from "./types";
 import axios from "axios";
 import { State } from "@/app/store/types";
@@ -6,7 +6,6 @@ import { isNullOrUndefined, isNullOrWhiteSpace } from "@/app/helpers/helpers";
 import { AuthenticationInfo } from "../authentication.model";
 import { AuthResources } from "../authentication.resources";
 import { AuthenticationDto, AuthenticationRefreshDto } from "../types";
-import { storeGet } from "@/app/store/index";
 
 export const authentication: Module<AuthenticationState, State> = {
   namespaced: true,
@@ -30,6 +29,17 @@ export const authentication: Module<AuthenticationState, State> = {
       if (isNullOrWhiteSpace(json) || json === null) return undefined;
 
       return AuthenticationInfo.deserialize(json);
+    },
+
+    [AuthResources.store.getters.token.value](
+      state: AuthenticationState,
+      getters: any
+    ): string | undefined {
+      const authentication =
+        state.authentication ??
+        getters[AuthResources.store.getters.authentication.value];
+
+      return authentication?.token;
     },
   },
 
@@ -61,7 +71,7 @@ export const authentication: Module<AuthenticationState, State> = {
       commit(AuthResources.store.mutations.addAuthInfo.value, result.data);
     },
     async [AuthResources.store.actions.refresh.value](
-      { commit },
+      context: ActionContext<AuthenticationState, State>,
       payload: AuthenticationRefreshDto
     ) {
       const result = await axios.post<AuthenticationRefreshDto>(
@@ -71,14 +81,13 @@ export const authentication: Module<AuthenticationState, State> = {
 
       if (isNullOrUndefined(result.data)) return;
 
-      const authenticationInfo = storeGet<AuthenticationInfo>(
-        AuthResources.store.getters.authentication.namespaced
-      );
+      const authenticationInfo =
+        context.getters[AuthResources.store.getters.authentication.namespaced];
       authenticationInfo.token = result.data.token;
       authenticationInfo.refreshToken = result.data.refreshToken;
       authenticationInfo.expires = result.data.expires;
 
-      commit(
+      context.commit(
         AuthResources.store.mutations.addAuthInfo.value,
         authenticationInfo
       );

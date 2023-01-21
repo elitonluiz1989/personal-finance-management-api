@@ -1,29 +1,35 @@
-import { useStore } from "@/app/store/index";
 import { AuthResources } from "./authentication.resources";
 import { AuthenticationInfo } from "@/authentication/authentication.model";
 import { AuthenticationRefreshDto } from "./types";
 import router from "@/app/router";
+import { isNullOrWhiteSpace } from "@/app/helpers/helpers";
+import { StoreHelper } from "@/app/store/store.helper";
 
 export async function authenticationGuard() {
-  const store = useStore();
-  const authenticationInfo = store.getters[
-    AuthResources.store.getters.authentication.namespaced
-  ] as AuthenticationInfo;
+  const authenticationInfo = StoreHelper.get<AuthenticationInfo | null>(
+    AuthResources.store.getters.authentication.namespaced,
+    null
+  );
 
   if (authenticationInfo?.isAuthenticated === false) return redirect();
 
   if (authenticationInfo?.isExpired) {
-    const response = confirm(AuthResources.confirmRefreshToken);
+    const response = prompt(AuthResources.confirmRefreshToken);
 
-    if (response == false) return redirect();
+    if (isNullOrWhiteSpace(response)) return redirect();
 
     const dto: AuthenticationRefreshDto = {
+      username: authenticationInfo?.user?.userName ?? "",
+      password: response ?? "",
       token: authenticationInfo.token,
       refreshToken: authenticationInfo.refreshToken,
     };
 
     try {
-      await store.dispatch(AuthResources.store.actions.refresh.namespaced, dto);
+      await StoreHelper.dispatch(
+        AuthResources.store.actions.refresh.namespaced,
+        dto
+      );
     } catch (e) {
       router.push({ name: "login" });
 

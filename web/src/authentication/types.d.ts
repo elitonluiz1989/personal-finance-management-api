@@ -4,6 +4,8 @@ export type AuthenticationDto = {
 };
 
 export type AuthenticationRefreshDto = {
+  username: string;
+  password: string;
   token: string;
   refreshToken: string;
   expires?: Date;

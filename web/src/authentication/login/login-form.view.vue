@@ -8,7 +8,7 @@ import { AppMessagesHelper } from "@/app/components/messages/app-messages.helper
 import router from "@/app/router";
 import { AuthenticationDto } from "../types";
 import { AuthResources } from "../authentication.resources";
-import { useStore } from "@/app/store";
+import { StoreHelper } from "@/app/store/store.helper";
 
 const messages = new AppMessagesHelper();
 const form: AppFom = {
@@ -24,7 +24,6 @@ const form: AppFom = {
   },
 };
 const validation = new ValidationService();
-const store = useStore();
 
 const submitForm = async (evt: Event) => {
   evt.preventDefault();
@@ -44,7 +43,7 @@ const submitForm = async (evt: Event) => {
     password: form.password.value.value,
   };
 
-  await store.dispatch(AuthResources.store.actions.login.namespaced, dto);
+  await StoreHelper.dispatch(AuthResources.store.actions.login.namespaced, dto);
 
   router.push("/");
 };

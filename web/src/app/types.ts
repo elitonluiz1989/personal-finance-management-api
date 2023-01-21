@@ -9,6 +9,11 @@ export type ValidationRule<T> = {
   message: string;
 };
 
+export type StoreResourcesItem = {
+  value: string;
+  namespaced: string;
+};
+
 export type AppFomField<T> = {
   value: Ref<T>;
   validations: ValidationRule<T>[];

@@ -38,12 +38,9 @@ namespace PersonalFinanceManagement.Api.Services
             if (ValidateNullableObject(dto) is false)
                 return default;
 
-            var results = await _repository.Query()
-                .Where(p => p.UserName == dto.UserName && p.Password == dto.HashedPassword)
-                .ToListAsync();
-            var user = results.FirstOrDefault();
+            var user = await GetUser(dto);
 
-            if (ValidateNullableObject(user) is false || user is null)
+            if (user is null)
                 return default;
 
             Token = CreateToken(user, configuration);
@@ -76,37 +73,12 @@ namespace PersonalFinanceManagement.Api.Services
             if (ValidateNullableObject(dto) is false)
                 return default;
 
-            var principal = GetPrincipalFromExpiredToken(dto.Token, configuration.GetValue<string>("Jwt:Secret"));
+            var user = await GetUser(dto);
 
-            if (principal is null)
-            {
-                AddNotification("Invalid access token/refresh token");
-
+            if (user is null)
                 return default;
-            }
 
-            var userIdValue = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid)?.Value;
-
-            if (string.IsNullOrEmpty(userIdValue))
-            {
-                AddNotification("User ID not found in token data");
-
-                return default;
-            }
-
-            var success = int.TryParse(userIdValue, out var userId);
-
-            if (success is false)
-            {
-                AddNotification("User ID not found in token data");
-
-                return default;
-            }
-
-            var user = await _repository.Find(userId);
-
-            if (user == null ||
-                user.RefreshToken != dto.RefreshToken ||
+            if (user.RefreshToken != dto.RefreshToken ||
                 user.RefeshTokenExperitionTime < DateTime.Now)
             {
                 AddNotification("Invalid token/refresh token");
@@ -125,6 +97,23 @@ namespace PersonalFinanceManagement.Api.Services
                 RefreshToken = newRefreshToken,
                 Expires = newToken.ValidTo
             };
+        }
+
+        private async Task<User?> GetUser(AuthenticationDto dto)
+        {
+            var results = await _repository.Query()
+                .Where(p => p.UserName == dto.UserName && p.Password == dto.HashedPassword)
+                .ToListAsync();
+            var user = results.FirstOrDefault();
+
+            if (user is null)
+            {
+                AddNotification("Username or password is invalid.");
+
+                return default;
+            }
+
+            return user;
         }
 
         private SecurityToken CreateToken(User user, IConfiguration configuration)

@@ -1,33 +1,25 @@
+import { createStoreResourceItem } from "@/app/helpers/helpers";
+
 const namespace = "authentication";
 
-type StoreResourcesItem = {
-  value: string;
-  namespaced: string;
-};
-
-function createStoreItem(value: string): StoreResourcesItem {
-  return {
-    value: value,
-    namespaced: `${namespace}/${value}`,
-  };
-}
-
 export const AuthResources = {
-  confirmRefreshToken: "Your session ended, do you want to restore it?",
+  confirmRefreshToken:
+    "Your session has ended. If you want to restore it, please enter your password again.",
   localStorage: {
     authInfo: "authInfo",
   },
   store: {
     namespace: namespace,
     getters: {
-      authentication: createStoreItem("getAuthentication"),
+      authentication: createStoreResourceItem(namespace, "getAuthentication"),
+      token: createStoreResourceItem(namespace, "getToken"),
     },
     mutations: {
-      addAuthInfo: createStoreItem("addAuthenticationInfo"),
+      addAuthInfo: createStoreResourceItem(namespace, "addAuthenticationInfo"),
     },
     actions: {
-      login: createStoreItem("login"),
-      refresh: createStoreItem("refresh"),
+      login: createStoreResourceItem(namespace, "login"),
+      refresh: createStoreResourceItem(namespace, "refresh"),
     },
   },
 };

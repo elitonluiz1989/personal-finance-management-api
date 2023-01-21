@@ -14,13 +14,3 @@ export const store = createStore<State>({
     isLoading: false,
   },
 });
-
-export function useStore() {
-  return useStoreBase(storeKey) ?? store;
-}
-
-export function storeGet<T>(getter: string): T {
-  const store = useStore();
-
-  return store?.getters[getter] as T;
-}
