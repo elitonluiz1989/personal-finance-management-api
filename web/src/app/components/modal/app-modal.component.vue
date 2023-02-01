@@ -7,25 +7,26 @@ import {
   watch,
   withDefaults,
 } from "vue";
-import { AppModalFooterConfig } from "./types";
+import { IAppModalFooterProps } from "./types";
+import AppModalHeader from "./app-modal-header.component.vue";
+import AppModalFooter from "./app-modal-footer.compenent.vue";
 
 type AppModalProps = {
   id: string;
   title: string;
   show: boolean;
-  footer: AppModalFooterConfig;
+  isForm: boolean;
+  footer: IAppModalFooterProps;
 };
 type AppModalEmits = {
   (e: "onClose", show: boolean): void;
+  (e: "onReset", evt: Event): void;
+  (e: "onSave", evt: Event): void;
 };
 
-const defaultFooterConfigs: AppModalFooterConfig = {
-  show: false,
-  saveText: "Save",
-  dismissText: "Close",
-};
 const props = withDefaults(defineProps<AppModalProps>(), {
   show: false,
+  isForm: false,
 });
 const show = ref(false);
 const labelId = `${props.id}-label`;
@@ -38,12 +39,6 @@ const modalDropCssStyles = computed(() => ({
   "modal-backdrop fade show": show.value,
   "modal-backdrop fade": show.value === false,
 }));
-const footerSaveText = computed(
-  () => props.footer.saveText ?? defaultFooterConfigs.saveText
-);
-const footerDismissText = computed(
-  () => props.footer.dismissText ?? defaultFooterConfigs.dismissText
-);
 
 watch(
   () => props.show,
@@ -52,13 +47,15 @@ watch(
   }
 );
 
+const emits = defineEmits<AppModalEmits>();
+
 const closeModal = () => {
   show.value = false;
 
   emits("onClose", false);
 };
-
-const emits = defineEmits<AppModalEmits>();
+const submitForm = (evt: Event) => emits("onSave", evt);
+const resetForm = (evt: Event) => emits("onReset", evt);
 </script>
 
 <template>
@@ -72,38 +69,45 @@ const emits = defineEmits<AppModalEmits>();
   >
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 :id="labelId" class="modal-title">{{ props.title }}</h5>
+        <form v-if="props.isForm" @submit="submitForm" @reset="resetForm">
+          <AppModalHeader
+            :title="props.title"
+            :label-id="labelId"
+            @trigger-on-close="closeModal"
+          />
 
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-            @click="closeModal"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
+          <div class="modal-body">
+            <slot></slot>
+          </div>
 
-        <div class="modal-body">
-          <slot></slot>
-        </div>
+          <AppModalFooter
+            :is-form="true"
+            :save-text="props.footer.saveText"
+            :reset-text="props.footer.dismissText"
+            :dismiss-text="props.footer.dismissText"
+            @trigger-on-close="closeModal"
+          />
+        </form>
 
-        <div class="modal-footer" v-show="props.footer.show">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-dismiss="modal"
-            @click="closeModal"
-          >
-            {{ footerDismissText }}
-          </button>
+        <template v-else>
+          <AppModalHeader
+            :title="props.title"
+            :label-id="labelId"
+            @trigger-on-close="closeModal"
+          />
 
-          <button type="button" class="btn btn-primary">
-            {{ footerSaveText }}
-          </button>
-        </div>
+          <div class="modal-body">
+            <slot></slot>
+          </div>
+
+          <AppModalFooter
+            :is-form="false"
+            :save-text="props.footer.saveText"
+            :reset-text="props.footer.dismissText"
+            :dismiss-text="props.footer.dismissText"
+            @trigger-on-close="closeModal"
+          />
+        </template>
       </div>
     </div>
   </div>
