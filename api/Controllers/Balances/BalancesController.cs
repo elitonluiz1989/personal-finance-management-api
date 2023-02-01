@@ -26,7 +26,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
             [FromServices] IBalanceSpecification specification
         )
         {
-            var results = await specification.Get(filter);
+            var results = await specification.Get(filter, AuthenticatedUserId);
 
             return Ok(results);
         }
@@ -38,12 +38,12 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
             [FromServices] IBalanceStore store
         )
         {
-            await store.Store(dto);
+            var balance = await store.Store(dto);
 
             if (HasNotifications())
                 return ResponseWithNotifications();
 
-            return ResponseWithCommit();
+            return ResponseWithCommit(balance);
         }
 
         [HttpDelete("{id}")]

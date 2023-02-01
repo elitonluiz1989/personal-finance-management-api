@@ -7,11 +7,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
     {
         public int Id { get; set; }
         public int BalanceId { get; set; }
-        public BalanceDto? Balance { get; set; }
         public int Reference { get; set; }
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
         public decimal Amount { get; set; }
+
+        public BalanceDto? Balance { get; set; }
         public List<TransactionItemDto> Items { get; set; } = new();
     }
 }

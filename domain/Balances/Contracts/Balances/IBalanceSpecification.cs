@@ -5,6 +5,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Contracts.Balances
 {
     public interface IBalanceSpecification
     {
-        Task<List<BalanceDto>> Get(BalanceFilter filter);
+        Task<List<BalanceDto>> Get(BalanceFilter filter, int userId);
     }
 }

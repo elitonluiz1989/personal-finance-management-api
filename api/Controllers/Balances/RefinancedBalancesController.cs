@@ -25,7 +25,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
             [FromServices] IRefinancedBalanceStore store
         )
         {
-            await store.Store(dto, AuthUserId);
+            await store.Store(dto, AuthenticatedUserId);
 
             if (HasNotifications())
                 return ResponseWithNotifications();

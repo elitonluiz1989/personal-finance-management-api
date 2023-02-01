@@ -1,24 +1,30 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
-using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Balances.Filters;
-using PersonalFinanceManagement.Domain.Transactions.Dtos;
-using PersonalFinanceManagement.Domain.Transactions.Entities;
+using PersonalFinanceManagement.Domain.Users.Contracts;
+using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Domain.Balances.Specifications
 {
     public class BalanceSpecification : IBalanceSpecification
     {
+        private readonly IUserRepository _userRepository;
         private readonly IBalanceRepository _repository;
 
-        public BalanceSpecification(IBalanceRepository repository)
+        public BalanceSpecification(
+            IUserRepository userRepository,
+            IBalanceRepository repository
+        )
         {
+            _userRepository = userRepository;
             _repository = repository;
         }
 
-        public async Task<List<BalanceDto>> Get(BalanceFilter filter)
+        public async Task<List<BalanceDto>> Get(BalanceFilter filter, int userId)
         {
+            var userRole = await _userRepository.GetUserRole(userId);
             var query = _repository.Query();
 
             if (filter.Id > 0)
@@ -39,52 +45,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             if (filter.Closed.HasValue)
                 query = query.Where(p => p.Closed == filter.Closed);
 
-            return await query.Select(s => new BalanceDto()
-            {
-                Id = s.Id,
-                UserId = s.UserId,
-                Type = s.Type,
-                Amount = s.Amount,
-                Financed = s.Financed,
-                InstallmentsNumber = s.InstallmentsNumber,
-                Installments = s.Installments
-                    .Select(i => GetInstallment(i))
-                    .ToList()
-            })
-            .ToListAsync();
-        }
+            if (userRole is not UserRoleEnum.Administrator)
+                query = query.Where(p => p.UserId == userId);
 
-        private static InstallmentDto GetInstallment(Installment installment)
-        {
-            return new InstallmentDto()
-            {
-                Id = installment.Id,
-                BalanceId = installment.BalanceId,
-                Reference = installment.Reference,
-                Number = installment.Number,
-                Amount = installment.Amount,
-                Items = installment.Items.Select(ti => new TransactionItemDto()
-                {
-                    TransactionId = ti.TransactionId,
-                    Transaction = GetTransaction(ti.Transaction),
-                    Type = ti.Type
-                })
-                .ToList()
-            };
-        }
-
-        private static TransactionDto? GetTransaction(Transaction? transaction)
-        {
-            if (transaction is null)
-                return default;
-
-            return new TransactionDto()
-            {
-                Id = transaction.Id,
-                Type = transaction.Type,
-                Date = transaction.Date,
-                Amount = transaction.Amount
-            };
+            return await query
+                .Select(s => BalanceMappingsExtension.ToBalanceDto(s))
+                .ToListAsync();
         }
     }
 }

@@ -2,6 +2,7 @@
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Users.Contracts;
@@ -11,10 +12,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
 {
     public class BalanceStore : Store<Balance, int>, IBalanceStore
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IUserRepository _userRepository;
         private readonly IBalanceInstallmentStore _balanceInstallmentStoreService;
 
         public BalanceStore(
+            IUnitOfWork unitOfWork,
             INotificationService notificationService,
             IBalanceRepository repository,
             IUserRepository userRepository,
@@ -22,28 +25,35 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
         )
             : base(notificationService, repository)
         {
+            _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _balanceInstallmentStoreService = balanceInstallmentStoreService;
         }
 
-        public async Task Store(BalanceStoreDto dto, bool fromRefinance = false)
+        public async Task<BalanceDto?> Store(BalanceStoreDto dto, bool fromRefinance = false)
         {
             if (ValidateDto(dto) is false)
-                return;
+                return default;
 
             var balance = await SetBalance(dto, fromRefinance);
 
             if (ValidateEntity(balance) is false || balance is null)
-                return;
+                return default;
 
             await FinanceBalance(balance, dto, fromRefinance);
 
             if (HasNotifications)
-                return;
+                return default;
 
             SaveEntity(balance);
-        }
 
+            if (HasNotifications)
+                return default;
+
+            _unitOfWork.Commit();
+
+            return balance.ToBalanceDto();
+        }
 
         protected async Task<Balance?> SetBalance(BalanceStoreDto dto, bool fromRefinance = false)
         {

@@ -7,7 +7,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Base
     [Route("[controller]")]
     public abstract class BaseApiController : Controller
     {
-        protected int AuthUserId => GetAuthUserId();
+        protected int AuthenticatedUserId => GetAuthenticatedUserId();
         private readonly INotificationService _notificationService;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -44,7 +44,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Base
             return Ok(result);
         }
 
-        private int GetAuthUserId()
+        private int GetAuthenticatedUserId()
         {
             if (HttpContext is null)
                 return default;
