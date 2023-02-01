@@ -6,6 +6,7 @@ import { isNullOrUndefined, isNullOrWhiteSpace } from "@/app/helpers/helpers";
 import { AuthenticationInfo } from "../authentication.model";
 import { AuthResources } from "../authentication.resources";
 import { AuthenticationDto, AuthenticationRefreshDto } from "../types";
+import { StoreHelper } from "@/app/store/store.helper";
 
 export const authentication: Module<AuthenticationState, State> = {
   namespaced: true,
@@ -79,10 +80,20 @@ export const authentication: Module<AuthenticationState, State> = {
         payload
       );
 
-      if (isNullOrUndefined(result.data)) return;
+      if (
+        isNullOrUndefined(result.data) ||
+        isNullOrWhiteSpace(result.data?.token)
+      )
+        throw new Error(AuthResources.refreshToken.tokenNull);
 
-      const authenticationInfo =
-        context.getters[AuthResources.store.getters.authentication.namespaced];
+      const authenticationInfo = StoreHelper.get<AuthenticationInfo | null>(
+        AuthResources.store.getters.authentication.namespaced,
+        null
+      );
+
+      if (authenticationInfo === null)
+        throw new Error(AuthResources.refreshToken.dataNotFound);
+
       authenticationInfo.token = result.data.token;
       authenticationInfo.refreshToken = result.data.refreshToken;
       authenticationInfo.expires = result.data.expires;

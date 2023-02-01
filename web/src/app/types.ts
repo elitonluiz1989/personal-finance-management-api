@@ -14,12 +14,18 @@ export type StoreResourcesItem = {
   namespaced: string;
 };
 
-export type AppFomField<T> = {
+export type AppFormField<T> = {
+  id: string;
   value: Ref<T>;
   validations: ValidationRule<T>[];
   invalid: Ref<boolean>;
 };
 
-export type AppFom = {
-  [key: string]: AppFomField<any>;
+export type AppForm = {
+  [key: string]: AppFormField<any>;
+};
+
+export type KeyValue<TKey, TValue> = {
+  key: TKey;
+  value: TValue;
 };

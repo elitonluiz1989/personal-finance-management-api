@@ -14,7 +14,7 @@ export async function authenticationGuard() {
   if (authenticationInfo?.isAuthenticated === false) return redirect();
 
   if (authenticationInfo?.isExpired) {
-    const response = prompt(AuthResources.confirmRefreshToken);
+    const response = prompt(AuthResources.refreshToken.confirm);
 
     if (isNullOrWhiteSpace(response)) return redirect();
 

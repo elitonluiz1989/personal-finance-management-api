@@ -1,49 +1,45 @@
 <script setup lang="ts">
-import AppMessages from "@/app/components/messages/app-messages.component.vue";
-import { ValidationRules } from "@/app/services/validation/validation-rules";
-import { ValidationService } from "@/app/services/validation/validation.service";
-import { AppFom } from "@/app/types";
-import { ref } from "vue";
-import { AppMessagesHelper } from "@/app/components/messages/app-messages.helpers";
 import router from "@/app/router";
-import { AuthenticationDto } from "../types";
+import { FormService } from "@/app/services/form/form.service";
+import {
+  FormOptions,
+  FormFieldsOptions,
+  FormFields,
+} from "@/app/services/form/types";
+import { ValidationRules } from "@/app/services/validation/validation-rules";
 import { AuthResources } from "../authentication.resources";
-import { StoreHelper } from "@/app/store/store.helper";
+import { AuthenticationDto } from "../types";
+import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
 
-const messages = new AppMessagesHelper();
-const form: AppFom = {
+const formFieldsOptions: FormFieldsOptions = {
   username: {
-    value: ref(""),
+    initialValue: "",
     validations: [ValidationRules.required("Username")],
-    invalid: ref(false),
   },
   password: {
-    value: ref(""),
+    initialValue: "",
     validations: [ValidationRules.required("Password")],
-    invalid: ref(false),
   },
 };
-const validation = new ValidationService();
+const formOptions: FormOptions = {
+  fields: formFieldsOptions,
+  submit: {
+    action: AuthResources.store.actions.login.namespaced,
+    dataHandler: (fields: FormFields): AuthenticationDto => ({
+      username: fields.username.model.value,
+      password: fields.password.model.value,
+    }),
+  },
+};
 
-const submitForm = async (evt: Event) => {
-  evt.preventDefault();
+const form = new FormService(formOptions);
 
-  messages.reset();
+const submitForm = async () => {
+  form.validate();
 
-  validation.validate(form);
+  if (form.invalid) return;
 
-  if (validation.isInvalid) {
-    messages.addErrors(validation.errors);
-
-    return;
-  }
-
-  const dto: AuthenticationDto = {
-    username: form.username.value.value,
-    password: form.password.value.value,
-  };
-
-  await StoreHelper.dispatch(AuthResources.store.actions.login.namespaced, dto);
+  await form.submit();
 
   router.push("/");
 };
@@ -53,23 +49,22 @@ const submitForm = async (evt: Event) => {
   <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-12 col-sm-7 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
-        <form @submit="submitForm">
-          <div class="form-group" v-show="messages.content.show">
-            <AppMessages
-              :messages="messages.content.messages"
-              :type="messages.content.type"
-            />
-          </div>
-
+        <form @submit.prevent="submitForm" @reset="() => form.reset()">
           <div class="form-group row">
-            <label for="username" class="form-label">User</label>
+            <label class="form-label">User</label>
 
             <input
               type="text"
               autocomplete="username"
-              id="username"
               class="form-control"
-              v-model="form.username.value.value"
+              form-field="username"
+              @focus="form.fields.username.clearValidation"
+              v-model="form.fields.username.model.value"
+            />
+
+            <AppValidationMessages
+              :validations="form.fields.username.validations"
+              v-if="form.fields.username.invalid"
             />
           </div>
 
@@ -79,9 +74,15 @@ const submitForm = async (evt: Event) => {
             <input
               type="password"
               autocomplete="current-password"
-              id="password"
               class="form-control"
-              v-model="form.password.value.value"
+              form-field="password"
+              @focus="form.fields.password.clearValidation"
+              v-model="form.fields.password.model.value"
+            />
+
+            <AppValidationMessages
+              :validations="form.fields.password.validations"
+              v-if="form.fields.password.invalid"
             />
           </div>
 

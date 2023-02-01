@@ -29,20 +29,31 @@ export class AxiosHelper {
 
         return config;
       },
-      this.errorHandler
+      (error: AxiosError) => this.errorHandler(error)
     );
 
     axios.interceptors.response.use(
       (response: AxiosResponse): AxiosResponse => response,
-      this.errorHandler
+      (error: AxiosError) => this.errorHandler(error)
     );
   }
 
   private static errorHandler(error: AxiosError): Promise<AxiosError> {
-    const errors = (error.response?.data ?? [error.message]) as string[];
+    const errors = this.getErrorMessage(error);
 
-    alert(errors.join(", "));
+    alert(errors);
 
     return Promise.reject(error);
+  }
+
+  private static getErrorMessage(error: AxiosError): string {
+    const { message, response } = error;
+
+    if (!response || !response.data) return message;
+
+    if (Array.isArray(response.data) && response.data.length)
+      return response?.data.join(", ");
+
+    return (response.data as string)?.toString() ?? "";
   }
 }
