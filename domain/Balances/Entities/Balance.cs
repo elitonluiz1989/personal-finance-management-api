@@ -91,7 +91,16 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         private bool VerifyIfClosed()
         {
             if (_closed.HasValue is false)
-                _closed = Installments?.All(i => i.Active is false) ?? false;
+            {
+                if (Installments?.Any() is false)
+                {
+                    _closed = false;
+                }
+                else
+                {
+                    _closed = Installments?.All(i => i.Active is false) ?? false;
+                }
+            }
 
             return _closed.Value;
         }

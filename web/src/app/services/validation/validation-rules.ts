@@ -1,12 +1,10 @@
+import { isBooleanAttr, isString } from "@vue/shared";
 import {
-  isBoolean,
   isNullOrUndefined,
   isNullOrWhiteSpace,
-  isString,
+  isNumber,
 } from "@/app/helpers/helpers";
 import { ValidationRule } from "@/app/types";
-import { Ref } from "vue";
-import { isNumber } from "./../../helpers/helpers";
 
 export class ValidationRules {
   public static required<T>(fieldName: string): ValidationRule<T> {
@@ -55,7 +53,7 @@ export class ValidationRules {
   }
 
   private static requiredValidation<T>(value: T) {
-    if (isBoolean(value)) return isNullOrUndefined(value) === false;
+    if (isBooleanAttr(String(value))) return isNullOrUndefined(value) === false;
 
     if (isNumber(value)) {
       const numValue = Number(value);

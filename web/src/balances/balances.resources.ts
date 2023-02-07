@@ -3,6 +3,8 @@ import { createStoreResourceItem } from "@/app/helpers/helpers";
 const namespace = "balances";
 
 export const BalancesResoures = {
+  open: "Open",
+  closed: "Closed",
   form: {
     title: {
       insert: "Add Balance",

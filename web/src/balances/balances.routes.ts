@@ -1,5 +1,5 @@
 import { authenticationGuard } from "@/authentication/authentication.guard";
-import BalancesListView from "@/balances/balances-list.view.vue";
+import BalancesListView from "@/balances/views/balances-list.view.vue";
 import { UserRoleEnum } from "@/users/enuns/user-role.enum";
 import { RouteLocationNamedRaw, RouteRecordRaw } from "vue-router";
 

@@ -6,6 +6,14 @@ import { BalancesResoures } from "../balances.resources";
 import { Balance } from "../balance.model";
 import { isNullOrUndefined } from "@/app/helpers/helpers";
 
+const handelBalanceData = (balances: Balance[], state: BalancesState) => {
+  for (const key in balances) {
+    balances[key] = Balance.createFrom(balances[key]);
+  }
+
+  state.balances = balances;
+};
+
 export const balances: Module<BalancesState, State> = {
   namespaced: true,
 
@@ -24,7 +32,7 @@ export const balances: Module<BalancesState, State> = {
       state: BalancesState,
       payload: Balance[]
     ) {
-      state.balances = payload;
+      handelBalanceData(payload, state);
     },
     [BalancesResoures.store.mutations.addBalance.value](
       state: BalancesState,
@@ -33,7 +41,9 @@ export const balances: Module<BalancesState, State> = {
       const balances = state.balances.filter(
         (b: Balance) => b.id !== payload.id
       );
-      state.balances = balances ?? [];
+      balances.push(payload);
+
+      handelBalanceData(balances, state);
     },
   },
 

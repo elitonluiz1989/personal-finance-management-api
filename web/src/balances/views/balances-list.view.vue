@@ -1,9 +1,10 @@
 <script async setup lang="ts">
 import { StoreHelper } from "@/app/store/store.helper";
 import { onMounted, ref } from "vue";
-import { Balance } from "./balance.model";
-import { BalancesResoures } from "./balances.resources";
-import BalanceForm from "./form/balance-form.component.vue";
+import { Balance } from "../balance.model";
+import { BalancesResoures } from "../balances.resources";
+import BalanceForm from "../components/balance-form.component.vue";
+import BalanceCard from "../components/balance-card/balance-card.component.vue";
 
 const balances = ref<Balance[]>([]);
 
@@ -31,9 +32,16 @@ const updateBalances = () => {
         <BalanceForm />
       </div>
     </div>
+
     <template v-if="balances.length > 0">
-      <div class="row" v-for="(balance, index) in balances" :key="index">
-        <div class="col-6"></div>
+      <div class="row justify-content-center py-3">
+        <div
+          class="col-12 mb-3"
+          v-for="(balance, index) in balances"
+          :key="index"
+        >
+          <BalanceCard :balance="balance" />
+        </div>
       </div>
     </template>
 

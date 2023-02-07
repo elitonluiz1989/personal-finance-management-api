@@ -1,5 +1,5 @@
+import { AppResources } from "@/app/app.resoures";
 import { IIndexable, KeyValue } from "@/app/types";
-import { AppResources } from "./../app/app.resoures";
 
 export enum BalanceTypeEnum {
   credit = 1,

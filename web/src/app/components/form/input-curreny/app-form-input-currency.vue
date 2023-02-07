@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isNullOrUndefined, isNullOrWhiteSpace } from "@/app/helpers/helpers";
+import { CurrencyFormatter } from "@/app/helpers/currency-formatter";
 import { defineEmits, defineProps, ref, withDefaults } from "vue";
-import { getCurrencyCode } from "./location-currency";
 
 type AppFormInputProps = {
   class: string;
@@ -20,16 +20,8 @@ const props = withDefaults(defineProps<AppFormInputProps>(), {
   maxlength: 200,
 });
 const emits = defineEmits<AppFormInputEmits>();
-
 const rawValue = ref<number>();
-
-const currency = props.currency ?? getCurrencyCode(navigator?.language);
-const formater = Intl.NumberFormat(props.location, {
-  style: "currency",
-  currency: currency,
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
+const currencyFormatter = new CurrencyFormatter(props.location, props.currency);
 
 const currencyHandler = (evt: Event) => {
   const { target } = evt;
@@ -50,7 +42,7 @@ const currencyHandler = (evt: Event) => {
 
   if (isNaN(rawValue.value)) rawValue.value = 0;
 
-  element.value = formater.format(rawValue.value);
+  element.value = currencyFormatter.format(rawValue.value);
 
   emits("update:modelValue", rawValue.value);
 };

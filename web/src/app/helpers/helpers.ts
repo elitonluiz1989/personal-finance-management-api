@@ -1,3 +1,4 @@
+import { isArray } from "@vue/shared";
 import { IIndexable, StoreResourcesItem } from "../types";
 
 function hasKey<T extends object>(obj: T, key: PropertyKey): key is keyof T {
@@ -14,6 +15,43 @@ export function mapTo<
     if (hasKey(to, key) === false) return;
 
     to[key] = from[key] as any;
+  }
+}
+
+export function mapFrom<
+  TSource extends IIndexable<any>,
+  TTarget extends IIndexable<any>
+>(source: TSource, target: TTarget) {
+  if (isNullOrUndefined(source) || isNullOrUndefined(target)) return;
+
+  for (const key in source) {
+    if (hasKey(target, key) === false) continue;
+
+    if (isArray(target[key])) {
+      (target[key] as any) = source[key];
+
+      continue;
+    }
+
+    if (isDate(target[key])) {
+      (target[key] as Date) = new Date(String(source[key]));
+
+      continue;
+    }
+
+    if (isBoolean(target[key])) {
+      (target[key] as boolean) = Boolean(String(source[key]));
+
+      continue;
+    }
+
+    if (isNumber(target[key])) {
+      (target[key] as number) = Number(String(source[key]));
+
+      continue;
+    }
+
+    (target[key] as any) = source[key];
   }
 }
 
@@ -48,11 +86,19 @@ export function isString<T>(value: T): boolean {
 }
 
 export function isNumber<T>(value: T): boolean {
-  return typeof value === "number" || isNaN(Number(value)) === false;
+  return typeof value === "number" && isNaN(Number(value)) === false;
 }
 
 export function isBoolean<T>(value: T): boolean {
   return typeof value === "boolean";
+}
+
+export function isDate<T>(value: T) {
+  if (value instanceof Date === false) return false;
+
+  const date = new Date(String(value));
+
+  return date && isValidNumber(date.getDate());
 }
 
 export function isValidNumber<T extends number>(value: T): boolean {
