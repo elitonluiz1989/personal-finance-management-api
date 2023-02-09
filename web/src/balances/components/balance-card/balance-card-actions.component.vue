@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
 import { computed, defineProps } from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 type BalanceActionsProps = {
   id: number;
@@ -20,9 +21,13 @@ const cssStyles = computed(() => ({
     class="balance__actions d-flex justify-content-evenly py-2"
     :class="cssStyles"
   >
-    <button class="btn">Refinance</button>
+    <button class="btn" title="Refinance">
+      <FontAwesomeIcon icon="fa-solid fa-money-bill-transfer" size="lg" />
+    </button>
 
-    <button class="btn">Remove</button>
+    <button class="btn" title="Remove">
+      <FontAwesomeIcon icon="fa-solid fa-trash-can" size="lg" />
+    </button>
   </div>
 </template>
 

@@ -21,16 +21,13 @@ const cardCssStyle = (type: BalanceTypeEnum) => ({
 </script>
 
 <template>
-  <div
-    class="balance card overflow-hidden"
-    :class="cardCssStyle(props.balance.type)"
-  >
+  <div class="balance card" :class="cardCssStyle(props.balance.type)">
     <div class="balance__title d-flex px-2 py-2 mb-0">
-      <h3
-        class="d-flex flex-fill align-items-center justify-content-center mb-0 text-white"
+      <div
+        class="d-flex flex-fill align-items-center justify-content-center mb-0 text-white fw-bolder"
       >
         {{ props.balance.name }}
-      </h3>
+      </div>
 
       <BalanceCardBadge
         :type="props.balance.type"
@@ -38,7 +35,7 @@ const cardCssStyle = (type: BalanceTypeEnum) => ({
       />
     </div>
 
-    <div class="container-fluid">
+    <div class="container-fluid flex-fill bg-white">
       <BalanceCardItem
         class="balance__user"
         label="User"
@@ -61,7 +58,6 @@ const cardCssStyle = (type: BalanceTypeEnum) => ({
     <BalanceCardInstallments
       :installments="props.balance.installments"
       :type="props.balance.type"
-      v-if="props.balance.installments?.length > 0"
     />
 
     <BalanceCardActions :id="balance.id" :type="balance.type" />
@@ -74,9 +70,8 @@ const cardCssStyle = (type: BalanceTypeEnum) => ({
 .balance {
   $selector: &;
 
-  &__actions {
-    background-color: #f9f9f9;
-  }
+  min-height: 20.6rem;
+  background-color: #f9f9f9;
 
   &--credit {
     border-color: $card-credit-color;

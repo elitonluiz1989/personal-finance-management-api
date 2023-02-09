@@ -76,7 +76,7 @@ const toggleAccordion = () => (isOpen.value = !isOpen.value);
     height: 0;
     overflow: hidden;
 
-    transition: height 0.6s ease-out;
+    transition: height 0.4s ease-out;
 
     &--show {
       height: v-bind(bodyHeight);

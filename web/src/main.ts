@@ -6,10 +6,23 @@ import router from "@/app/router";
 import { store, storeKey } from "@/app/store";
 import App from "@/app/views/app.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faAngleUp as fasAngleUp } from "@fortawesome/free-solid-svg-icons";
-import { faAngleDown as fasAngleDown } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleUp as fasAngleUp,
+  faAngleDown as fasAngleDown,
+  faMoneyBillTransfer as fasMoneyBillTransfer,
+  faTrashCan as fasTrashCan,
+  faCaretUp as fasCaretUp,
+  faPlus as fasPLus,
+} from "@fortawesome/free-solid-svg-icons";
 
-library.add(fasAngleUp, fasAngleDown);
+library.add(
+  fasAngleUp,
+  fasAngleDown,
+  fasMoneyBillTransfer,
+  fasTrashCan,
+  fasCaretUp,
+  fasPLus
+);
 
 createApp(App).use(store, storeKey).use(router).mount("#app");
 

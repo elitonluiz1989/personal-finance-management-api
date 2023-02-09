@@ -34,9 +34,11 @@ const updateBalances = () => {
     </div>
 
     <template v-if="balances.length > 0">
-      <div class="row justify-content-center py-3">
+      <div
+        class="row justify-content-center justify-content-lg-start align-items-stretch py-3"
+      >
         <div
-          class="col-12 mb-3"
+          class="col-12 col-sm-6 col-md-5 col-lg-4 col-xl-3 col-xxl-2 mb-3"
           v-for="(balance, index) in balances"
           :key="index"
         >

@@ -1,5 +1,6 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Base.Extensions;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
 
 namespace PersonalFinanceManagement.Domain.Balances.Extensions
@@ -14,6 +15,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
                 UserId = balance.UserId,
                 Name = balance.Name,
                 Type = balance.Type,
+                TypeDescription = balance.Type.GetDescrition(),
                 Date = balance.Date,
                 Amount = balance.Amount,
                 Financed = balance.Financed,
@@ -24,8 +26,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
                     Id = i.Id,
                     BalanceId = i.BalanceId,
                     Reference = i.Reference,
+                    ReferenceFormatted = i.Reference.ToMonthYear(),
                     Number = i.Number,
                     Status = i.Status,
+                    StatusDescription = i.Status.GetDescrition(),
                     Amount = i.Amount,
                     Items = i.Items.Select(ti => new TransactionItemDto()
                     {

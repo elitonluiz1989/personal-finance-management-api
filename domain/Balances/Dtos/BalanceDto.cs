@@ -8,6 +8,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public int UserId { get; set; }
         public string Name { get; set; } = string.Empty;
         public BalanceTypeEnum Type { get; set; }
+        public string TypeDescription { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public bool Financed { get; set; }

@@ -7,6 +7,7 @@ export class Balance {
   public userId = 0;
   public name = "";
   public type: BalanceTypeEnum = BalanceTypeEnum.credit;
+  public typeDescription = "";
   public date: Date = new Date();
   public amount = 0;
   public financed = false;

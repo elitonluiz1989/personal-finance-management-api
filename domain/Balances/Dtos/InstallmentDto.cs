@@ -8,8 +8,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public int Id { get; set; }
         public int BalanceId { get; set; }
         public int Reference { get; set; }
+        public string ReferenceFormatted { get; set; } = string.Empty;
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
+        public string StatusDescription { get; set; } = string.Empty;
         public decimal Amount { get; set; }
 
         public BalanceDto? Balance { get; set; }
