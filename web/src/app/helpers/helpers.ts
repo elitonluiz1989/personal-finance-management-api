@@ -40,7 +40,7 @@ export function mapFrom<
     }
 
     if (isBoolean(target[key])) {
-      (target[key] as boolean) = Boolean(String(source[key]));
+      (target[key] as boolean) = source[key] as boolean;
 
       continue;
     }

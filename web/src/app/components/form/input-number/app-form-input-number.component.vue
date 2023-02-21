@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getEventTarget, isValidNumber } from "@/app/helpers/helpers";
-import { defineEmits, defineProps, ref } from "vue";
+import { defineEmits, defineProps, ref, watch, withDefaults } from "vue";
 
 type AppFormInputNumberProps = {
   class: string;
@@ -8,17 +8,33 @@ type AppFormInputNumberProps = {
   modelValue: number;
   min?: number;
   max?: number;
+  disabled: boolean;
   onFocus: (e: Event) => void;
 };
 type AppFormInputNumberEmits = {
   (e: "update:modelValue", value: number): void;
 };
 
-const props = defineProps<AppFormInputNumberProps>();
+const props = withDefaults(defineProps<AppFormInputNumberProps>(), {
+  disabled: false,
+});
 const emits = defineEmits<AppFormInputNumberEmits>();
 const min = Number(props.min);
 const max = Number(props.max);
 const value = ref<number>();
+
+watch(
+  () => props.modelValue,
+  (value: number) => {
+    const elements = document.querySelectorAll<HTMLInputElement>(
+      'input.form-control[type="number"]'
+    );
+
+    if (elements) {
+      elements.forEach((e) => (e.value = value.toString()));
+    }
+  }
+);
 
 const onFocus = (evt: Event) => props.onFocus(evt);
 const onkeyup = (evt: Event) => {
@@ -52,6 +68,7 @@ const onkeyup = (evt: Event) => {
     class="form-control"
     form-field="installmentsNumber"
     :min="min"
+    :disabled="props.disabled"
     @focus="onFocus"
     @keyup="onkeyup"
     v-if="isValidNumber(min) && isValidNumber(max) === false"
@@ -62,6 +79,7 @@ const onkeyup = (evt: Event) => {
     class="form-control"
     form-field="installmentsNumber"
     :max="max"
+    :disabled="props.disabled"
     @focus="onFocus"
     @keyup="onkeyup"
     v-if="isValidNumber(min) === false && isValidNumber(max)"
@@ -73,6 +91,7 @@ const onkeyup = (evt: Event) => {
     form-field="installmentsNumber"
     :min="min"
     :max="max"
+    :disabled="props.disabled"
     @focus="onFocus"
     @keyup="onkeyup"
     v-if="isValidNumber(min) && isValidNumber(max)"

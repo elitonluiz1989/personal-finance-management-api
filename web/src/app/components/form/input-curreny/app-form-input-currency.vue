@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { isNullOrUndefined, isNullOrWhiteSpace } from "@/app/helpers/helpers";
 import { CurrencyFormatter } from "@/app/helpers/currency-formatter";
-import { defineEmits, defineProps, ref, withDefaults } from "vue";
+import { defineEmits, defineProps, ref, watch, withDefaults } from "vue";
 
 type AppFormInputProps = {
   class: string;
@@ -10,6 +10,7 @@ type AppFormInputProps = {
   maxlength?: number;
   location?: string;
   currency?: string;
+  disabled: boolean;
   onFocus: (e: Event) => void;
 };
 type AppFormInputEmits = {
@@ -18,11 +19,24 @@ type AppFormInputEmits = {
 const props = withDefaults(defineProps<AppFormInputProps>(), {
   location: navigator?.language,
   maxlength: 200,
+  disabled: false,
 });
 const emits = defineEmits<AppFormInputEmits>();
 const rawValue = ref<number>();
 const currencyFormatter = new CurrencyFormatter(props.location, props.currency);
 
+const triggerFocus = (evt: Event) => props.onFocus(evt);
+const watchValueChange = (newValue: number, oldValue: number) => {
+  if (newValue === oldValue) return;
+
+  const elements = document.querySelectorAll("input[type=text]");
+
+  if (!elements || elements?.length === 0) return;
+
+  for (const element of elements) {
+    element.setAttribute("value", newValue.toString());
+  }
+};
 const currencyHandler = (evt: Event) => {
   const { target } = evt;
   const element = target as HTMLInputElement;
@@ -46,9 +60,9 @@ const currencyHandler = (evt: Event) => {
 
   emits("update:modelValue", rawValue.value);
 };
-const triggerFocus = (evt: Event) => props.onFocus(evt);
-</script>
 
+watch(() => props.modelValue, watchValueChange);
+</script>
 <template>
   <div class="position-relative w-100">
     <input
@@ -56,6 +70,7 @@ const triggerFocus = (evt: Event) => props.onFocus(evt);
       :class="props.class"
       :maxlength="props.maxlength"
       :form-field="props.formField"
+      :disabled="props.disabled"
       @focus="triggerFocus"
       @keyup="currencyHandler"
       v-if="isNullOrUndefined(props.maxlength)"
@@ -66,6 +81,7 @@ const triggerFocus = (evt: Event) => props.onFocus(evt);
       :class="props.class"
       :maxlength="props.maxlength"
       :form-field="props.formField"
+      :disabled="props.disabled"
       @focus="triggerFocus"
       @keyup="currencyHandler"
     />

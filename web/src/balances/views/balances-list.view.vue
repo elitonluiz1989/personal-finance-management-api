@@ -1,35 +1,41 @@
 <script async setup lang="ts">
 import { StoreHelper } from "@/app/store/store.helper";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { Balance } from "../balance.model";
 import { BalancesResoures } from "../balances.resources";
 import BalanceForm from "../components/balance-form.component.vue";
 import BalanceCard from "../components/balance-card/balance-card.component.vue";
 
-const balances = ref<Balance[]>([]);
+const balanceFormRef = ref();
 
 onMounted(async () => {
   await getBalances();
 });
 
-const getBalances = async () => {
-  await StoreHelper.dispatch(BalancesResoures.store.actions.list.namespaced);
-
-  updateBalances();
-};
-const updateBalances = () => {
-  balances.value = StoreHelper.get<Balance[]>(
+const balances = computed(() =>
+  StoreHelper.get<Balance[]>(
     BalancesResoures.store.getters.balances.namespaced,
     []
-  );
+  )
+);
+
+const getBalances = async () => {
+  await StoreHelper.dispatch(BalancesResoures.store.actions.list.namespaced);
 };
+const triggerEdit = (balanceId: number) =>
+  balanceFormRef?.value?.showModal(balanceId);
+const triggerRefinance = (balanceId: number) =>
+  balanceFormRef?.value?.showModal(balanceId, true);
+const triggerRemoveModal = (balanceId: number) => console.log(balanceId);
+const onCloseForm = async () =>
+  await StoreHelper.dispatch(BalancesResoures.store.actions.list.namespaced);
 </script>
 
 <template>
   <div class="container-fluid">
     <div class="row">
       <div class="col-12 d-flex justify-content-end">
-        <BalanceForm />
+        <BalanceForm ref="balanceFormRef" @on-close="onCloseForm" />
       </div>
     </div>
 
@@ -42,7 +48,12 @@ const updateBalances = () => {
           v-for="(balance, index) in balances"
           :key="index"
         >
-          <BalanceCard :balance="balance" />
+          <BalanceCard
+            :balance="balance"
+            @on-edit="triggerEdit"
+            @on-refinance="triggerRefinance"
+            @on-remove="triggerRemoveModal"
+          />
         </div>
       </div>
     </template>

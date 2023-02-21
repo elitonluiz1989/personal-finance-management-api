@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
+import { defineEmits, defineProps } from "vue";
 import { Balance } from "@/balances/balance.model";
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
 import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
@@ -11,13 +11,23 @@ import BalanceCardActions from "./balance-card-actions.component.vue";
 type BalanceCardProps = {
   balance: Balance;
 };
+type BalanceCardEmits = {
+  (e: "onEdit", balanceId: number): void;
+  (e: "onRefinance", balanceId: number): void;
+  (e: "onRemove", balanceId: number): void;
+};
 
 const props = defineProps<BalanceCardProps>();
+const emits = defineEmits<BalanceCardEmits>();
 
 const cardCssStyle = (type: BalanceTypeEnum) => ({
   "balance--credit": type === BalanceTypeEnum.credit,
   "balance--debt": type === BalanceTypeEnum.debt,
 });
+
+const triggerEdit = () => emits("onEdit", props.balance.id);
+const triggerRefinance = () => emits("onRefinance", props.balance.id);
+const triggerRemove = () => emits("onRemove", props.balance.id);
 </script>
 
 <template>
@@ -60,7 +70,13 @@ const cardCssStyle = (type: BalanceTypeEnum) => ({
       :type="props.balance.type"
     />
 
-    <BalanceCardActions :id="balance.id" :type="balance.type" />
+    <BalanceCardActions
+      :id="balance.id"
+      :type="balance.type"
+      @on-edit="triggerEdit"
+      @on-refinance="triggerRefinance"
+      @on-remove="triggerRemove"
+    />
   </div>
 </template>
 

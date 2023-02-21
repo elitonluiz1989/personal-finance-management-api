@@ -35,6 +35,26 @@ export class FormService {
     this.resetValues();
   }
 
+  public enableAll() {
+    const fields = Object.values(this._fields);
+
+    for (const field of fields) {
+      if (field.disabled === false) continue;
+
+      field.enable();
+    }
+  }
+
+  public disableAll() {
+    const fields = Object.values(this._fields);
+
+    for (const field of fields) {
+      if (field.disabled) continue;
+
+      field.disable();
+    }
+  }
+
   public async submit() {
     const dto = this._options.submit.dataHandler(this._fields);
 

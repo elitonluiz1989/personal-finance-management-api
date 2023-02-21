@@ -31,6 +31,18 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
             return Ok(results);
         }
 
+        [HttpGet("{id}")]
+        [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
+        public async Task<IActionResult> Get(
+             int id,
+            [FromServices] IBalanceSpecification specification
+        )
+        {
+            var result = await specification.Find(id, AuthenticatedUserId);
+
+            return Ok(result);
+        }
+
         [HttpPost]
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Post(

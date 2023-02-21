@@ -74,6 +74,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
                 .NotNull()
                 .When(p => UserId == default);
 
+            Validator.RuleFor(p => Name)
+                .NotEmpty()
+                .MaximumLength(100);
+
             Validator.RuleFor(p => Type)
                 .IsInEnum();
 

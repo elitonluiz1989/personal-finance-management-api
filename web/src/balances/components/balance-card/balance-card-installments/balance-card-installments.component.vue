@@ -4,6 +4,7 @@ import { Installment } from "@/installments/installment.model";
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
 import BalanceCardInstallmentBadge from "./balance-card-installment-badge.component.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
 
 type BalanceCardInstallmentsProp = {
   installments: Installment[];
@@ -61,9 +62,17 @@ const toggleInstallmentsList = () => (clicked.value = !clicked.value);
               <span class="badge bg-dark">{{ installment.number }}</span>
             </div>
 
-            <span class="balance__installments-reference flex-fill px-3">
-              {{ installment.referenceFormatted }}
-            </span>
+            <div class="balance__installments-reference flex-fill px-3">
+              <span>
+                {{ installment.referenceFormatted }}
+              </span>
+
+              <span class="px-2">-</span>
+
+              <span>
+                {{ CurrencyFormatterStatic.format(installment.amount) }}
+              </span>
+            </div>
 
             <BalanceCardInstallmentBadge
               :status="installment.status"
@@ -84,7 +93,7 @@ const toggleInstallmentsList = () => (clicked.value = !clicked.value);
 
   &-indicator {
     width: 2rem;
-    transition: all 0.35s; /* -- 👈 Create a animation on all CSS properties with a duration of 0.35s */
+    transition: all 0.35s;
     transform: rotate(0);
 
     &--rotated {

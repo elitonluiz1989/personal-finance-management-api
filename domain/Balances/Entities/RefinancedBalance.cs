@@ -18,6 +18,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public short InstallmentsNumber { get; set; }
         public bool Active { get; set; } = true;
         public DateTime CreatedAt { get; set; }
+        public int UserId { get; set; }
 
         public virtual User? User { get; set; }
         public virtual Balance? Balance { get; set; }
@@ -40,13 +41,25 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
                 .NotNull()
                 .When(p => BalanceId == default);
 
-            Validator.RuleFor(p => Date)
+            Validator.RuleFor(p => OriginalDate)
+                .NotNull()
                 .NotEqual(default(DateTime));
 
             Validator.RuleFor(p => OriginalAmount)
                 .GreaterThan(0);
 
+            Validator.RuleFor(p => Date)
+                .NotNull()
+                .NotEqual(default(DateTime));
+
             Validator.RuleFor(p => Amount)
+                .GreaterThan(0);
+
+            Validator.RuleFor(p => CreatedAt)
+                .NotNull()
+                .NotEqual(default(DateTime));
+
+            Validator.RuleFor(p => UserId)
                 .GreaterThan(0);
         }
     }

@@ -44,12 +44,16 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
             if (ValidateEntity(balance) is false || balance is null)
                 return;
 
-            var refinancedBalance = await SetRefinancedBalance(dto, balance);
+            var refinancedBalance = await SetRefinancedBalance(dto, balance, userId);
 
             if (HasNotifications || refinancedBalance is null)
                 return;
 
             SaveRefinancing(refinancedBalance);
+
+            if (HasNotifications)
+                return;
+
             await SaveNewBalance(balance, refinancedBalance);
 
         }
@@ -74,7 +78,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
             return false;
         }
 
-        private async Task<RefinancedBalance?> SetRefinancedBalance(RefinancedBalanceStoreDto dto, Balance balance)
+        private async Task<RefinancedBalance?> SetRefinancedBalance(RefinancedBalanceStoreDto dto, Balance balance, int userId)
         {
             await InactivatePreviousRefinancing(balance.Id);
 
@@ -89,7 +93,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
                 Amount = SetBalanceValue(balance, dto),
                 Financed = SetBalanceFinanced(balance, dto),
                 InstallmentsNumber = SetInstallmentsNumber(balance, dto),
-                Active = true
+                Active = true,
+                CreatedAt = DateTime.Now,
+                UserId = userId
             };
         }
 
@@ -137,10 +143,14 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances
 
         private void SaveRefinancing(RefinancedBalance refinancedBalance)
         {
-            if (refinancedBalance.Validate())
-                _repository.Save(refinancedBalance);
+            if (refinancedBalance.Validate() is false)
+            {
+                NotificationService.AddNotification(refinancedBalance.Errors);
 
-            NotificationService.AddNotification(refinancedBalance.Errors);
+                return;
+            }
+            
+            _repository.Save(refinancedBalance);
         }
 
         private async Task SaveNewBalance(Balance balance, RefinancedBalance refinancedBalance)

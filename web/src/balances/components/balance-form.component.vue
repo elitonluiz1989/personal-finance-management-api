@@ -7,7 +7,7 @@ import AppModal from "@/app/components/modal/app-modal.component.vue";
 import { IAppModalFooterProps } from "@/app/components/modal/types";
 import { ValidationRules } from "@/app/services/validation/validation-rules";
 import { KeyValue } from "@/app/types";
-import { computed, onMounted, ref } from "vue";
+import { computed, defineEmits, defineExpose, onMounted, ref } from "vue";
 import * as BalanceType from "../balances-type.enum";
 import { BalancesResoures } from "../balances.resources";
 import { FormService } from "@/app/services/form/form.service";
@@ -20,29 +20,41 @@ import { StoreHelper } from "@/app/store/store.helper";
 import { UsersResoures } from "@/users/users.resources";
 import { User } from "@/users/user.model";
 import { Balance } from "../balance.model";
+import { RefinancedBalance } from "../balance-refinanced.model";
 
 type FormDataHandlerType = (fields: FormFields) => Balance;
+type BalanceFormEmits = {
+  (e: "onClose"): void;
+};
 
-const showModal = ref(false);
+const show = ref(false);
+const modalTitle = ref(BalancesResoures.form.title.insert);
+const editMode = ref(false);
+const refinanceMode = ref(false);
+const users = ref<User[]>([]);
+const emits = defineEmits<BalanceFormEmits>();
+
 const modalId = "balance-form-modal";
 const modalFooterConfig: IAppModalFooterProps = {
   show: true,
 };
 const balanceTypes: KeyValue<string, BalanceType.BalanceTypeEnum>[] =
   BalanceType.toKeyValue();
-const users = ref<User[]>([]);
 const formFieldsOptions: FormFieldsOptions = {
-  name: {
-    initialValue: "",
-    validations: [
-      ValidationRules.required<string>(BalancesResoures.form.fields.name),
-      ValidationRules.maxlength(BalancesResoures.form.fields.name, 100),
-    ],
+  id: {
+    initialValue: 0,
   },
   userId: {
     initialValue: 0,
     validations: [
       ValidationRules.required<number>(BalancesResoures.form.fields.user),
+    ],
+  },
+  name: {
+    initialValue: "",
+    validations: [
+      ValidationRules.required<string>(BalancesResoures.form.fields.name),
+      ValidationRules.maxlength(BalancesResoures.form.fields.name, 100),
     ],
   },
   type: {
@@ -86,6 +98,9 @@ const formFieldsOptions: FormFieldsOptions = {
 };
 const dataHandler: FormDataHandlerType = (fields: FormFields): Balance => {
   const balance = new Balance();
+
+  if (editMode.value) balance.id = fields.id.value;
+
   balance.userId = fields.userId.value;
   balance.name = fields.name.value;
   balance.type = fields.type.value;
@@ -113,11 +128,6 @@ const intallmentsNumberCssStyles = computed(() => ({
   "installments-number form-group row overflow-hidden":
     form.fields.financed.model.value === false,
 }));
-
-onMounted(async () => {
-  users.value = await getUsers();
-});
-
 const showFinancedValue = computed(() => {
   return (
     isNaN(form.fields.amount.value) === false &&
@@ -143,21 +153,97 @@ const getUsers = async (): Promise<User[]> => {
     []
   );
 };
-const showModalEvent = () => (showModal.value = true);
-const closeModal = (show: boolean) => {
-  showModal.value = show;
+const showModal = async (balanceId = 0, refinancing = false) => {
+  show.value = true;
+  editMode.value = false;
+  refinanceMode.value = false;
+  form.fields.id.model.value = 0;
+
+  if (+balanceId > 0) {
+    modalTitle.value = BalancesResoures.form.title.edit;
+    editMode.value = true;
+    refinanceMode.value = refinancing;
+    form.fields.id.model.value = balanceId;
+
+    const balance = StoreHelper.getRaw(
+      BalancesResoures.store.getters.balance.namespaced
+    )(balanceId);
+
+    if (!balance) return;
+
+    form.fields.userId.model.value = balance.userId;
+    form.fields.name.model.value = balance.name;
+    form.fields.type.model.value = balance.type;
+    form.fields.date.model.value = (balance.date as Date)
+      .toISOString()
+      .split("T")[0];
+    form.fields.amount.model.value = balance.amount;
+    form.fields.financed.model.value = balance.financed;
+    form.fields.installmentsNumber.model.value = balance.installmentsNumber;
+
+    if (refinanceMode.value) {
+      form.fields.name.disable();
+      form.fields.userId.disable();
+      form.fields.type.disable();
+    } else {
+      form.fields.userId.disable();
+      form.fields.amount.disable();
+      form.fields.date.disable();
+      form.fields.financed.disable();
+      form.fields.installmentsNumber.disable();
+    }
+  }
+};
+const showModalEvent = async () => {
+  await showModal();
+};
+const closeModal = (value: boolean) => {
+  show.value = value;
+  editMode.value = false;
+  refinanceMode.value = false;
+  modalTitle.value = BalancesResoures.form.title.insert;
+
+  form.enableAll();
 
   form.reset();
+
+  emits("onClose");
+};
+const refinance = async (form: FormService) => {
+  const dto = new RefinancedBalance();
+  dto.balanceId = form.fields.id.value;
+  dto.name = form.fields.name.value;
+  dto.date = form.fields.date.value;
+  dto.amount = form.fields.amount.value;
+  dto.financed = form.fields.financed.value;
+  dto.installmentsNumber = form.fields.installmentsNumber.value;
+
+  await StoreHelper.dispatch(
+    BalancesResoures.store.actions.refinance.namespaced,
+    dto
+  );
 };
 const submitForm = async () => {
   form.validate();
 
   if (form.invalid) return;
 
-  await form.submit();
+  if (refinanceMode.value) {
+    await refinance(form);
+  } else {
+    await form.submit();
+  }
 
   closeModal(false);
 };
+
+onMounted(async () => {
+  users.value = await getUsers();
+});
+
+defineExpose({
+  showModal,
+});
 </script>
 
 <template>
@@ -165,8 +251,8 @@ const submitForm = async () => {
 
   <AppModal
     :id="modalId"
-    :show="showModal"
-    :title="BalancesResoures.form.title.insert"
+    :show="show"
+    :title="modalTitle"
     :is-form="true"
     :footer="modalFooterConfig"
     @on-close="closeModal"
@@ -185,6 +271,7 @@ const submitForm = async () => {
             class="form-control"
             maxlength="100"
             form-field="name"
+            :disabled="form.fields.name.disabled"
             @focus="form.fields.name.clearValidation"
             v-model="form.fields.name.model.value"
           />
@@ -205,6 +292,7 @@ const submitForm = async () => {
           <select
             class="form-control"
             form-field="user"
+            :disabled="form.fields.userId.disabled"
             @change="form.fields.userId.clearValidation"
             v-model="form.fields.userId.model.value"
           >
@@ -237,6 +325,7 @@ const submitForm = async () => {
           <select
             class="form-control"
             form-field="type"
+            :disabled="form.fields.type.disabled"
             @change="form.fields.type.clearValidation"
             v-model="form.fields.type.model.value"
           >
@@ -268,6 +357,7 @@ const submitForm = async () => {
             type="date"
             class="form-control"
             form-field="date"
+            :disabled="form.fields.date.disabled"
             @change="form.fields.date.clearValidation"
             v-model="form.fields.date.model.value"
           />
@@ -289,6 +379,7 @@ const submitForm = async () => {
             class="form-control"
             form-field="amount"
             :maxlength="14"
+            :disabled="form.fields.amount.disabled"
             :on-focus="() => form.fields.amount.clearValidation()"
             v-model="form.fields.amount.model.value"
           />
@@ -302,6 +393,7 @@ const submitForm = async () => {
         <div class="col-12 col-sm-8 mb-3">
           <label class="form-label">
             {{ BalancesResoures.form.fields.financed }}?
+            {{ form.fields.financed.model.value }}
           </label>
 
           <div class="w-100">
@@ -309,6 +401,7 @@ const submitForm = async () => {
               <input
                 type="radio"
                 :value="true"
+                :disabled="form.fields.financed.disabled"
                 v-model="form.fields.financed.model.value"
               />
               {{ AppResources.yes }}
@@ -318,6 +411,7 @@ const submitForm = async () => {
               <input
                 type="radio"
                 :value="false"
+                :disabled="form.fields.financed.disabled"
                 v-model="form.fields.financed.model.value"
               />
               {{ AppResources.no }}
@@ -344,6 +438,7 @@ const submitForm = async () => {
             form-field="installmentsNumber"
             :min="1"
             :max="999"
+            :disabled="form.fields.installmentsNumber.disabled"
             :on-focus="() => form.fields.installmentsNumber.clearValidation()"
             v-model="form.fields.installmentsNumber.model.value"
           />

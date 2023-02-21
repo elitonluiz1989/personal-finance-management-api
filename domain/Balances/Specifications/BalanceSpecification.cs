@@ -49,9 +49,24 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 query = query.Where(p => p.UserId == userId);
 
             return await query
-                .Include(p => p.Installments)
+                .Include(p => p.Installments.Where(i => i.DeletedAt == null))
                 .Select(s => BalanceMappingsExtension.ToBalanceDto(s))
                 .ToListAsync();
+        }
+
+        public async Task<BalanceDto?> Find(int id, int userId)
+        {
+            var userRole = await _userRepository.GetUserRole(userId);
+            var query = _repository.Query()
+                .Where(p => p.Id == id);
+
+            if (userRole is not UserRoleEnum.Administrator)
+                query = query.Where(p => p.UserId == userId);
+
+            return await query
+                .Include(p => p.Installments)
+                .Select(s => BalanceMappingsExtension.ToBalanceDto(s))
+                .FirstOrDefaultAsync();
         }
     }
 }

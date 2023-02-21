@@ -8,6 +8,10 @@ export class StoreHelper {
     return store;
   }
 
+  public static getRaw(getter: string): any {
+    return this.store?.getters[getter];
+  }
+
   public static get<T>(getter: string, defualtValue: T): T {
     const value = this.store?.getters[getter];
 

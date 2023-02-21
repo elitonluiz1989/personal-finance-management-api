@@ -56,6 +56,10 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
             Validator.RuleFor(p => Type)
                 .IsInEnum();
 
+            Validator.RuleFor(p => Date)
+                .NotNull()
+                .NotEqual(default(DateTime));
+
             Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
         }

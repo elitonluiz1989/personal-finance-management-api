@@ -8,6 +8,7 @@ export const BalancesResoures = {
   form: {
     title: {
       insert: "Add Balance",
+      edit: "Edit Balance",
     },
     fields: {
       name: "Name",
@@ -23,14 +24,21 @@ export const BalancesResoures = {
     namespace: namespace,
     getters: {
       balances: createStoreResourceItem(namespace, "getBalances"),
+      balance: createStoreResourceItem(namespace, "getBalance"),
     },
     mutations: {
       addBalance: createStoreResourceItem(namespace, "addBalance"),
       addBalances: createStoreResourceItem(namespace, "addBalances"),
+      addBalanceOnBalances: createStoreResourceItem(
+        namespace,
+        "addBalanceOnBalances"
+      ),
     },
     actions: {
       list: createStoreResourceItem(namespace, "list"),
+      find: createStoreResourceItem(namespace, "find"),
       add: createStoreResourceItem(namespace, "add"),
+      refinance: createStoreResourceItem(namespace, "refinance"),
     },
   },
 };

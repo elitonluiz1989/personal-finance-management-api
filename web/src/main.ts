@@ -13,6 +13,7 @@ import {
   faTrashCan as fasTrashCan,
   faCaretUp as fasCaretUp,
   faPlus as fasPLus,
+  faPen as fasPen,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -21,7 +22,8 @@ library.add(
   fasMoneyBillTransfer,
   fasTrashCan,
   fasCaretUp,
-  fasPLus
+  fasPLus,
+  fasPen
 );
 
 createApp(App).use(store, storeKey).use(router).mount("#app");

@@ -6,6 +6,7 @@ export class FormField<T> {
   private _field: string;
   private _model: Ref<T>;
   private _invalid: Ref<boolean>;
+  private _disabled: Ref<boolean>;
   private _validations: ValidationRule<T>[];
   private _element: HTMLElement | null = null;
 
@@ -13,6 +14,7 @@ export class FormField<T> {
     this._field = field;
     this._model = ref(options.initialValue) as Ref<T>;
     this._invalid = ref(false);
+    this._disabled = ref(false);
     this._validations = options.validations;
 
     this.setElement();
@@ -36,6 +38,10 @@ export class FormField<T> {
 
   set invalid(value: boolean) {
     this._invalid.value = value;
+  }
+
+  get disabled(): boolean {
+    return this._disabled.value;
   }
 
   get element(): HTMLElement | null {
@@ -62,6 +68,14 @@ export class FormField<T> {
     if (!this.element || this.isMarked() === false) return;
 
     this.element?.classList?.remove("is-invalid");
+  }
+
+  public enable() {
+    this._disabled.value = false;
+  }
+
+  public disable() {
+    this._disabled.value = true;
   }
 
   public clearValidation() {

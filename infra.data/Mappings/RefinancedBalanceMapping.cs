@@ -55,6 +55,15 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnOrder(11)
                 .IsRequired();
 
+            builder.Property(p => p.UserId)
+                .HasColumnOrder(12)
+                .IsRequired();
+
+            builder.HasOne(p => p.User)
+                .WithMany(o => o.RefinancedBalances)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(p => p.Balance)
                 .WithMany(o => o.RefinancedBalances)
                 .HasForeignKey(p => p.BalanceId)
