@@ -18,7 +18,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public bool Active => Status != InstallmentStatusEnum.Paid;
 
         public virtual Balance? Balance { get; set; }
-        public virtual List<TransactionItem> Items { get; set; } = new();
+        public virtual List<TransactionItem> TransactionItems { get; set; } = new();
 
         public Installment()
         {
@@ -32,7 +32,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
         public decimal GetAmountToTransactions()
         {
-            var totalPartiallyPaid = Items
+            var totalPartiallyPaid = TransactionItems
                 ?.Where(i => i.PartiallyPaid)
                 ?.Sum(i => i.AmountPaid) ?? 0;
 

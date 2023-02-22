@@ -5,6 +5,9 @@ const namespace = "balances";
 export const BalancesResoures = {
   open: "Open",
   closed: "Closed",
+  confirm: {
+    removeBalance: "Do you want remove this balance?",
+  },
   form: {
     title: {
       insert: "Add Balance",
@@ -39,6 +42,7 @@ export const BalancesResoures = {
       find: createStoreResourceItem(namespace, "find"),
       add: createStoreResourceItem(namespace, "add"),
       refinance: createStoreResourceItem(namespace, "refinance"),
+      remove: createStoreResourceItem(namespace, "remove"),
     },
   },
 };

@@ -39,7 +39,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(p => p.Installment)
-                .WithMany(o => o.Items)
+                .WithMany(o => o.TransactionItems)
                 .HasForeignKey(p => p.InstallmentId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

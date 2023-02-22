@@ -12,11 +12,18 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories.Balances
         {
         }
 
+        public async Task<Installment?> FindWithTransactionItems(int id)
+        {
+            return await Query()
+                .Include(i => i.TransactionItems)
+                .FirstOrDefaultAsync(i => i.Id == id);
+        }
+
         public async Task<List<Installment>> ListWithTransactionItems(int[] ids, int userId)
         {
             return await Query()
                 .Include(i => i.Balance)
-                .Include(i => i.Items)
+                .Include(i => i.TransactionItems)
                 .Where(i => 
                     ids.Contains(i.Id) &&
                     i.Status != InstallmentStatusEnum.Paid &&

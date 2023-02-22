@@ -28,5 +28,14 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories.Balances
                 )
                 .ToListAsync();
         }
+
+        public async Task<Balance?> FindWithTransactions(int id)
+        {
+            return await Query()
+                .Include(b => b.Installments)
+                .ThenInclude(i => i.TransactionItems)
+                .ThenInclude(ti => ti.Transaction)
+                .FirstOrDefaultAsync(b => b.Id == id);
+        }
     }
 }

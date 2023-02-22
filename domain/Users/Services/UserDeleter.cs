@@ -5,7 +5,7 @@ using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Users.Services
 {
-    public class UserDeleter : BaseDeleter<User, int>, IUserDeleter
+    public class UserDeleter : BaseDeleter<User, int, IUserRepository>, IUserDeleter
     {
         public UserDeleter(
             INotificationService notificationService,
@@ -13,6 +13,11 @@ namespace PersonalFinanceManagement.Domain.Users.Services
         )
             : base(notificationService, repository)
         {
+        }
+
+        protected override async Task<User?> Find(int id)
+        {
+            return await _repository.Find(id);
         }
 
         protected override void Validate(IEntity? entity)

@@ -26,7 +26,16 @@ const triggerEdit = (balanceId: number) =>
   balanceFormRef?.value?.showModal(balanceId);
 const triggerRefinance = (balanceId: number) =>
   balanceFormRef?.value?.showModal(balanceId, true);
-const triggerRemoveModal = (balanceId: number) => console.log(balanceId);
+const triggerRemoveModal = async (balanceId: number) => {
+  const response = confirm(BalancesResoures.confirm.removeBalance);
+
+  if (response === false) return;
+
+  await StoreHelper.dispatch(
+    BalancesResoures.store.actions.remove.namespaced,
+    balanceId
+  );
+};
 const onCloseForm = async () =>
   await StoreHelper.dispatch(BalancesResoures.store.actions.list.namespaced);
 </script>

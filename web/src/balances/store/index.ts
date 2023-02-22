@@ -103,5 +103,17 @@ export const balances: Module<BalancesState, State> = {
 
       commit(BalancesResoures.store.mutations.addBalances.value, result.data);
     },
+    async [BalancesResoures.store.actions.remove.value](
+      { state, commit },
+      payload: number
+    ) {
+      const result = await axios.delete<boolean>(`/Balances/${payload}`);
+
+      if (!result || result.data === false) return;
+
+      const balances = state.balances?.filter((b) => b.id !== payload) ?? [];
+
+      commit(BalancesResoures.store.mutations.addBalances.value, balances);
+    },
   },
 };

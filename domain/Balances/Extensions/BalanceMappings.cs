@@ -31,7 +31,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
                     Status = i.Status,
                     StatusDescription = i.Status.GetDescrition(),
                     Amount = i.Amount,
-                    Items = i.Items.Select(ti => new TransactionItemDto()
+                    Items = i.TransactionItems.Select(ti => new TransactionItemDto()
                     {
                         TransactionId = ti.TransactionId,
                         Type = ti.Type,

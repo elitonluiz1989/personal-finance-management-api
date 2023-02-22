@@ -7,5 +7,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Contracts.Balances
     {
         Task<Balance?> FindWithInstallments(int balanceId);
         Task<List<Balance>> ListWithInstallmentsByIds(int[] ids, int userId);
+        Task<Balance?> FindWithTransactions(int balanceId);
     }
 }

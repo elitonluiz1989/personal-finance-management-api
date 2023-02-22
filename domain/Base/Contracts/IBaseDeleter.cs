@@ -1,7 +1,13 @@
-﻿namespace PersonalFinanceManagement.Domain.Base.Contracts
+﻿using PersonalFinanceManagement.Domain.Base.Entites;
+
+namespace PersonalFinanceManagement.Domain.Base.Contracts
 {
-    public interface IBaseDeleter<Tkey>
+    public interface IBaseDeleter<TEntity, TKey>
+        where TEntity : Entity<TKey>
+        where TKey : struct
     {
-        Task Delete(Tkey id);
+        void Delete(IEnumerable<TEntity> entities);
+        Task Delete(TKey id);
+        void Delete(TEntity? entity);
     }
 }

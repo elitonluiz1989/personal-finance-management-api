@@ -3,26 +3,43 @@ using PersonalFinanceManagement.Domain.Base.Entites;
 
 namespace PersonalFinanceManagement.Domain.Base.Services
 {
-    public abstract class BaseDeleter<TEntity, TKey> : IBaseDeleter<TKey>
+    public abstract class BaseDeleter<TEntity, TKey, TRepository> : IBaseDeleter<TEntity, TKey>
         where TEntity : Entity<TKey>
         where TKey : struct
+        where TRepository : IRepository<TEntity, TKey>
     {
         protected readonly INotificationService _notificationService;
-        protected readonly IRepository<TEntity, TKey> _repository;
+        protected readonly TRepository _repository;
 
         public BaseDeleter(
             INotificationService notificationService,
-            IRepository<TEntity, TKey> repository
+            TRepository repository
         )
         {
             _notificationService = notificationService;
             _repository = repository;
         }
 
-        public async Task Delete(TKey id)
+        public virtual void Delete(IEnumerable<TEntity> entities)
         {
-            var entity = await _repository.Find(id);
+            foreach (var entity in entities)
+            {
+                Delete(entity);
 
+                if (_notificationService.HasNotifications())
+                    break;
+            }
+        }
+
+        public virtual async Task Delete(TKey id)
+        {
+            var entity = await Find(id);
+
+            Delete(entity);
+        }
+
+        public virtual void Delete(TEntity? entity)
+        {
             Validate(entity);
 
             if (entity is null || _notificationService.HasNotifications())
@@ -30,6 +47,8 @@ namespace PersonalFinanceManagement.Domain.Base.Services
 
             _repository.Delete(entity);
         }
+
+        protected abstract Task<TEntity?> Find(TKey id);
 
         protected abstract void Validate(IEntity? entity);
     }
