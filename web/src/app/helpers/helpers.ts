@@ -109,3 +109,7 @@ export function getEventTarget<T extends EventTarget>(evt: Event): T {
   const { target } = evt;
   return target as T;
 }
+
+export function extractDateFormDateTime(date: Date): string {
+  return date.toISOString().split("T")[0];
+}

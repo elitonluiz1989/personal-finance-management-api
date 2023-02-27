@@ -2,12 +2,10 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import { BalancesRoutes } from "@/balances/balances.routes";
 import { AuthenticationRoutes } from "@/authentication/authentication.routes";
 import { authenticationGlobalGuard } from "@/authentication/authentication-global.guard";
+import { HomeRoutes } from "@/home/home.routes";
 
 const routes: RouteRecordRaw[] = [
-  {
-    path: "/",
-    redirect: () => "/balances",
-  },
+  ...HomeRoutes,
   ...AuthenticationRoutes,
   ...BalancesRoutes,
 ];

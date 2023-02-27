@@ -7,7 +7,20 @@ type AppHeaderPropsType = {
   title: string;
 };
 const props = defineProps<AppHeaderPropsType>();
-const navItems: IAppNavitem[] = [];
+const navItems: IAppNavitem[] = [
+  {
+    url: "/",
+    text: "Home",
+    cssClasses: "nav-link",
+    active: false,
+  },
+  {
+    url: "/balances",
+    text: "Balances",
+    cssClasses: "nav-link",
+    active: false,
+  },
+];
 const showNavBar = navItems.length > 1;
 </script>
 

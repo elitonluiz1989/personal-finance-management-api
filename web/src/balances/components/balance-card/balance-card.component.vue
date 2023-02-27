@@ -89,6 +89,11 @@ const triggerRemove = () => emits("onRemove", props.balance.id);
   min-height: 20.6rem;
   background-color: #f9f9f9;
 
+  &__title {
+    border-top-right-radius: 0.3rem;
+    border-top-left-radius: 0.3em;
+  }
+
   &--credit {
     border-color: $card-credit-color;
 

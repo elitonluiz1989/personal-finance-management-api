@@ -1,9 +1,9 @@
-﻿using PersonalFinanceManagement.Domain.Base.Entites;
-
-namespace PersonalFinanceManagement.Domain.Base.Contracts
+﻿namespace PersonalFinanceManagement.Domain.Base.Contracts
 {
     public interface IEntityWithSoftDelete
     {
+        DateTime? DeletedAt { get; set; }
+
         void SetAsDeleted();
     }
 }

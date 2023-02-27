@@ -49,7 +49,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 query = query.Where(p => p.UserId == userId);
 
             return await query
-                .Include(p => p.Installments.Where(i => i.DeletedAt == null))
+                .Include(p => p.Installments)
                 .Select(s => BalanceMappingsExtension.ToBalanceDto(s))
                 .ToListAsync();
         }

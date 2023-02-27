@@ -12,6 +12,7 @@ import * as BalanceType from "../balances-type.enum";
 import { BalancesResoures } from "../balances.resources";
 import { FormService } from "@/app/services/form/form.service";
 import {
+  FormDataHandler,
   FormFields,
   FormFieldsOptions,
   FormOptions,
@@ -21,8 +22,8 @@ import { UsersResoures } from "@/users/users.resources";
 import { User } from "@/users/user.model";
 import { Balance } from "../balance.model";
 import { RefinancedBalance } from "../balance-refinanced.model";
+import { extractDateFormDateTime } from "@/app/helpers/helpers";
 
-type FormDataHandlerType = (fields: FormFields) => Balance;
 type BalanceFormEmits = {
   (e: "onClose"): void;
 };
@@ -64,7 +65,7 @@ const formFieldsOptions: FormFieldsOptions = {
     ],
   },
   date: {
-    initialValue: "",
+    initialValue: extractDateFormDateTime(new Date()),
     validations: [
       ValidationRules.required<string>(BalancesResoures.form.fields.date),
     ],
@@ -96,7 +97,7 @@ const formFieldsOptions: FormFieldsOptions = {
     ],
   },
 };
-const dataHandler: FormDataHandlerType = (fields: FormFields): Balance => {
+const dataHandler: FormDataHandler = (fields: FormFields): Balance => {
   const balance = new Balance();
 
   if (editMode.value) balance.id = fields.id.value;
@@ -174,9 +175,9 @@ const showModal = async (balanceId = 0, refinancing = false) => {
     form.fields.userId.model.value = balance.userId;
     form.fields.name.model.value = balance.name;
     form.fields.type.model.value = balance.type;
-    form.fields.date.model.value = (balance.date as Date)
-      .toISOString()
-      .split("T")[0];
+    form.fields.date.model.value = extractDateFormDateTime(
+      balance.date as Date
+    );
     form.fields.amount.model.value = balance.amount;
     form.fields.financed.model.value = balance.financed;
     form.fields.installmentsNumber.model.value = balance.installmentsNumber;
