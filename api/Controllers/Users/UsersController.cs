@@ -12,10 +12,12 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
     public class UsersController : BaseApiController
     {
         public UsersController(
+            IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
-            IUnitOfWork unitOfWork
+            IUnitOfWork unitOfWork,
+            IUserRepository userRepository
         )
-            : base(notificationService, unitOfWork)
+            : base(httpContextAccessor, notificationService, unitOfWork, userRepository)
         {
         }
 
@@ -26,7 +28,9 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
             [FromServices] IUserSpecification specification
         )
         {
-            var results = await specification.Get(filter);
+            var results = await specification
+                .WithFilter(filter, AuthenticatedUserId, IsAdmin)
+                .List();
 
             return Ok(results);
         }
@@ -35,8 +39,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Post(
             [FromBody] UserStoreDto dto,
-            [FromServices] IUserStore store,
-            [FromServices] IUnitOfWork unitOfWork
+            [FromServices] IUserStore store
         )
         {
             await store.Store(dto);
@@ -51,8 +54,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Patch(
             int id,
-            [FromServices] IUserDeleter deleter,
-            [FromServices] IUnitOfWork unitOfWork
+            [FromServices] IUserDeleter deleter
         )
         {
             await deleter.Delete(id);

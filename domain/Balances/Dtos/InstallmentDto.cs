@@ -7,6 +7,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
     {
         public int Id { get; set; }
         public int BalanceId { get; set; }
+        public int UserId { get; set; }
         public int Reference { get; set; }
         public string ReferenceFormatted { get; set; } = string.Empty;
         public short Number { get; set; }

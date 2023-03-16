@@ -1,65 +1,63 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Users.Contracts;
+using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Api.Controllers.Base
 {
     [ApiController]
     [Route("[controller]")]
-    public abstract class BaseApiController : Controller
+    public abstract class BaseApiController : BaseController
     {
-        protected int AuthenticatedUserId => GetAuthenticatedUserId();
-        private readonly INotificationService _notificationService;
-        private readonly IUnitOfWork _unitOfWork;
+        protected int AuthenticatedUserId { get; private set; }
+        protected bool IsAdmin { get; private set; }
+        private readonly IUserRepository _userRepository;
 
         protected BaseApiController(
+            IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
-            IUnitOfWork unitOfWork
+            IUnitOfWork unitOfWork,
+            IUserRepository userRepository
         )
+            : base(httpContextAccessor, notificationService, unitOfWork)
         {
-            _notificationService = notificationService;
-            _unitOfWork = unitOfWork;
+            _userRepository = userRepository;
+
+            DefineVariables();
         }
 
-        protected bool HasNotifications()
+        private void SetAuthenticatedUserId()
         {
-            return _notificationService.HasNotifications();
-        }
+            if (_httpContextAccessor?.HttpContext is null)
+                return;
 
-        protected IActionResult ResponseWithNotifications()
-        {
-            return BadRequest(_notificationService.GetNotifications());
-        }
-
-        protected IActionResult ResponseWithCommit()
-        {
-            _unitOfWork.Commit();
-
-            return Ok(true);
-        }
-
-        protected IActionResult ResponseWithCommit<T>(T result)
-        {
-            _unitOfWork.Commit();
-
-            return Ok(result);
-        }
-
-        private int GetAuthenticatedUserId()
-        {
-            if (HttpContext is null)
-                return default;
-
-            var userIdValue = HttpContext.Items.FirstOrDefault(i => i.Key.ToString() == "UserId").Value;
+            var userIdValue = _httpContextAccessor.HttpContext.Items.FirstOrDefault(i => i.Key.ToString() == "UserId").Value;
 
             if (userIdValue is null)
-                return default;
+                return;
 
             var success = int.TryParse(userIdValue.ToString(), out int userId);
 
             if (success is false)
-                return default;
+                return;
 
-            return userId;
+            AuthenticatedUserId = userId;
+        }
+
+        private void SetIfIsAdmin()
+        {
+            if (AuthenticatedUserId == 0)
+                return;
+
+            var userRole = _userRepository.GetUserRole(AuthenticatedUserId);
+
+            IsAdmin = userRole is UserRoleEnum.Administrator;
+        }
+
+        private void DefineVariables()
+        {
+            SetAuthenticatedUserId();
+            SetIfIsAdmin();
         }
     }
 }

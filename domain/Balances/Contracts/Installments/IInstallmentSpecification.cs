@@ -3,9 +3,9 @@ using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Filters;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 
-namespace PersonalFinanceManagement.Domain.Balances.Contracts.Balances
+namespace PersonalFinanceManagement.Domain.Balances.Contracts.Installments
 {
-    public interface IBalanceSpecification : ISpecification<Balance, int, BalanceFilter, BalanceDto>
+    public interface IInstallmentSpecification : ISpecification<Installment, int, InstallmentFilter, InstallmentDto>
     {
     }
 }

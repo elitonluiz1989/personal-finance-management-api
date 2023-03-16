@@ -3,16 +3,19 @@ using PersonalFinanceManagement.Api.Controllers.Base;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
+using PersonalFinanceManagement.Domain.Users.Contracts;
 
 namespace PersonalFinanceManagement.Api.Controllers.Transactions
 {
     public class TransactionsController : BaseApiController
     {
         public TransactionsController(
+            IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
-            IUnitOfWork unitOfWork
+            IUnitOfWork unitOfWork,
+            IUserRepository userRepository
         )
-            : base(notificationService, unitOfWork)
+            : base(httpContextAccessor, notificationService, unitOfWork, userRepository)
         {
         }
 

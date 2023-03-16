@@ -12,12 +12,12 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories.Users
         {
         }
 
-        public async Task<UserRoleEnum?> GetUserRole(int userId)
+        public UserRoleEnum? GetUserRole(int userId)
         {
-            return await Query()
+            return Query()
                 .Where(u => u.Id == userId)
                 .Select(u => u.Role)
-                .FirstOrDefaultAsync();
+                .First();
         }
     }
 }

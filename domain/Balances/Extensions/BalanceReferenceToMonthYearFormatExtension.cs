@@ -1,6 +1,6 @@
 ﻿namespace PersonalFinanceManagement.Domain.Balances.Extensions
 {
-    public static class BalanceReferenceToMonthYearFormat
+    public static class BalanceReferenceToMonthYearFormatExtension
     {
         public static string ToMonthYear(this int reference)
         {

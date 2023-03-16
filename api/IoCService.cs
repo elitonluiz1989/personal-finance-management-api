@@ -41,6 +41,7 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<IBalanceDeleter, BalanceDeleter>();
 
             services.AddScoped<IInstallmentRepository, InstallmentRepository>();
+            services.AddScoped<IInstallmentSpecification, InstallmentSpecification>();
             services.AddScoped<IInstallmentStore, InstallmentStore>();
             services.AddScoped<IInstallmentDeleter, InstallmentDeleter>();
             services.AddScoped<IBalanceInstallmentStore, BalanceInstallmentStore>();

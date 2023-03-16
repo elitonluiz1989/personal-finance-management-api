@@ -6,6 +6,6 @@ namespace PersonalFinanceManagement.Domain.Users.Contracts
 {
     public interface IUserRepository : IRepository<User, int>
     {
-        Task<UserRoleEnum?> GetUserRole(int userId);
+        UserRoleEnum? GetUserRole(int userId);
     }
 }

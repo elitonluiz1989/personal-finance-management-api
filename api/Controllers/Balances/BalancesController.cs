@@ -5,6 +5,7 @@ using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Filters;
 using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Api.Controllers.Balances
@@ -12,21 +13,25 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
     public class BalancesController : BaseApiController
     {
         public BalancesController(
+            IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
-            IUnitOfWork unitOfWork
+            IUnitOfWork unitOfWork,
+            IUserRepository userRepository
         )
-            : base(notificationService, unitOfWork)
+            : base(httpContextAccessor, notificationService, unitOfWork, userRepository)
         {
         }
 
         [HttpGet()]
         [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
         public async Task<IActionResult> Get(
-            [FromQuery] BalanceFilter filter,
+            [FromQuery] BalanceFilter filters,
             [FromServices] IBalanceSpecification specification
         )
         {
-            var results = await specification.Get(filter, AuthenticatedUserId);
+            var results = await specification
+                .WithFilter(filters, AuthenticatedUserId, IsAdmin)
+                .List();
 
             return Ok(results);
         }
@@ -38,7 +43,9 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
             [FromServices] IBalanceSpecification specification
         )
         {
-            var result = await specification.Find(id, AuthenticatedUserId);
+            var result = await specification
+                .WithFilter(new BalanceFilter() { Id = id }, AuthenticatedUserId, IsAdmin)
+                .First();
 
             return Ok(result);
         }

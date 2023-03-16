@@ -29,6 +29,8 @@ void ConfigureServices(WebApplicationBuilder builder)
     var jwtSecret = Encoding.ASCII.GetBytes(
         builder.Configuration.GetValue<string>("Jwt:Secret")
     );
+    
+    builder.Services.AddHttpContextAccessor();
 
     builder.Services.AddCors();
     builder.Services.AddControllers();

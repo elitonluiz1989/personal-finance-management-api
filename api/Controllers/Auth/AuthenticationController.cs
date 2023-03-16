@@ -9,13 +9,14 @@ namespace PersonalFinanceManagement.Api.Controllers.Auth
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthenticationController : BaseApiController
+    public class AuthenticationController : BaseController
     {
         public AuthenticationController(
+            IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
             IUnitOfWork unitOfWork
         )
-            : base(notificationService, unitOfWork)
+            : base(httpContextAccessor, notificationService, unitOfWork)
         {
         }
 

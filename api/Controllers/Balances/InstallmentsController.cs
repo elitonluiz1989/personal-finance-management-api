@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Api.Attributes;
 using PersonalFinanceManagement.Api.Controllers.Base;
-using PersonalFinanceManagement.Domain.Balances.Contracts.RefinanceBalances;
-using PersonalFinanceManagement.Domain.Balances.Dtos;
+using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
+using PersonalFinanceManagement.Domain.Balances.Filters;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Api.Controllers.Balances
 {
-    public class RefinancedBalancesController : BaseApiController
+    public class InstallmentsController : BaseApiController
     {
-        public RefinancedBalancesController(
+        public InstallmentsController(
             IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
             IUnitOfWork unitOfWork,
@@ -21,19 +21,18 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         {
         }
 
-        [HttpPost]
-        [RolesAuthorized(UserRoleEnum.Administrator)]
-        public async Task<IActionResult> Post(
-            [FromBody] RefinancedBalanceStoreDto dto,
-            [FromServices] IRefinancedBalanceStore store
+        [HttpGet()]
+        [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
+        public async Task<IActionResult> Get(
+            [FromQuery] InstallmentFilter filters,
+            [FromServices] IInstallmentSpecification specification
         )
         {
-            await store.Store(dto, AuthenticatedUserId);
+            var results = await specification
+                .WithFilter(filters, AuthenticatedUserId, IsAdmin)
+                .List();
 
-            if (HasNotifications())
-                return ResponseWithNotifications();
-
-            return ResponseWithCommit();
+            return Ok(results);
         }
     }
 }
