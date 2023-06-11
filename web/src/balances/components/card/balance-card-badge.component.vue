@@ -1,7 +1,7 @@
 <script setup="" lang="ts">
 import { AppResources } from "@/app/app.resoures";
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
-import { BalancesResoures } from "@/balances/balances.resources";
+import { BalancesResources } from "@/balances/balances.resources";
 import { computed, defineProps } from "vue";
 
 type BalanceBadgeProps = {
@@ -32,11 +32,11 @@ const getBalanceType = (type: BalanceTypeEnum): string => {
     </span>
 
     <span class="badge text-bg-dark" v-if="props.closed">
-      {{ BalancesResoures.closed }}
+      {{ BalancesResources.closed }}
     </span>
 
     <span class="badge text-bg-warning" v-else>
-      {{ BalancesResoures.open }}
+      {{ BalancesResources.open }}
     </span>
   </div>
 </template>

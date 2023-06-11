@@ -1,12 +1,12 @@
 import { isNullOrUndefined } from "@/app/helpers/helpers";
-import { FormFields } from "../form/types";
+import { FormFields } from "../form/form-fields.model";
 
-export class ValidationService {
-  private _form: FormFields;
+export class ValidationService<TFormFields extends FormFields> {
+  private _form: TFormFields;
   private _invalid = false;
   private _errors: string[] = [];
 
-  constructor(form: FormFields) {
+  constructor(form: TFormFields) {
     this._form = form;
   }
 
@@ -22,7 +22,7 @@ export class ValidationService {
     this._errors = [];
     this._invalid = false;
 
-    for (const field of Object.values(this._form)) {
+    for (const field of this._form.fieldsList) {
       if (isNullOrUndefined(field.validations)) continue;
 
       for (const validation of field.validations) {
@@ -43,9 +43,6 @@ export class ValidationService {
   public clearValidation() {
     this._errors = [];
     this._invalid = false;
-
-    for (const field of Object.values(this._form)) {
-      field.markAsValid();
-    }
+    this._form.markAllAsValid();
   }
 }

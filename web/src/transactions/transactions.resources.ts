@@ -2,7 +2,7 @@ import { createStoreResourceItem } from "@/app/helpers/helpers";
 
 const namespace = "transactions";
 
-export const TransactionsResoures = {
+export const TransactionsResources = {
   confirm: {
     removeTransaction: "Do you want remove this transaction?",
   },
@@ -12,11 +12,16 @@ export const TransactionsResoures = {
       edit: "Edit transaction",
     },
     fields: {
+      id: "Id",
       date: "Date",
       amount: "Amount",
       user: "User",
       type: "Type",
       installments: "Installments",
+    },
+    text: {
+      addInstallments: "Add Installments",
+      loadMore: "Load more",
     },
   },
   store: {

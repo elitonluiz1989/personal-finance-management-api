@@ -1,21 +1,25 @@
 import { ValidationRule } from "@/app/types";
 import { Ref, ref } from "vue";
 import { FormFieldOptions } from "./types";
+import { isNullOrUndefined } from "@/app/helpers/helpers";
 
 export class FormField<T> {
+  public validations: ValidationRule<T>[];
+
   private _field: string;
   private _model: Ref<T>;
   private _invalid: Ref<boolean>;
   private _disabled: Ref<boolean>;
-  private _validations: ValidationRule<T>[];
   private _element: HTMLElement | null = null;
+  private _initialValue: T;
 
   constructor(field: string, options: FormFieldOptions<T>) {
     this._field = field;
     this._model = ref(options.initialValue) as Ref<T>;
     this._invalid = ref(false);
     this._disabled = ref(false);
-    this._validations = options.validations;
+    this.validations = options.validations;
+    this._initialValue = options.initialValue;
 
     this.setElement();
   }
@@ -26,10 +30,6 @@ export class FormField<T> {
 
   get model(): Ref<T> {
     return this._model;
-  }
-
-  get validations(): ValidationRule<T>[] {
-    return this._validations;
   }
 
   get invalid(): boolean {
@@ -52,6 +52,13 @@ export class FormField<T> {
 
   get value(): T {
     return this._model.value;
+  }
+
+  get changed(): boolean {
+    return (
+      isNullOrUndefined(this._model.value) === false &&
+      String(this._model.value) !== String(this._initialValue)
+    );
   }
 
   public markAsInvalid() {
@@ -80,6 +87,10 @@ export class FormField<T> {
 
   public clearValidation() {
     this.markAsValid();
+  }
+
+  public reset() {
+    this._model.value = this._initialValue;
   }
 
   private setElement() {

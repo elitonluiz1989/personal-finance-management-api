@@ -1,10 +1,10 @@
 <script async setup lang="ts">
 import { StoreHelper } from "@/app/store/store.helper";
 import { computed, onMounted, ref } from "vue";
-import { Balance } from "../balance.model";
-import { BalancesResoures } from "../balances.resources";
-import BalanceForm from "../components/balance-form.component.vue";
-import BalanceCard from "../components/balance-card/balance-card.component.vue";
+import { Balance } from "../models/balance.model";
+import { BalancesResources } from "../balances.resources";
+import BalanceForm from "../components/form/balance-form.component.vue";
+import BalanceCard from "../components/card/balance-card.component.vue";
 
 const balanceFormRef = ref();
 
@@ -14,30 +14,30 @@ onMounted(async () => {
 
 const balances = computed(() =>
   StoreHelper.get<Balance[]>(
-    BalancesResoures.store.getters.balances.namespaced,
+    BalancesResources.store.getters.balances.namespaced,
     []
   )
 );
 
 const getBalances = async () => {
-  await StoreHelper.dispatch(BalancesResoures.store.actions.list.namespaced);
+  await StoreHelper.dispatch(BalancesResources.store.actions.list.namespaced);
 };
 const triggerEdit = (balanceId: number) =>
   balanceFormRef?.value?.showModal(balanceId);
 const triggerRefinance = (balanceId: number) =>
   balanceFormRef?.value?.showModal(balanceId, true);
 const triggerRemoveModal = async (balanceId: number) => {
-  const response = confirm(BalancesResoures.confirm.removeBalance);
+  const response = confirm(BalancesResources.confirm.removeBalance);
 
   if (response === false) return;
 
   await StoreHelper.dispatch(
-    BalancesResoures.store.actions.remove.namespaced,
+    BalancesResources.store.actions.remove.namespaced,
     balanceId
   );
 };
 const onCloseForm = async () =>
-  await StoreHelper.dispatch(BalancesResoures.store.actions.list.namespaced);
+  await StoreHelper.dispatch(BalancesResources.store.actions.list.namespaced);
 </script>
 
 <template>

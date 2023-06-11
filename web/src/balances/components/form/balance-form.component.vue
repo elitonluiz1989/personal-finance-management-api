@@ -1,38 +1,25 @@
 <script setup lang="ts">
 import { AppResources } from "@/app/app.resoures";
-import AppFormInputCurrency from "@/app/components/form/input-curreny/app-form-input-currency.vue";
+import AppFormInputCurrency from "@/app/components/form/input-curreny/app-form-input-currency.component.vue";
 import AppFormInputNumber from "@/app/components/form/input-number/app-form-input-number.component.vue";
 import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
 import AppModal from "@/app/components/modal/app-modal.component.vue";
 import { IAppModalFooterProps } from "@/app/components/modal/types";
-import { ValidationRules } from "@/app/services/validation/validation-rules";
 import { KeyValue } from "@/app/types";
 import { computed, defineEmits, defineExpose, onMounted, ref } from "vue";
-import * as BalanceType from "../balances-type.enum";
-import { BalancesResoures } from "../balances.resources";
-import { FormService } from "@/app/services/form/form.service";
-import {
-  FormDataHandler,
-  FormFields,
-  FormFieldsOptions,
-  FormOptions,
-} from "@/app/services/form/types";
-import { StoreHelper } from "@/app/store/store.helper";
-import { UsersResoures } from "@/users/users.resources";
 import { User } from "@/users/user.model";
-import { Balance } from "../balance.model";
-import { RefinancedBalance } from "../balance-refinanced.model";
-import { extractDateFormDateTime } from "@/app/helpers/helpers";
+import { BalancesResources } from "@/balances/balances.resources";
+import * as BalanceType from "@/balances/balances-type.enum";
+import { BalanceFormService } from "./balance-form.service";
 
 type BalanceFormEmits = {
   (e: "onClose"): void;
 };
 
 const show = ref(false);
-const modalTitle = ref(BalancesResoures.form.title.insert);
-const editMode = ref(false);
-const refinanceMode = ref(false);
+const modalTitle = ref(BalancesResources.form.title.insert);
 const users = ref<User[]>([]);
+
 const emits = defineEmits<BalanceFormEmits>();
 
 const modalId = "balance-form-modal";
@@ -41,87 +28,7 @@ const modalFooterConfig: IAppModalFooterProps = {
 };
 const balanceTypes: KeyValue<string, BalanceType.BalanceTypeEnum>[] =
   BalanceType.toKeyValue();
-const formFieldsOptions: FormFieldsOptions = {
-  id: {
-    initialValue: 0,
-  },
-  userId: {
-    initialValue: 0,
-    validations: [
-      ValidationRules.required<number>(BalancesResoures.form.fields.user),
-    ],
-  },
-  name: {
-    initialValue: "",
-    validations: [
-      ValidationRules.required<string>(BalancesResoures.form.fields.name),
-      ValidationRules.maxlength(BalancesResoures.form.fields.name, 100),
-    ],
-  },
-  type: {
-    initialValue: 0,
-    validations: [
-      ValidationRules.required<number>(BalancesResoures.form.fields.type),
-    ],
-  },
-  date: {
-    initialValue: extractDateFormDateTime(new Date()),
-    validations: [
-      ValidationRules.required<string>(BalancesResoures.form.fields.date),
-    ],
-  },
-  amount: {
-    initialValue: 0,
-    validations: [
-      ValidationRules.required<number>(BalancesResoures.form.fields.amount),
-    ],
-  },
-  financed: {
-    initialValue: false,
-    validations: [
-      ValidationRules.required<boolean>(BalancesResoures.form.fields.financed),
-    ],
-  },
-  installmentsNumber: {
-    initialValue: 0,
-    validations: [
-      ValidationRules.requiredIf<number>(
-        BalancesResoures.form.fields.intallmentsNumber,
-        () => form.fields.financed.value
-      ),
-      ValidationRules.between(
-        BalancesResoures.form.fields.intallmentsNumber,
-        1,
-        999
-      ),
-    ],
-  },
-};
-const dataHandler: FormDataHandler = (fields: FormFields): Balance => {
-  const balance = new Balance();
-
-  if (editMode.value) balance.id = fields.id.value;
-
-  balance.userId = fields.userId.value;
-  balance.name = fields.name.value;
-  balance.type = fields.type.value;
-  balance.date = fields.date.value;
-  balance.amount = fields.amount.value;
-  balance.financed = fields.financed.value;
-
-  if (balance.financed)
-    balance.installmentsNumber = form.fields.installmentsNumber.model.value;
-
-  return balance;
-};
-const formOptions: FormOptions = {
-  fields: formFieldsOptions,
-  submit: {
-    action: BalancesResoures.store.actions.add.namespaced,
-    dataHandler: dataHandler,
-  },
-};
-const form = new FormService(formOptions);
+const form = new BalanceFormService();
 
 const intallmentsNumberCssStyles = computed(() => ({
   "installments-number form-group row overflow-hidden show":
@@ -129,117 +36,42 @@ const intallmentsNumberCssStyles = computed(() => ({
   "installments-number form-group row overflow-hidden":
     form.fields.financed.model.value === false,
 }));
-const showFinancedValue = computed(() => {
-  return (
-    isNaN(form.fields.amount.value) === false &&
-    isNaN(form.fields.installmentsNumber.value) === false &&
-    form.fields.amount.value > 0 &&
-    form.fields.installmentsNumber.value > 0
-  );
-});
-const financedValue = computed(() => {
-  if (showFinancedValue.value === false) return 0;
+const showFinancedValue = computed(form.verifyIfShowFinancedValue);
+const financedValue = computed(form.financedValueFormatted);
 
-  const financedValue =
-    form.fields.amount.value / form.fields.installmentsNumber.value;
-
-  return financedValue.toFixed(2);
-});
-
-const getUsers = async (): Promise<User[]> => {
-  await StoreHelper.dispatch(UsersResoures.store.actions.list.namespaced, {});
-
-  return StoreHelper.get<User[]>(
-    UsersResoures.store.getters.users.namespaced,
-    []
-  );
-};
 const showModal = async (balanceId = 0, refinancing = false) => {
   show.value = true;
-  editMode.value = false;
-  refinanceMode.value = false;
-  form.fields.id.model.value = 0;
 
-  if (+balanceId > 0) {
-    modalTitle.value = BalancesResoures.form.title.edit;
-    editMode.value = true;
-    refinanceMode.value = refinancing;
-    form.fields.id.model.value = balanceId;
+  form.resetModes();
+  form.reset();
 
-    const balance = StoreHelper.getRaw(
-      BalancesResoures.store.getters.balance.namespaced
-    )(balanceId);
+  if (isNaN(balanceId) || +balanceId === 0) return;
 
-    if (!balance) return;
+  modalTitle.value = BalancesResources.form.title.edit;
 
-    form.fields.userId.model.value = balance.userId;
-    form.fields.name.model.value = balance.name;
-    form.fields.type.model.value = balance.type;
-    form.fields.date.model.value = extractDateFormDateTime(
-      balance.date as Date
-    );
-    form.fields.amount.model.value = balance.amount;
-    form.fields.financed.model.value = balance.financed;
-    form.fields.installmentsNumber.model.value = balance.installmentsNumber;
-
-    if (refinanceMode.value) {
-      form.fields.name.disable();
-      form.fields.userId.disable();
-      form.fields.type.disable();
-    } else {
-      form.fields.userId.disable();
-      form.fields.amount.disable();
-      form.fields.date.disable();
-      form.fields.financed.disable();
-      form.fields.installmentsNumber.disable();
-    }
-  }
+  form.enableEditMode(balanceId, refinancing);
 };
 const showModalEvent = async () => {
   await showModal();
 };
 const closeModal = (value: boolean) => {
   show.value = value;
-  editMode.value = false;
-  refinanceMode.value = false;
-  modalTitle.value = BalancesResoures.form.title.insert;
+  modalTitle.value = BalancesResources.form.title.insert;
 
+  form.resetModes();
   form.enableAll();
-
   form.reset();
 
   emits("onClose");
 };
-const refinance = async (form: FormService) => {
-  const dto = new RefinancedBalance();
-  dto.balanceId = form.fields.id.value;
-  dto.name = form.fields.name.value;
-  dto.date = form.fields.date.value;
-  dto.amount = form.fields.amount.value;
-  dto.financed = form.fields.financed.value;
-  dto.installmentsNumber = form.fields.installmentsNumber.value;
-
-  await StoreHelper.dispatch(
-    BalancesResoures.store.actions.refinance.namespaced,
-    dto
-  );
-};
 const submitForm = async () => {
-  form.validate();
-
-  if (form.invalid) return;
-
-  if (refinanceMode.value) {
-    await refinance(form);
-  } else {
-    await form.submit();
-  }
+  await form.submit();
 
   closeModal(false);
 };
 
 onMounted(async () => {
-  users.value = await getUsers();
+  users.value = await form.getUsers();
 });
 
 defineExpose({
@@ -264,7 +96,7 @@ defineExpose({
       <div class="form-group row">
         <div class="col-12 mb-3">
           <label class="form-label">{{
-            BalancesResoures.form.fields.name
+            BalancesResources.form.fields.name
           }}</label>
 
           <input
@@ -287,7 +119,7 @@ defineExpose({
       <div class="row">
         <div class="col-12 mb-3">
           <label class="form-label">{{
-            BalancesResoures.form.fields.user
+            BalancesResources.form.fields.user
           }}</label>
 
           <select
@@ -320,7 +152,7 @@ defineExpose({
       <div class="form-group row">
         <div class="col-12 col-sm-4 mb-3">
           <label class="form-label">
-            {{ BalancesResoures.form.fields.type }}
+            {{ BalancesResources.form.fields.type }}
           </label>
 
           <select
@@ -351,7 +183,7 @@ defineExpose({
 
         <div class="col-12 col-sm-5 mb-3">
           <label class="form-label">{{
-            BalancesResoures.form.fields.date
+            BalancesResources.form.fields.date
           }}</label>
 
           <input
@@ -373,7 +205,7 @@ defineExpose({
       <div class="form-group row">
         <div class="col-12 col-sm-4 mb-3">
           <label class="form-label">
-            {{ BalancesResoures.form.fields.amount }}
+            {{ BalancesResources.form.fields.amount }}
           </label>
 
           <AppFormInputCurrency
@@ -393,7 +225,7 @@ defineExpose({
 
         <div class="col-12 col-sm-8 mb-3">
           <label class="form-label">
-            {{ BalancesResoures.form.fields.financed }}?
+            {{ BalancesResources.form.fields.financed }}?
             {{ form.fields.financed.model.value }}
           </label>
 
@@ -429,7 +261,7 @@ defineExpose({
       <div :class="intallmentsNumberCssStyles">
         <div class="col-12">
           <label class="form-label">
-            {{ BalancesResoures.form.fields.intallmentsNumber }}
+            {{ BalancesResources.form.fields.intallmentsNumber }}
           </label>
         </div>
 

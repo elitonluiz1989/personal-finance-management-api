@@ -2,8 +2,8 @@ import { Module } from "vuex";
 import { BalancesState } from "./types";
 import axios from "axios";
 import { State } from "@/app/store/types";
-import { BalancesResoures } from "../balances.resources";
-import { Balance } from "../balance.model";
+import { BalancesResources } from "../balances.resources";
+import { Balance } from "../models/balance.model";
 import { isNullOrUndefined } from "@/app/helpers/helpers";
 import { RefinancedBalance } from "../balance-refinanced.model";
 
@@ -23,12 +23,12 @@ export const balances: Module<BalancesState, State> = {
   },
 
   getters: {
-    [BalancesResoures.store.getters.balances.value](
+    [BalancesResources.store.getters.balances.value](
       state: BalancesState
     ): Balance[] {
       return state.balances ?? [];
     },
-    [BalancesResoures.store.getters.balance.value](
+    [BalancesResources.store.getters.balance.value](
       state: BalancesState
     ): (id: number) => Balance | undefined {
       return (id: number) => state.balances.find((b) => b.id === id);
@@ -36,7 +36,7 @@ export const balances: Module<BalancesState, State> = {
   },
 
   mutations: {
-    [BalancesResoures.store.mutations.addBalanceOnBalances.value](
+    [BalancesResources.store.mutations.addBalanceOnBalances.value](
       state: BalancesState,
       payload: Balance
     ) {
@@ -47,7 +47,7 @@ export const balances: Module<BalancesState, State> = {
 
       handelBalanceData(balances, state);
     },
-    [BalancesResoures.store.mutations.addBalances.value](
+    [BalancesResources.store.mutations.addBalances.value](
       state: BalancesState,
       payload: Balance[]
     ) {
@@ -56,16 +56,16 @@ export const balances: Module<BalancesState, State> = {
   },
 
   actions: {
-    async [BalancesResoures.store.actions.list.value](
+    async [BalancesResources.store.actions.list.value](
       { commit },
       payload: any
     ) {
       const result = await axios.get<Balance[]>("/Balances", payload);
       const balances = result.data ?? [];
 
-      commit(BalancesResoures.store.mutations.addBalances.value, balances);
+      commit(BalancesResources.store.mutations.addBalances.value, balances);
     },
-    async [BalancesResoures.store.actions.find.value](
+    async [BalancesResources.store.actions.find.value](
       { commit },
       payload: number
     ) {
@@ -73,37 +73,37 @@ export const balances: Module<BalancesState, State> = {
 
       if (!result.data) return;
 
-      commit(BalancesResoures.store.mutations.addBalance.value, result.data);
+      commit(BalancesResources.store.mutations.addBalance.value, result.data);
     },
-    async [BalancesResoures.store.actions.add.value](
+    async [BalancesResources.store.actions.add.value](
       { commit, dispatch },
       payload: Balance
     ) {
       const result = await axios.post<Balance>("/Balances", payload);
 
       if (isNullOrUndefined(result.data)) {
-        dispatch(BalancesResoures.store.actions.list.namespaced);
+        dispatch(BalancesResources.store.actions.list.namespaced);
 
         return;
       }
 
-      commit(BalancesResoures.store.mutations.addBalances.value, result.data);
+      commit(BalancesResources.store.mutations.addBalances.value, result.data);
     },
-    async [BalancesResoures.store.actions.refinance.value](
+    async [BalancesResources.store.actions.refinance.value](
       { commit, dispatch },
       payload: RefinancedBalance
     ) {
       const result = await axios.post<Balance>("/RefinancedBalances", payload);
 
       if (isNullOrUndefined(result.data)) {
-        dispatch(BalancesResoures.store.actions.list.namespaced);
+        dispatch(BalancesResources.store.actions.list.namespaced);
 
         return;
       }
 
-      commit(BalancesResoures.store.mutations.addBalances.value, result.data);
+      commit(BalancesResources.store.mutations.addBalances.value, result.data);
     },
-    async [BalancesResoures.store.actions.remove.value](
+    async [BalancesResources.store.actions.remove.value](
       { state, commit },
       payload: number
     ) {
@@ -113,7 +113,7 @@ export const balances: Module<BalancesState, State> = {
 
       const balances = state.balances?.filter((b) => b.id !== payload) ?? [];
 
-      commit(BalancesResoures.store.mutations.addBalances.value, balances);
+      commit(BalancesResources.store.mutations.addBalances.value, balances);
     },
   },
 };

@@ -1,27 +1,29 @@
 import { IAppModalFooterProps } from "@/app/components/modal/types";
 import { FormService } from "@/app/services/form/form.service";
-import { FormFieldsOptions, FormOptions } from "@/app/services/form/types";
-import { ValidationRules } from "@/app/services/validation/validation-rules";
 import { StoreHelper } from "@/app/store/store.helper";
 import { KeyValue } from "@/app/types";
-import { TransactionsResoures } from "@/transactions/transactions.resources";
+import { TransactionsResources } from "@/transactions/transactions.resources";
 import * as TransactionType from "@/transactions/transaction-type.enum";
 import { User } from "@/users/user.model";
 import { UsersResoures } from "@/users/users.resources";
-import { Transaction } from "@/transactions/models/transaction.model";
-import { extractDateFormDateTime } from "@/app/helpers/helpers";
+import { InstallmentsResources } from "@/installments/installments.resources";
+import { InstallmentFilter } from "@/installments/models/installment.filter";
+import { BalanceTypeEnum } from "@/balances/balances-type.enum";
+import { Installment } from "@/installments/installment.model";
+import { TransactionFormFields } from "@/transactions/models/transaction-form-fields.model";
+import { ValidationService } from "@/app/services/validation/validation.service";
 
-export class TransactionsFormService {
+export class TransactionsFormService extends FormService<TransactionFormFields> {
   private _modalId!: string;
   private _modalFooterConfig!: IAppModalFooterProps;
-  private _formFieldsOptions!: FormFieldsOptions;
-  private _formOptions!: FormOptions;
-  private _form!: FormService;
   private _transactionTypes!:
     | KeyValue<string, TransactionType.TransactionTypeEnum>[];
+  private _page = 1;
 
   constructor() {
-    this.initialize();
+    super();
+
+    this.disableComboxes();
   }
 
   get modalId(): string {
@@ -32,25 +34,9 @@ export class TransactionsFormService {
     return this._modalFooterConfig;
   }
 
-  get formFieldsOptions(): FormFieldsOptions {
-    return this._formFieldsOptions;
-  }
-
-  get formOptions(): FormOptions {
-    return this._formOptions;
-  }
-
-  get form(): FormService {
-    return this._form;
-  }
-
   get transactionTypes():
     | KeyValue<string, TransactionType.TransactionTypeEnum>[] {
     return this._transactionTypes;
-  }
-
-  public dataHandler(): Transaction {
-    return new Transaction();
   }
 
   public async getUsers(): Promise<User[]> {
@@ -62,64 +48,53 @@ export class TransactionsFormService {
     );
   }
 
-  private initialize() {
+  public async searchForUserInstallments(
+    userId: number,
+    type: BalanceTypeEnum,
+    appendData: boolean
+  ): Promise<void> {
+    this._page = appendData ? this._page + 1 : 1;
+
+    const filter = new InstallmentFilter();
+    filter.userId = userId;
+    filter.balanceType = type;
+    filter.page = this._page;
+    filter.appendData = true;
+    filter.withoutPagination = false;
+    filter.installmentToAddAtTransaction = true;
+
+    await StoreHelper.dispatch(
+      InstallmentsResources.store.actions.list.namespaced,
+      filter
+    );
+  }
+
+  public clearStatedInstallments() {
+    StoreHelper.set<Installment[]>(
+      InstallmentsResources.store.mutations.addInstallments.namespaced,
+      []
+    );
+  }
+
+  public override async submit(): Promise<void> {
+    const dto = this._formFields.createTransaction();
+
+    await StoreHelper.dispatch(
+      TransactionsResources.store.actions.add.namespaced,
+      dto
+    );
+  }
+
+  protected override initialize(): void {
     this._modalId = "transaction-form-modal";
-    this._modalFooterConfig = {
-      show: true,
-    };
-    this._formFieldsOptions = {
-      id: {
-        initialValue: 0,
-      },
-      date: {
-        initialValue: extractDateFormDateTime(new Date()),
-        validations: [
-          ValidationRules.required<string>(
-            TransactionsResoures.form.fields.date
-          ),
-        ],
-      },
-      amount: {
-        initialValue: 0,
-        validations: [
-          ValidationRules.required<number>(
-            TransactionsResoures.form.fields.amount
-          ),
-        ],
-      },
-      userId: {
-        initialValue: 0,
-        validations: [
-          ValidationRules.required<number>(
-            TransactionsResoures.form.fields.user
-          ),
-        ],
-      },
-      type: {
-        initialValue: 0,
-        validations: [
-          ValidationRules.required<number>(
-            TransactionsResoures.form.fields.type
-          ),
-        ],
-      },
-      intallments: {
-        initialValue: [],
-        validations: [
-          ValidationRules.required<any[]>(
-            TransactionsResoures.form.fields.installments
-          ),
-        ],
-      },
-    };
-    this._formOptions = {
-      fields: this._formFieldsOptions,
-      submit: {
-        action: TransactionsResoures.store.actions.add.namespaced,
-        dataHandler: this.dataHandler,
-      },
-    };
-    this._form = new FormService(this._formOptions);
+    this._modalFooterConfig = { show: true };
     this._transactionTypes = TransactionType.toKeyValue();
+    this._formFields = new TransactionFormFields();
+    this._validateService = new ValidationService(this._formFields);
+  }
+
+  private disableComboxes() {
+    this._formFields.userId.disable();
+    this._formFields.type.disable();
   }
 }

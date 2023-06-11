@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, defineProps, ref } from "vue";
-import { Installment } from "@/installments/installment.model";
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
-import BalanceCardInstallmentBadge from "./balance-card-installment-badge.component.vue";
+import InstallmentCard from "@/installments/components/installment-card.component.vue";
+import { Installment } from "@/installments/installment.model";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
 
 type BalanceCardInstallmentsProp = {
   installments: Installment[];
@@ -54,30 +53,11 @@ const toggleInstallmentsList = () => (clicked.value = !clicked.value);
           v-if="props.installments.length > 0"
         >
           <li
-            class="d-flex list-style-none py-2 px-4"
+            class="d-flex list-style-none py-2"
             v-for="(installment, index) in props.installments"
             :key="index"
           >
-            <div class="d-flex align-items-center">
-              <span class="badge bg-dark">{{ installment.number }}</span>
-            </div>
-
-            <div class="balance__installments-reference flex-fill px-3">
-              <span>
-                {{ installment.referenceFormatted }}
-              </span>
-
-              <span class="px-2">-</span>
-
-              <span>
-                {{ CurrencyFormatterStatic.format(installment.amount) }}
-              </span>
-            </div>
-
-            <BalanceCardInstallmentBadge
-              :status="installment.status"
-              :description="installment.statusDescription"
-            />
+            <InstallmentCard :installment="installment" />
           </li>
         </ul>
       </div>

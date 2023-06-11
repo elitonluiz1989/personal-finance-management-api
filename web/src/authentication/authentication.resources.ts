@@ -12,6 +12,10 @@ export const AuthResources = {
   localStorage: {
     authInfo: "authInfo",
   },
+  form: {
+    username: "Username",
+    password: "Password",
+  },
   store: {
     namespace: namespace,
     getters: {

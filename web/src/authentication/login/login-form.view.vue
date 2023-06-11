@@ -1,38 +1,9 @@
 <script setup lang="ts">
 import router from "@/app/router";
-import { FormService } from "@/app/services/form/form.service";
-import {
-  FormOptions,
-  FormFieldsOptions,
-  FormFields,
-} from "@/app/services/form/types";
-import { ValidationRules } from "@/app/services/validation/validation-rules";
-import { AuthResources } from "../authentication.resources";
-import { AuthenticationDto } from "../types";
 import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
+import { LoginFormService } from "./login-form.service";
 
-const formFieldsOptions: FormFieldsOptions = {
-  username: {
-    initialValue: "",
-    validations: [ValidationRules.required("Username")],
-  },
-  password: {
-    initialValue: "",
-    validations: [ValidationRules.required("Password")],
-  },
-};
-const formOptions: FormOptions = {
-  fields: formFieldsOptions,
-  submit: {
-    action: AuthResources.store.actions.login.namespaced,
-    dataHandler: (fields: FormFields): AuthenticationDto => ({
-      username: fields.username.model.value,
-      password: fields.password.model.value,
-    }),
-  },
-};
-
-const form = new FormService(formOptions);
+const form = new LoginFormService();
 
 const submitForm = async () => {
   form.validate();

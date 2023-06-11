@@ -1,26 +1,15 @@
-import { FormField } from "./form-field.model";
+import { FormFields } from "./form-fields.model";
 
 export type FormFieldOptions<T> = IIndexable<T> & {
   initialValue: T;
   validations: ValidationRule<T>[];
 };
 
-export type FormFieldsOptions = {
-  [key: string]: FormFieldOptions<any>;
-};
+export type FormDataHandler<TFormFields extends FormFields> = (
+  fields: TFormFields
+) => T;
 
-export type FormDataHandler = (fields: FormField) => T;
-
-export type FormSubmitOptions = {
+export type FormSubmitHandler<TFormFields extends FormFields> = {
   action: string;
-  dataHandler: FormDataHandler;
-};
-
-export type FormOptions = {
-  fields: FormFieldOptions;
-  submit: FormSubmitOptions;
-};
-
-export type FormFields = {
-  [key: string]: FormField<any>;
+  dataHandler: FormDataHandler<TFormFields>;
 };

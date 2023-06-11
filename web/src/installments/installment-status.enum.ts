@@ -1,5 +1,5 @@
 export enum InstallmentStatusEnum {
-  Created = 1,
-  Paid,
-  PartiallyPaid,
+  created = 1,
+  paid,
+  partiallyPaid,
 }

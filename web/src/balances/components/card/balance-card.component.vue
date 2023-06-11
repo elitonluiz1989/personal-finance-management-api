@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { defineEmits, defineProps } from "vue";
-import { Balance } from "@/balances/balance.model";
+import { Balance } from "@/balances/models/balance.model";
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
 import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
 import BalanceCardItem from "./balance-card-item.component.vue";
 import BalanceCardBadge from "./balance-card-badge.component.vue";
-import BalanceCardInstallments from "./balance-card-installments/balance-card-installments.component.vue";
 import BalanceCardActions from "./balance-card-actions.component.vue";
+import BalanceCardInstallments from "./installments/balance-card-installments.component.vue";
 
 type BalanceCardProps = {
   balance: Balance;

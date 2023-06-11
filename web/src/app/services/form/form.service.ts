@@ -1,75 +1,46 @@
-import { StoreHelper } from "@/app/store/store.helper";
 import { ValidationService } from "../validation/validation.service";
-import { FormField } from "./form-field.model";
-import { FormFields, FormOptions } from "./types";
+import { FormSubmitHandler } from "./types";
+import { FormFields } from "./form-fields.model";
 
-export class FormService {
-  private _fields: FormFields = {};
-  private _validateService: ValidationService;
+export abstract class FormService<TFormFields extends FormFields> {
+  protected _formFields!: TFormFields;
+  protected _submitHandler!: FormSubmitHandler<TFormFields>;
+  protected _validateService!: ValidationService<TFormFields>;
 
-  constructor(private _options: FormOptions) {
-    this.createFormFields();
-
-    this._validateService = new ValidationService(this._fields);
+  constructor() {
+    this.initialize();
   }
 
-  get invalid(): boolean {
+  public get invalid(): boolean {
     return this._validateService.isInvalid;
   }
 
-  get fields(): FormFields {
-    return this._fields;
+  public get fields(): TFormFields {
+    return this._formFields;
   }
 
-  public validate() {
+  public validate(): void {
     this._validateService.validate();
   }
 
-  public clearValidations() {
+  public clearValidations(): void {
     this._validateService.clearValidation();
   }
 
-  public reset() {
+  public reset(): void {
     this.clearValidations();
-
-    this.resetValues();
+    this._formFields.resetAll();
   }
 
-  public enableAll() {
-    const fields = Object.values(this._fields);
-
-    for (const field of fields) {
-      if (field.disabled === false) continue;
-
-      field.enable();
-    }
+  public enableAll(): void {
+    this._formFields.enableAll();
   }
 
-  public disableAll() {
-    const fields = Object.values(this._fields);
-
-    for (const field of fields) {
-      if (field.disabled) continue;
-
-      field.disable();
-    }
+  public disableAll(): void {
+    this._formFields.disableAll();
   }
 
-  public async submit() {
-    const dto = this._options.submit.dataHandler(this._fields);
+  public abstract submit(): Promise<void>;
 
-    await StoreHelper.dispatch(this._options.submit.action, dto);
-  }
-
-  private createFormFields() {
-    for (const key in this._options.fields) {
-      this._fields[key] = new FormField(key, this._options.fields[key]);
-    }
-  }
-
-  private resetValues() {
-    for (const key in this._options.fields) {
-      this._fields[key].model.value = this._options.fields[key].initialValue;
-    }
-  }
+  protected abstract initialize(): void;
 }

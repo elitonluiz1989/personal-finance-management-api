@@ -1,4 +1,4 @@
-import { Balance } from "../balance.model";
+import { Balance } from "../models/balance.model";
 
 export type BalancesState = {
   balances: Balance[];

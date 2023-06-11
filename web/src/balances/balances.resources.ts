@@ -2,7 +2,7 @@ import { createStoreResourceItem } from "@/app/helpers/helpers";
 
 const namespace = "balances";
 
-export const BalancesResoures = {
+export const BalancesResources = {
   open: "Open",
   closed: "Closed",
   confirm: {
@@ -14,8 +14,9 @@ export const BalancesResoures = {
       edit: "Edit Balance",
     },
     fields: {
-      name: "Name",
+      id: "Id",
       user: "User",
+      name: "Name",
       type: "Type",
       date: "Date",
       amount: "Amount",
