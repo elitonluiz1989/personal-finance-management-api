@@ -6,3 +6,27 @@ html, body {
 body {
   background-color: white;
 }
+
+.badge-fit-content {
+  height: fit-content;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.disabled {
+  background-color: $gray-200;
+}
+
+.w-fit-content {
+  width: fit-content;
+}

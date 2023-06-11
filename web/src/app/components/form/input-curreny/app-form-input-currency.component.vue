@@ -11,7 +11,8 @@ type AppFormInputProps = {
   location?: string;
   currency?: string;
   disabled: boolean;
-  onFocus: (e: Event) => void;
+  onFocus?: (e: Event) => void;
+  onKeyUp?: (e: Event) => void;
 };
 type AppFormInputEmits = {
   (e: "update:modelValue", show: number): void;
@@ -25,8 +26,7 @@ const emits = defineEmits<AppFormInputEmits>();
 const rawValue = ref<number>();
 const currencyFormatter = new CurrencyFormatter(props.location, props.currency);
 
-const triggerFocus = (evt: Event) => props.onFocus(evt);
-const watchValueChange = (newValue: number, oldValue: number) => {
+const watchValueChange = (newValue: number, oldValue: number): void => {
   if (newValue === oldValue) return;
 
   const elements = document.querySelectorAll("input[type=text]");
@@ -37,12 +37,12 @@ const watchValueChange = (newValue: number, oldValue: number) => {
     element.setAttribute("value", newValue.toString());
   }
 };
-const currencyHandler = (evt: Event) => {
+const currencyHandler = (evt: Event): void => {
   const { target } = evt;
   const element = target as HTMLInputElement;
   let value = element?.value.toString().replace(/[^\d]/g, "");
 
-  if (isNullOrWhiteSpace(value)) return "";
+  if (isNullOrWhiteSpace(value)) return;
 
   if (value.length < 3) value = value.padStart(3, "0");
 
@@ -60,6 +60,14 @@ const currencyHandler = (evt: Event) => {
 
   emits("update:modelValue", rawValue.value);
 };
+const triggerFocus = (evt: Event): void => {
+  if (props.onFocus instanceof Function) props.onFocus(evt);
+};
+const onKeyUpHandler = (evt: Event): void => {
+  currencyHandler(evt);
+
+  if (props.onKeyUp instanceof Function) props.onKeyUp(evt);
+};
 
 watch(() => props.modelValue, watchValueChange);
 </script>
@@ -72,7 +80,7 @@ watch(() => props.modelValue, watchValueChange);
       :form-field="props.formField"
       :disabled="props.disabled"
       @focus="triggerFocus"
-      @keyup="currencyHandler"
+      @keyup="onKeyUpHandler"
       v-if="isNullOrUndefined(props.maxlength)"
     />
 
@@ -83,7 +91,7 @@ watch(() => props.modelValue, watchValueChange);
       :form-field="props.formField"
       :disabled="props.disabled"
       @focus="triggerFocus"
-      @keyup="currencyHandler"
+      @keyup="onKeyUpHandler"
     />
   </div>
 </template>

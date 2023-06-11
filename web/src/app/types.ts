@@ -29,3 +29,10 @@ export type KeyValue<TKey, TValue> = {
   key: TKey;
   value: TValue;
 };
+
+export type PaginationStateType = {
+  page: number;
+  pageSize?: number;
+  totalPages?: number;
+  total?: number;
+};
