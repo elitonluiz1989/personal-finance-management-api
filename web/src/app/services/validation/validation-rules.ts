@@ -1,10 +1,10 @@
-import { isBooleanAttr, isString } from "@vue/shared";
 import {
   isNullOrUndefined,
   isNullOrWhiteSpace,
   isNumber,
 } from "@/app/helpers/helpers";
 import { ValidationRule } from "@/app/types";
+import { isBooleanAttr, isString } from "@vue/shared";
 
 export class ValidationRules {
   public static required<T>(fieldName: string): ValidationRule<T> {
@@ -53,16 +53,21 @@ export class ValidationRules {
   }
 
   private static requiredValidation<T>(value: T) {
+    if (Array.isArray(value)) return value.length > 0;
+
     if (isBooleanAttr(String(value))) return isNullOrUndefined(value) === false;
 
-    if (isNumber(value)) {
-      const numValue = Number(value);
-
-      return isNaN(numValue) === false && numValue > 0;
-    }
+    if (isNumber(value))
+      return ValidationRules.requiredNumberValidation<T>(value);
 
     if (isString(value)) return isNullOrWhiteSpace(String(value)) == false;
 
     return isNullOrUndefined(value) === false;
+  }
+
+  private static requiredNumberValidation<T>(value: T) {
+    const numValue = Number(value);
+
+    return isNaN(numValue) === false && numValue > 0;
   }
 }

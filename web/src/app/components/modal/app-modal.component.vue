@@ -12,7 +12,7 @@ import AppModalHeader from "./app-modal-header.component.vue";
 import AppModalFooter from "./app-modal-footer.compenent.vue";
 
 type AppModalProps = {
-  id: string;
+  id?: string | null;
   title: string;
   show: boolean;
   isForm: boolean;
@@ -25,6 +25,7 @@ type AppModalEmits = {
 };
 
 const props = withDefaults(defineProps<AppModalProps>(), {
+  id: null,
   show: false,
   isForm: false,
 });
@@ -82,9 +83,9 @@ const resetForm = (evt: Event) => emits("onReset", evt);
 
           <AppModalFooter
             :is-form="true"
-            :save-text="props.footer.saveText"
-            :reset-text="props.footer.dismissText"
-            :dismiss-text="props.footer.dismissText"
+            :save-text="props.footer?.saveText"
+            :reset-text="props.footer?.resetText"
+            :dismiss-text="props.footer?.dismissText"
             @trigger-on-close="closeModal"
           />
         </form>
@@ -102,9 +103,9 @@ const resetForm = (evt: Event) => emits("onReset", evt);
 
           <AppModalFooter
             :is-form="false"
-            :save-text="props.footer.saveText"
-            :reset-text="props.footer.dismissText"
-            :dismiss-text="props.footer.dismissText"
+            :save-text="props.footer?.saveText"
+            :reset-text="props.footer?.resetText"
+            :dismiss-text="props.footer?.dismissText"
             @trigger-on-close="closeModal"
           />
         </template>

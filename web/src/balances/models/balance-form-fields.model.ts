@@ -1,10 +1,10 @@
+import { extractDateFormDateTime } from "@/app/helpers/helpers";
 import { FormField } from "@/app/services/form/form-field.model";
 import { FormFields } from "@/app/services/form/form-fields.model";
-import { BalancesResources } from "../balances.resources";
 import { ValidationRules as Rules } from "@/app/services/validation/validation-rules";
-import { extractDateFormDateTime } from "@/app/helpers/helpers";
-import { Balance } from "./balance.model";
 import { RefinancedBalance } from "../balance-refinanced.model";
+import { BalancesResources } from "../balances.resources";
+import { Balance } from "./balance.model";
 
 export class BalanceFormFields extends FormFields {
   public id: FormField<number>;
@@ -59,11 +59,14 @@ export class BalanceFormFields extends FormFields {
         Rules.between(BalancesResources.form.fields.intallmentsNumber, 1, 999),
       ]
     );
+
+    this.fillFieldsList();
   }
 
   public fill(balance: Balance): void {
     if (!balance) return;
 
+    this.id.model.value = balance.id;
     this.userId.model.value = balance.userId;
     this.name.model.value = balance.name;
     this.type.model.value = balance.type ?? 0;

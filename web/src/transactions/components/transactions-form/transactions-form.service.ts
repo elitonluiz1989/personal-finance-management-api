@@ -1,23 +1,24 @@
 import { IAppModalFooterProps } from "@/app/components/modal/types";
 import { FormService } from "@/app/services/form/form.service";
+import { ValidationService } from "@/app/services/validation/validation.service";
 import { StoreHelper } from "@/app/store/store.helper";
 import { KeyValue } from "@/app/types";
-import { TransactionsResources } from "@/transactions/transactions.resources";
-import * as TransactionType from "@/transactions/transaction-type.enum";
-import { User } from "@/users/user.model";
-import { UsersResoures } from "@/users/users.resources";
-import { InstallmentsResources } from "@/installments/installments.resources";
-import { InstallmentFilter } from "@/installments/models/installment.filter";
 import { BalanceTypeEnum } from "@/balances/balances-type.enum";
 import { Installment } from "@/installments/installment.model";
+import { InstallmentsResources } from "@/installments/installments.resources";
+import { InstallmentFilter } from "@/installments/models/installment.filter";
 import { TransactionFormFields } from "@/transactions/models/transaction-form-fields.model";
-import { ValidationService } from "@/app/services/validation/validation.service";
+import * as TransactionType from "@/transactions/transaction-type.enum";
+import { TransactionsResources } from "@/transactions/transactions.resources";
+import { User } from "@/users/user.model";
+import { UsersResoures } from "@/users/users.resources";
 
 export class TransactionsFormService extends FormService<TransactionFormFields> {
-  private _modalId!: string;
   private _modalFooterConfig!: IAppModalFooterProps;
-  private _transactionTypes!:
-    | KeyValue<string, TransactionType.TransactionTypeEnum>[];
+  private _transactionTypes: KeyValue<
+    string,
+    TransactionType.TransactionTypeEnum
+  >[] = [];
   private _page = 1;
 
   constructor() {
@@ -26,16 +27,14 @@ export class TransactionsFormService extends FormService<TransactionFormFields> 
     this.disableComboxes();
   }
 
-  get modalId(): string {
-    return this._modalId;
-  }
-
   get modalFooterConfig(): IAppModalFooterProps {
     return this._modalFooterConfig;
   }
 
-  get transactionTypes():
-    | KeyValue<string, TransactionType.TransactionTypeEnum>[] {
+  get transactionTypes(): KeyValue<
+    string,
+    TransactionType.TransactionTypeEnum
+  >[] {
     return this._transactionTypes;
   }
 
@@ -86,7 +85,6 @@ export class TransactionsFormService extends FormService<TransactionFormFields> 
   }
 
   protected override initialize(): void {
-    this._modalId = "transaction-form-modal";
     this._modalFooterConfig = { show: true };
     this._transactionTypes = TransactionType.toKeyValue();
     this._formFields = new TransactionFormFields();

@@ -18,6 +18,8 @@ export class LoginFormFields extends FormFields {
       AuthResources.form.password,
       ""
     );
+
+    this.fillFieldsList();
   }
 
   public createAuthenticationDto(): AuthenticationDto {

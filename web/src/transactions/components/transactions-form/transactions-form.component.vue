@@ -1,24 +1,25 @@
 <script setup lang="ts">
 import AppFormInputCurrency from "@/app/components/form/input-curreny/app-form-input-currency.component.vue";
 import AppModal from "@/app/components/modal/app-modal.component.vue";
+import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
+import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
+import { Installment } from "@/installments/installment.model";
 import { User } from "@/users/user.model";
 import {
-  onMounted,
-  ref,
-  defineProps,
-  defineEmits,
-  defineExpose,
-  withDefaults,
-  computed,
+computed,
+defineEmits,
+defineExpose,
+defineProps,
+onMounted,
+ref,
+withDefaults,
 } from "vue";
 import { TransactionsResources } from "../../transactions.resources";
-import { Installment } from "@/installments/installment.model";
-import { TransactionsFormService } from "./transactions-form.service";
 import TransactionsFormInstallments from "./installments/transactions-form-installments.component.vue";
-import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
+import { TransactionsFormService } from "./transactions-form.service";
 
 type TransactionsFormProps = {
-  showAddButton: boolean;
+  showAddButton?: boolean;
 };
 type TransactionFormEmits = {
   (e: "onClose"): void;
@@ -114,9 +115,7 @@ const selectedInstallmentHandler = (installment: Installment): void => {
 const showModal = (transactionId = 0): void => {
   show.value = true;
 };
-const showModalEvent = async (): Promise<void> => {
-  await showModal();
-};
+const showModalEvent = (): void => showModal();
 const closeModal = (value: boolean): void => {
   show.value = value;
   editMode.value = false;
@@ -157,7 +156,6 @@ defineExpose({
   </button>
 
   <AppModal
-    :id="form.modalId"
     :show="show"
     :title="modalTitle"
     :is-form="true"
@@ -276,7 +274,7 @@ defineExpose({
 
       <div class="form-group row">
         <div class="col-12">
-          <div class="d-flex mb-3">
+          <div class="d-flex">
             <label class="fw-bold"> Amount of selected installments: </label>
 
             <span
@@ -284,6 +282,13 @@ defineExpose({
             >
               {{ transactionInstallmentsAmountFormatted }}
             </span>
+          </div>
+
+          <div class="flex-mb-3">
+            <AppValidationMessages
+              :validations="form.fields.installments.validations"
+              v-if="form.fields.installments.invalid"
+            />
           </div>
 
           <TransactionsFormInstallments

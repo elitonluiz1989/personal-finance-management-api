@@ -2,14 +2,14 @@
 import { AppResources } from "@/app/app.resoures";
 import AppFormInputCurrency from "@/app/components/form/input-curreny/app-form-input-currency.component.vue";
 import AppFormInputNumber from "@/app/components/form/input-number/app-form-input-number.component.vue";
-import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
 import AppModal from "@/app/components/modal/app-modal.component.vue";
 import { IAppModalFooterProps } from "@/app/components/modal/types";
+import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
 import { KeyValue } from "@/app/types";
-import { computed, defineEmits, defineExpose, onMounted, ref } from "vue";
-import { User } from "@/users/user.model";
-import { BalancesResources } from "@/balances/balances.resources";
 import * as BalanceType from "@/balances/balances-type.enum";
+import { BalancesResources } from "@/balances/balances.resources";
+import { User } from "@/users/user.model";
+import { computed, defineEmits, defineExpose, onMounted, ref } from "vue";
 import { BalanceFormService } from "./balance-form.service";
 
 type BalanceFormEmits = {
@@ -36,8 +36,8 @@ const intallmentsNumberCssStyles = computed(() => ({
   "installments-number form-group row overflow-hidden":
     form.fields.financed.model.value === false,
 }));
-const showFinancedValue = computed(form.verifyIfShowFinancedValue);
-const financedValue = computed(form.financedValueFormatted);
+const showFinancedValue = computed(() => form.verifyIfShowFinancedValue());
+const financedValue = computed(() => form.financedValueFormatted());
 
 const showModal = async (balanceId = 0, refinancing = false) => {
   show.value = true;
