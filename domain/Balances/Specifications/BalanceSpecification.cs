@@ -19,50 +19,41 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
         public override ISpecification<Balance, int, BalanceFilter, BalanceDto> WithFilter(BalanceFilter filter, int authenticatedUserId, bool isAdmin)
         {
             if (filter.Id > 0)
-                _query.Where(p => p.Id == filter.Id);
+                Query.Where(p => p.Id == filter.Id);
 
             if (filter.UserId > 0)
-                _query.Where(p => p.UserId == filter.UserId);
+                Query.Where(p => p.UserId == filter.UserId);
 
             if (filter.Types.Any())
-                _query.Where(p => filter.Types.Contains(p.Type));
+                Query.Where(p => filter.Types.Contains(p.Type));
 
             if (filter.Financed.HasValue)
-                _query.Where(p => p.Financed == filter.Financed);
+                Query.Where(p => p.Financed == filter.Financed);
 
             if (filter.InstallmentsNumber.HasValue)
-                _query.Where(p => p.InstallmentsNumber == p.InstallmentsNumber);
+                Query.Where(p => p.InstallmentsNumber == p.InstallmentsNumber);
 
             if (filter.Closed.HasValue)
-                _query.Where(p => p.Closed == filter.Closed);
+                Query.Where(p => p.Closed == filter.Closed);
 
             if (filter.UserId > 0)
             {
-                _query.Where(p => p.UserId == filter.UserId);
+                Query.Where(p => p.UserId == filter.UserId);
             }
             else
             {                
                 if (isAdmin is false)
-                   _query.Where(p => p.UserId == authenticatedUserId);
+                   Query.Where(p => p.UserId == authenticatedUserId);
             }
 
             return this;
         }
 
-        public override async Task<IEnumerable<BalanceDto>> List()
+        protected override IQueryable<BalanceDto> GetQuery()
         {
-            return await _query
+            return Query
                 .Include(p => p.Installments)
-                .Select(s => BalanceMappingsExtension.ToBalanceDto(s))
-                .ToListAsync();
-        }
-
-        public override async Task<BalanceDto?> First()
-        {
-            return await _query
-                .Include(p => p.Installments)
-                .Select(s => BalanceMappingsExtension.ToBalanceDto(s))
-                .FirstOrDefaultAsync();
+                .Select(s => BalanceMappingsExtension.ToBalanceDto(s));
         }
     }
 }

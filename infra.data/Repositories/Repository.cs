@@ -8,23 +8,24 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
         where TEntity : Entity<TKey>
         where TKey : struct
     {
-        protected readonly IDBContext Context;
+        public IDBContext Context => _context;
+        protected readonly IDBContext _context;
 
         public Repository(IDBContext dbContext)
         {
-            Context = dbContext;
+            _context = dbContext;
         }
 
         public void Insert(TEntity entity)
         {
-            Context.Set<TEntity>().Add(entity);
+            _context.Set<TEntity>().Add(entity);
         }
 
         public void Update(TEntity entity)
         {
             DetachLocalEntity(entity);
 
-            Context.Entry(entity).State = EntityState.Modified;
+            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public async Task Delete(TKey id)
@@ -48,7 +49,7 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
 
             DetachLocalEntity(entity);
 
-            Context.Set<TEntity>().Remove(entity);
+            _context.Set<TEntity>().Remove(entity);
         }
 
         public void Delete(IEnumerable<TEntity> entities)
@@ -63,12 +64,12 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
                 return;
             }
 
-            Context.Set<TEntity>().RemoveRange(entities);
+            _context.Set<TEntity>().RemoveRange(entities);
         }
 
         public IQueryable<TEntity> Query()
         {
-            return Context.Set<TEntity>();
+            return _context.Set<TEntity>();
         }
 
         public async Task<IEnumerable<TEntity>> All()
@@ -106,10 +107,10 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
 
         private void DetachLocalEntity(TEntity entity)
         {
-            var localContextEntity = Context.Set<TEntity>().Local.FirstOrDefault(e => e.Id.Equals(entity.Id));
+            var localContextEntity = _context.Set<TEntity>().Local.FirstOrDefault(e => e.Id.Equals(entity.Id));
 
             if (localContextEntity is not null)
-                Context.Entry(localContextEntity).State = EntityState.Detached;
+                _context.Entry(localContextEntity).State = EntityState.Detached;
         }
     }
 }

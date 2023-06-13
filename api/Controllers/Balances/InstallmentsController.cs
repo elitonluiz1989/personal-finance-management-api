@@ -30,7 +30,8 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         {
             var results = await specification
                 .WithFilter(filters, AuthenticatedUserId, IsAdmin)
-                .List();
+                .WithPagination(filters)
+                .PagedList();
 
             return Ok(results);
         }

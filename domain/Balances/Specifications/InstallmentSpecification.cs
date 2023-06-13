@@ -4,32 +4,35 @@ using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Balances.Filters;
-using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Dtos;
 using PersonalFinanceManagement.Domain.Base.Specifications;
 
 namespace PersonalFinanceManagement.Domain.Balances.Specifications
 {
     public class InstallmentSpecification : Specification<Installment, int, InstallmentFilter, InstallmentDto>, IInstallmentSpecification
     {
-        private InstallmentFilter _filter = new();
         public InstallmentSpecification(IInstallmentRepository repository)
             : base(repository)
         {
+            Filter = new InstallmentFilter();
         }
 
-        public override ISpecification<Installment, int, InstallmentFilter, InstallmentDto> WithFilter(InstallmentFilter filter, int authenticatedUserId, bool isAdmin)
+        public override IInstallmentSpecification WithFilter(InstallmentFilter filter, int authenticatedUserId, bool isAdmin)
         {
-            _filter = filter;
+            Filter = filter;
 
-            if (_filter.Id > 0)
-                _query = _query.Where(p => p.Id == filter.Id);
+            if (Filter is null)
+                return this;
 
-            if (_filter.BalanceId > 0)
-                _query = _query.Where(p => p.BalanceId == filter.BalanceId);
+            if (Filter.Id > 0)
+                Query = Query.Where(p => p.Id == filter.Id);
 
-            if (_filter.UserId > 0)
+            if (Filter.BalanceId > 0)
+                Query = Query.Where(p => p.BalanceId == filter.BalanceId);
+
+            if (Filter.UserId > 0)
             {
-                _query = _query.Where(p =>
+                Query = Query.Where(p =>
                     p.Balance != null &&
                     p.Balance.UserId == filter.UserId
                 );
@@ -37,38 +40,57 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             else
             {
                 if (isAdmin is false)
-                    _query = _query.Where(p =>
+                    Query = Query.Where(p =>
                         p.Balance != null &&
                         p.Balance.UserId == authenticatedUserId
                     );
             }
 
-            if (_filter.TransactionId > 0)
-                _query = _query.Where(p =>
+            if (Filter.TransactionId > 0)
+                Query = Query.Where(p =>
                     p.TransactionItems.Any(ti => 
                         ti.Transaction != null &&
                         ti.Transaction.Id == filter.TransactionId
                     )
                 );
 
-            if (_filter.Reference > 0)
-                _query = _query.Where(p => p.Reference == filter.Reference);
+            if (Filter.BalanceType is not null)
+            {
+                Query = Query.Where(p =>
+                    p.Balance != null &&
+                    (
+                        (
+                            filter.InstallmentToAddAtTransaction == false &&
+                            p.Balance.Type == Filter.BalanceType.Value
+                        ) ||
+                        (
+                            filter.InstallmentToAddAtTransaction &&
+                            p.Balance.Type != Filter.BalanceType.Value
+                        )
+                    )
+                );
+            }
 
-            if (_filter.Number > 0)
-                _query = _query.Where(p => p.Number == filter.Number);
+            if (Filter.Reference > 0)
+                Query = Query.Where(p => p.Reference == filter.Reference);
 
-            if (_filter.Status > 0)
-                _query = _query.Where(p => p.Status == p.Status);
+            if (Filter.Number > 0)
+                Query = Query.Where(p => p.Number == filter.Number);
 
-            if (_filter.Amount > 0)
-                _query = _query.Where(p => p.Amount == filter.Amount);
+            if (Filter.Status > 0)
+                Query = Query.Where(p => p.Status == p.Status);
+
+            if (Filter.Amount > 0)
+                Query = Query.Where(p => p.Amount == filter.Amount);
 
             return this;
         }
 
-        public override async Task<IEnumerable<InstallmentDto>> List()
+        public override async Task<PagedResultsDto<InstallmentDto>> PagedList()
         {
-            return await GetQuery().ToListAsync();
+            var query = GetQuery();
+
+            return await GetPagedResults(query);
         }
 
         public override async Task<InstallmentDto?> First()
@@ -76,21 +98,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             return await GetQuery().FirstOrDefaultAsync();
         }
 
-        private IQueryable<InstallmentDto> GetQuery()
+        protected override IQueryable<InstallmentDto> GetQuery()
         {
-            _query = _query
+            return Query
                 .Include(p => p.Balance)
-                .Include(p => p.TransactionItems)
-                    .ThenInclude(p => p.Transaction);
-
-            if (_filter.WithoutPagination is false)
-            {
-                _query = _query
-                    .Skip(_filter.Page)
-                    .Take(_filter.PageSize);
-            }
-
-            return _query
                 .Select(s => InstalmentMappingsExtension.ToInstallmentDto(s));
         }
     }

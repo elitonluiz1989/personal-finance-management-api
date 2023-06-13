@@ -1,4 +1,5 @@
-﻿using PersonalFinanceManagement.Domain.Base.Entites;
+﻿using Microsoft.EntityFrameworkCore;
+using PersonalFinanceManagement.Domain.Base.Entites;
 
 namespace PersonalFinanceManagement.Domain.Base.Contracts
 {
@@ -6,6 +7,7 @@ namespace PersonalFinanceManagement.Domain.Base.Contracts
         where TEntity : Entity<TKey>
         where TKey : struct
     {
+        IDBContext Context { get; }
         void Insert(TEntity entity);
         void Update(TEntity entity);
         Task Delete(TKey id);

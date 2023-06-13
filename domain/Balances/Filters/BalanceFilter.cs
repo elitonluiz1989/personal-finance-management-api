@@ -1,8 +1,9 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
+using PersonalFinanceManagement.Domain.Base.Filters;
 
 namespace PersonalFinanceManagement.Domain.Balances.Filters
 {
-    public record BalanceFilter
+    public record BalanceFilter : Filter
     {
         public int Id { get; set; }
         public int UserId { get; set; }
