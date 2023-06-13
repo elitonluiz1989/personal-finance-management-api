@@ -7,8 +7,8 @@ import { computed, defineProps, withDefaults } from "vue";
 
 type AppBadgeProps = {
   color: BootstrapColorsEnum;
-  fitContent: boolean;
   text: string;
+  fitContent?: boolean;
 };
 const props = withDefaults(defineProps<AppBadgeProps>(), {
   fitContent: false,

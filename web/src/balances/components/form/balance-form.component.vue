@@ -213,7 +213,7 @@ defineExpose({
             form-field="amount"
             :maxlength="14"
             :disabled="form.fields.amount.disabled"
-            :on-focus="() => form.fields.amount.clearValidation()"
+            @on-focus="() => form.fields.amount.clearValidation()"
             v-model="form.fields.amount.model.value"
           />
 

@@ -5,7 +5,7 @@ import { State } from "@/app/store/types";
 import { BalancesResources } from "../balances.resources";
 import { Balance } from "../models/balance.model";
 import { isNullOrUndefined } from "@/app/helpers/helpers";
-import { RefinancedBalance } from "../balance-refinanced.model";
+import { RefinancedBalance } from "../models/balance-refinanced.model";
 
 const handelBalanceData = (balances: Balance[], state: BalancesState) => {
   for (const key in balances) {

@@ -2,21 +2,19 @@
 import AppFormInputCurrency from "@/app/components/form/input-curreny/app-form-input-currency.component.vue";
 import AppModal from "@/app/components/modal/app-modal.component.vue";
 import AppValidationMessages from "@/app/components/validation-messages/app-validation-messages.component.vue";
-import { CurrencyFormatterStatic } from "@/app/helpers/currency-formatter";
 import { Installment } from "@/installments/installment.model";
-import { User } from "@/users/user.model";
 import {
-computed,
-defineEmits,
-defineExpose,
-defineProps,
-onMounted,
-ref,
-withDefaults,
+  computed,
+  defineEmits,
+  defineExpose,
+  defineProps,
+  onMounted,
+  withDefaults,
 } from "vue";
-import { TransactionsResources } from "../../transactions.resources";
+import { TransactionsFormStrings as FormStrings } from "../../transactions.resources";
 import TransactionsFormInstallments from "./installments/transactions-form-installments.component.vue";
-import { TransactionsFormService } from "./transactions-form.service";
+import { TransactionsFormEventsService } from "./services/transaction-form-events.service";
+import { TransactionsFormService } from "./services/transactions-form.service";
 
 type TransactionsFormProps = {
   showAddButton?: boolean;
@@ -25,120 +23,35 @@ type TransactionFormEmits = {
   (e: "onClose"): void;
 };
 
-const show = ref(false);
-const modalTitle = ref(TransactionsResources.form.title.insert);
-const editMode = ref(false);
-const refinanceMode = ref(false);
-const users = ref<User[]>([]);
-const transactionInstallmentsAmount = ref(0);
-const allowKeepSelectionInstalments = ref(true);
-
 const props = withDefaults(defineProps<TransactionsFormProps>(), {
   showAddButton: true,
 });
 const emits = defineEmits<TransactionFormEmits>();
 
 const form = new TransactionsFormService();
+const events = new TransactionsFormEventsService(form);
 
-const transactionInstallmentsAmountFormatted = computed((): string => {
-  if (!transactionInstallmentsAmount.value)
-    return CurrencyFormatterStatic.format(0);
+const installmentsAmountFormatted = computed((): string =>
+  form.getInstallmentsAmountFormatted()
+);
+const modalTitle = computed((): string => form.getModalTitle());
 
-  return CurrencyFormatterStatic.format(transactionInstallmentsAmount.value);
-});
-
-const onChangeAmount = async (): Promise<void> => {
-  if (form.fields.amount.changed) {
-    form.fields.userId.enable();
-    form.fields.type.enable();
-
-    validateIfAllowKeepSelection();
-  } else {
-    form.fields.userId.disable();
-    form.fields.type.disable();
-  }
+const showModal = (): void => {
+  form.show.value = true;
 };
-const onChangeUser = async (): Promise<void> => {
-  form.fields.userId.clearValidation();
-
-  await searchInstallments();
-};
-const onChangeType = async (): Promise<void> => {
-  form.fields.type.clearValidation();
-
-  await searchInstallments();
-};
-const searchInstallments = async (appendData = false): Promise<void> => {
-  if (
-    form.fields.userId.changed === false ||
-    form.fields.type.changed === false
-  ) {
-    form.clearStatedInstallments();
-
-    return;
-  }
-
-  if (appendData === false) form.clearStatedInstallments();
-
-  await form.searchForUserInstallments(
-    form.fields.userId.value,
-    form.fields.type.value,
-    appendData
-  );
-};
-const validateIfAllowKeepSelection = (): void => {
-  allowKeepSelectionInstalments.value =
-    transactionInstallmentsAmount.value < form.fields.amount.value;
-};
-const selectedInstallmentHandler = (installment: Installment): void => {
-  const alreadySelected = form.fields.installments.value.find(
-    (i: Installment) => i.id === installment.id
-  );
-
-  if (alreadySelected) {
-    form.fields.installments.model.value =
-      form.fields.installments.model.value.filter(
-        (i: Installment) => i.id !== installment.id
-      );
-  } else {
-    form.fields.installments.model.value.push(installment);
-  }
-
-  transactionInstallmentsAmount.value =
-    form.fields.installments.model.value.reduce(
-      (acc: number, installment: Installment) => acc + installment.amount,
-      0
-    );
-
-  validateIfAllowKeepSelection();
-};
-const showModal = (transactionId = 0): void => {
-  show.value = true;
-};
-const showModalEvent = (): void => showModal();
-const closeModal = (value: boolean): void => {
-  show.value = value;
-  editMode.value = false;
-  refinanceMode.value = false;
-  modalTitle.value = TransactionsResources.form.title.insert;
-  transactionInstallmentsAmount.value = 0;
-
-  form.clearStatedInstallments();
-  form.enableAll();
-  form.reset();
+const closeModal = (): void => {
+  events.closeModalHandler();
 
   emits("onClose");
 };
 const submitForm = async (): Promise<void> => {
-  form.validate();
+  form.submit();
 
-  if (form.invalid) return;
-
-  closeModal(false);
+  closeModal();
 };
 
 onMounted(async (): Promise<void> => {
-  users.value = await form.getUsers();
+  await events.populateUsers();
 });
 
 defineExpose({
@@ -147,29 +60,23 @@ defineExpose({
 </script>
 
 <template>
-  <button
-    class="btn btn-primary"
-    @click="showModalEvent"
-    v-if="props.showAddButton"
-  >
+  <button class="btn btn-primary" @click="showModal" v-if="props.showAddButton">
     Add Transaction
   </button>
 
   <AppModal
-    :show="show"
+    :show="form.show.value"
     :title="modalTitle"
     :is-form="true"
     :footer="form.modalFooterConfig"
     @on-close="closeModal"
-    @on-reset="() => form.reset()"
+    @on-reset="() => events.reset()"
     @on-save.prevent="submitForm"
   >
     <div class="container-fluid">
       <div class="form-group row">
         <div class="col-12 col-sm-5 mb-3">
-          <label class="form-label">{{
-            TransactionsResources.form.fields.date
-          }}</label>
+          <label class="form-label">{{ FormStrings.date }}</label>
 
           <input
             type="date"
@@ -188,7 +95,7 @@ defineExpose({
 
         <div class="col-12 col-sm-4 mb-3">
           <label class="form-label">
-            {{ TransactionsResources.form.fields.amount }}
+            {{ FormStrings.amount }}
           </label>
 
           <AppFormInputCurrency
@@ -196,8 +103,8 @@ defineExpose({
             form-field="amount"
             :maxlength="14"
             :disabled="form.fields.amount.disabled"
-            :on-focus="() => form.fields.amount.clearValidation()"
-            :on-key-up="onChangeAmount"
+            @on-focus="() => form.fields.amount.clearValidation()"
+            @on-key-up="() => events.amountChangeHandler()"
             v-model="form.fields.amount.model.value"
           />
 
@@ -210,23 +117,21 @@ defineExpose({
 
       <div class="row">
         <div class="col-12 col-sm mb-3">
-          <label class="form-label">{{
-            TransactionsResources.form.fields.user
-          }}</label>
+          <label class="form-label">{{ FormStrings.user }}</label>
 
           <select
             class="form-control"
             form-field="user"
             :disabled="form.fields.userId.disabled"
-            @change="onChangeUser"
+            @change="events.userChangeHandler"
             v-model="form.fields.userId.model.value"
           >
             <option :value="(0 as number)">...</option>
 
-            <template v-if="users.length > 0">
+            <template v-if="form.users.value.length > 0">
               <option
                 :value="user.id"
-                v-for="(user, index) of users"
+                v-for="(user, index) of form.users.value"
                 :key="index"
               >
                 {{ user.name }}
@@ -242,14 +147,14 @@ defineExpose({
 
         <div class="col-12 col-sm-4">
           <label class="form-label">
-            {{ TransactionsResources.form.fields.type }}
+            {{ FormStrings.type }}
           </label>
 
           <select
             class="form-control"
             form-field="type"
             :disabled="form.fields.type.disabled"
-            @change="onChangeType"
+            @change="events.typeChangeHandler"
             v-model="form.fields.type.model.value"
           >
             <option value="0">...</option>
@@ -274,17 +179,17 @@ defineExpose({
 
       <div class="form-group row">
         <div class="col-12">
-          <div class="d-flex">
-            <label class="fw-bold"> Amount of selected installments: </label>
-
-            <span
-              class="ms-2 form-control flex-fill w-fit-content text-end disabled"
-            >
-              {{ transactionInstallmentsAmountFormatted }}
-            </span>
-          </div>
-
           <div class="flex-mb-3">
+            <div class="d-flex">
+              <label class="fw-bold"> Amount of selected installments: </label>
+
+              <span
+                class="ms-2 form-control flex-fill w-fit-content text-end disabled"
+              >
+                {{ installmentsAmountFormatted }}
+              </span>
+            </div>
+
             <AppValidationMessages
               :validations="form.fields.installments.validations"
               v-if="form.fields.installments.invalid"
@@ -292,9 +197,9 @@ defineExpose({
           </div>
 
           <TransactionsFormInstallments
-            :allow-selection="allowKeepSelectionInstalments"
-            @on-search="searchInstallments"
-            @on-select-installment="selectedInstallmentHandler"
+            :allow-selection="form.allowKeepSelectionInstalments.value"
+            @on-search="events.searchInstallments"
+            @on-select-installment="(installment: Installment) => events.selectedInstallmentHandler(installment)"
           />
         </div>
       </div>

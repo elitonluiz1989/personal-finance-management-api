@@ -1,49 +1,50 @@
 import { createStoreResourceItem } from "@/app/helpers/helpers";
 
-const namespace = "transactions";
+export class TransactionsFormStrings {
+  public static insertTitle = "Add transaction";
+  public static editTitle = "Edit transaction";
 
-export const TransactionsResources = {
-  confirm: {
-    removeTransaction: "Do you want remove this transaction?",
-  },
-  form: {
-    title: {
-      insert: "Add transaction",
-      edit: "Edit transaction",
-    },
-    fields: {
-      id: "Id",
-      date: "Date",
-      amount: "Amount",
-      user: "User",
-      type: "Type",
-      installments: "Installments",
-    },
-    text: {
-      addInstallments: "Add Installments",
-      loadMore: "Load more",
-    },
-  },
-  store: {
-    namespace: namespace,
-    getters: {
-      Transactions: createStoreResourceItem(namespace, "getTransactions"),
-      Transaction: createStoreResourceItem(namespace, "getTransaction"),
-    },
-    mutations: {
-      addTransaction: createStoreResourceItem(namespace, "addTransaction"),
-      addTransactions: createStoreResourceItem(namespace, "addTransactions"),
-      addTransactionOnTransactions: createStoreResourceItem(
-        namespace,
-        "addTransactionOnTransactions"
-      ),
-    },
-    actions: {
-      list: createStoreResourceItem(namespace, "list"),
-      find: createStoreResourceItem(namespace, "find"),
-      add: createStoreResourceItem(namespace, "add"),
-      refinance: createStoreResourceItem(namespace, "refinance"),
-      remove: createStoreResourceItem(namespace, "remove"),
-    },
-  },
-};
+  public static id = "Id";
+  public static date = "Date";
+  public static amount = "Amount";
+  public static user = "User";
+  public static type = "Type";
+  public static installments = "Installments";
+
+  public static loadMore = "Load more";
+}
+
+export class TransactionsStoreStrings {
+  public static namespace = "transactions";
+
+  public static getterTransactions = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "getTransactions"
+  );
+  public static getterTransaction = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "getTransaction"
+  );
+
+  public static setterAddTransaction = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "addTransaction"
+  );
+  public static setterAddTransactions = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "addTransactions"
+  );
+
+  public static actionList = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "list"
+  );
+  public static actionFindAction = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "find"
+  );
+  public static actionAdd = createStoreResourceItem(
+    TransactionsStoreStrings.namespace,
+    "add"
+  );
+}

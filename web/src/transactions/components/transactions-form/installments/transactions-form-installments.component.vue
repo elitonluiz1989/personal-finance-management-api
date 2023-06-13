@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, defineEmits, defineProps, withDefaults } from "vue";
 import { Installment } from "@/installments/installment.model";
-import { TransactionsResources } from "@/transactions/transactions.resources";
+import { TransactionsFormStrings as FormStrings } from "@/transactions/transactions.resources";
 import { StoreHelper } from "@/app/store/store.helper";
 import { InstallmentsResources } from "@/installments/installments.resources";
 import TransactionsFormInstallment from "./transactions-form-installment.component.vue";
@@ -57,7 +57,7 @@ const selectInstallment = (installment: Installment) =>
         class="btn btn-outline-secondary w-100"
         @click.prevent="search(true)"
       >
-        {{ TransactionsResources.form.text.loadMore }}
+        {{ FormStrings.loadMore }}
       </button>
     </div>
   </div>

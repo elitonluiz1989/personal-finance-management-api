@@ -2,7 +2,7 @@ import { extractDateFormDateTime } from "@/app/helpers/helpers";
 import { FormField } from "@/app/services/form/form-field.model";
 import { FormFields } from "@/app/services/form/form-fields.model";
 import { ValidationRules as Rules } from "@/app/services/validation/validation-rules";
-import { RefinancedBalance } from "../balance-refinanced.model";
+import { RefinancedBalance } from "./balance-refinanced.model";
 import { BalancesResources } from "../balances.resources";
 import { Balance } from "./balance.model";
 

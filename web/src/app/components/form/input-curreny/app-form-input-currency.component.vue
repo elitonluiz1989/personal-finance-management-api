@@ -11,11 +11,11 @@ type AppFormInputProps = {
   location?: string;
   currency?: string;
   disabled: boolean;
-  onFocus?: (e: Event) => void;
-  onKeyUp?: (e: Event) => void;
 };
 type AppFormInputEmits = {
   (e: "update:modelValue", show: number): void;
+  (e: "onFocus", evt: Event): void;
+  (e: "onKeyUp", evt: Event): void;
 };
 const props = withDefaults(defineProps<AppFormInputProps>(), {
   location: navigator?.language,
@@ -61,12 +61,12 @@ const currencyHandler = (evt: Event): void => {
   emits("update:modelValue", rawValue.value);
 };
 const triggerFocus = (evt: Event): void => {
-  if (props.onFocus instanceof Function) props.onFocus(evt);
+  emits("onFocus", evt);
 };
 const onKeyUpHandler = (evt: Event): void => {
   currencyHandler(evt);
 
-  if (props.onKeyUp instanceof Function) props.onKeyUp(evt);
+  emits("onKeyUp", evt);
 };
 
 watch(() => props.modelValue, watchValueChange);
@@ -87,11 +87,11 @@ watch(() => props.modelValue, watchValueChange);
     <input
       type="text"
       :class="props.class"
-      :maxlength="props.maxlength"
       :form-field="props.formField"
       :disabled="props.disabled"
       @focus="triggerFocus"
       @keyup="onKeyUpHandler"
+      v-else
     />
   </div>
 </template>
