@@ -15,6 +15,12 @@ const navItems: IAppNavitem[] = [
     active: false,
   },
   {
+    url: "/transactions",
+    text: "Transactions",
+    cssClasses: "nav-link",
+    active: false,
+  },
+  {
     url: "/balances",
     text: "Balances",
     cssClasses: "nav-link",
