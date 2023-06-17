@@ -25,7 +25,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
         public async Task<IActionResult> Get(
             [FromQuery] InstallmentFilter filters,
-            [FromServices] IInstallmentSpecification specification
+            [FromServices] IInstallmentWithBalanceSpecification specification
         )
         {
             var results = await specification

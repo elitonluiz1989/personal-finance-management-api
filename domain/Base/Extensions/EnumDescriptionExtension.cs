@@ -5,7 +5,7 @@ namespace PersonalFinanceManagement.Domain.Base.Extensions
 {
     public static class EnumDescriptionExtension
     {
-        public static string GetDescrition(this Enum value)
+        public static string GetDescription(this Enum value)
         {
             if (value is null)
                 return string.Empty;

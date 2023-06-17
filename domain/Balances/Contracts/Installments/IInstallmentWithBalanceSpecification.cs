@@ -5,7 +5,7 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 
 namespace PersonalFinanceManagement.Domain.Balances.Contracts.Installments
 {
-    public interface IInstallmentSpecification : ISpecification<Installment, int, InstallmentFilter, InstallmentDto>
+    public interface IInstallmentWithBalanceSpecification : ISpecification<Installment, int, InstallmentFilter, InstallmentWithBalanceDto>
     {
     }
 }

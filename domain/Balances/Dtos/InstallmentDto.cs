@@ -1,5 +1,6 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
-using PersonalFinanceManagement.Domain.Transactions.Dtos;
+using PersonalFinanceManagement.Domain.Balances.Extensions;
+using PersonalFinanceManagement.Domain.Base.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Balances.Dtos
 {
@@ -8,13 +9,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public int Id { get; set; }
         public int BalanceId { get; set; }
         public int Reference { get; set; }
-        public string ReferenceFormatted { get; set; } = string.Empty;
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
-        public string StatusDescription { get; set; } = string.Empty;
         public decimal Amount { get; set; }
 
-        public BalanceSimplifiedDto? Balance { get; set; }
-        public List<TransactionItemDto> Items { get; set; } = new();
+        public string ReferenceFormatted => Reference.ToMonthYear();
+        public string StatusDescription => Status.GetDescription();
     }
 }

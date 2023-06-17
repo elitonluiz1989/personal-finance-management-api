@@ -1,37 +1,46 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
-using PersonalFinanceManagement.Domain.Base.Extensions;
+using PersonalFinanceManagement.Domain.Transactions.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Balances.Extensions
 {
     public static class InstalmentMappingsExtension
     {
-        public static InstallmentDto ToInstallmentDto(this Installment installment)
+        public static InstallmentWithBalanceDto ToInstallmentWithBalanceDto(this Installment installment)
         {
-            var dto = new InstallmentDto()
+            var dto = new InstallmentWithBalanceDto()
             {
                 Id = installment.Id,
                 BalanceId = installment.BalanceId,
                 Reference = installment.Reference,
-                ReferenceFormatted = installment.Reference.ToMonthYear(),
                 Number = installment.Number,
                 Status = installment.Status,
-                StatusDescription = installment.Status.GetDescrition(),
                 Amount = installment.Amount
             };
 
             if (installment.Balance is Balance balance)
+                dto.Balance = balance.ToBalanceSimplifiedDto();
+
+            return dto;
+        }
+
+        public static InstallmentWithTransactionItemsDto ToInstallmentWithTransactionItemsDto(this Installment installment)
+        {
+            var dto = new InstallmentWithTransactionItemsDto()
             {
-                dto.Balance = new BalanceSimplifiedDto()
-                {
-                    Id = balance.Id,
-                    UserId = balance.UserId,
-                    Name = balance.Name,
-                    Type = balance.Type,
-                    TypeDescription = balance.Type.GetDescrition(),
-                    InstallmentsNumber = balance.InstallmentsNumber
-                };
-            }
+                Id = installment.Id,
+                BalanceId = installment.BalanceId,
+                Reference = installment.Reference,
+                Number = installment.Number,
+                Status = installment.Status,
+                Amount = installment.Amount
+            };
+
+            if (installment.TransactionItems.Any())
+                dto.Items = installment
+                    .TransactionItems
+                        .Select(ti => ti.TransactionItemWithTransactionDto())
+                            .ToList();
 
             return dto;
         }

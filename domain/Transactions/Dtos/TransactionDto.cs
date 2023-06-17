@@ -1,5 +1,5 @@
 ﻿using PersonalFinanceManagement.Domain.Transactions.Enums;
-using PersonalFinanceManagement.Domain.Users.Dtos;
+using PersonalFinanceManagement.Domain.Base.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Dtos
 {
@@ -11,6 +11,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Dtos
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
 
-        public UserDto? User { get; set; }
+        public string TypeDescription => Type.GetDescription();
     }
 }

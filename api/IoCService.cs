@@ -11,6 +11,7 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Services;
+using PersonalFinanceManagement.Domain.Transactions.Specifications;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Services;
 using PersonalFinanceManagement.Domain.Users.Specifications;
@@ -41,7 +42,7 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<IBalanceDeleter, BalanceDeleter>();
 
             services.AddScoped<IInstallmentRepository, InstallmentRepository>();
-            services.AddScoped<IInstallmentSpecification, InstallmentSpecification>();
+            services.AddScoped<InstallmentWithBalanceSpecification, InstallmentWithBalanceSpecification>();
             services.AddScoped<IInstallmentStore, InstallmentStore>();
             services.AddScoped<IInstallmentDeleter, InstallmentDeleter>();
             services.AddScoped<IBalanceInstallmentStore, BalanceInstallmentStore>();
@@ -56,6 +57,7 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<ITransactionItemStorageHandler, TransactionItemStorageHandler>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
+            services.AddScoped<ITransactionWithTransactionItemsSpecification, TransactionWithTransactionItemsSpecification>();
         }
     }
 }

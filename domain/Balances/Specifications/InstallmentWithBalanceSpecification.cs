@@ -9,15 +9,15 @@ using PersonalFinanceManagement.Domain.Base.Specifications;
 
 namespace PersonalFinanceManagement.Domain.Balances.Specifications
 {
-    public class InstallmentSpecification : Specification<Installment, int, InstallmentFilter, InstallmentDto>, IInstallmentSpecification
+    public class InstallmentWithBalanceSpecification : Specification<Installment, int, InstallmentFilter, InstallmentWithBalanceDto>, IInstallmentWithBalanceSpecification
     {
-        public InstallmentSpecification(IInstallmentRepository repository)
+        public InstallmentWithBalanceSpecification(IInstallmentRepository repository)
             : base(repository)
         {
             Filter = new InstallmentFilter();
         }
 
-        public override IInstallmentSpecification WithFilter(InstallmentFilter filter, int authenticatedUserId, bool isAdmin)
+        public override IInstallmentWithBalanceSpecification WithFilter(InstallmentFilter filter, int authenticatedUserId, bool isAdmin)
         {
             Filter = filter;
 
@@ -86,23 +86,23 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             return this;
         }
 
-        public override async Task<PagedResultsDto<InstallmentDto>> PagedList()
+        public override async Task<PagedResultsDto<InstallmentWithBalanceDto>> PagedList()
         {
             var query = GetQuery();
 
             return await GetPagedResults(query);
         }
 
-        public override async Task<InstallmentDto?> First()
+        public override async Task<InstallmentWithBalanceDto?> First()
         {
             return await GetQuery().FirstOrDefaultAsync();
         }
 
-        protected override IQueryable<InstallmentDto> GetQuery()
+        protected override IQueryable<InstallmentWithBalanceDto> GetQuery()
         {
             return Query
                 .Include(p => p.Balance)
-                .Select(s => InstalmentMappingsExtension.ToInstallmentDto(s));
+                .Select(s => InstalmentMappingsExtension.ToInstallmentWithBalanceDto(s));
         }
     }
 }

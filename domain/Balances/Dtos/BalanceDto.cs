@@ -6,6 +6,6 @@
         public decimal Amount { get; set; }
         public bool Financed { get; set; }
         public bool Closed { get; set; }
-        public List<InstallmentDto> Installments { get; set; } = new();
+        public List<InstallmentWithTransactionItemsDto> Installments { get; set; } = new();
     }
 }

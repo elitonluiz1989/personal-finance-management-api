@@ -78,16 +78,20 @@ namespace PersonalFinanceManagement.Domain.Base.Specifications
         {
             var filter = Filter ?? new Filter();
 
-            var totalResults = await QueryWithoutPagination.CountAsync();
-            decimal totalPages = totalResults / filter.PageSize;
-
             var dto = new PagedResultsDto<TResult>
             {
                 Results = await query.ToListAsync()
             };
             dto.Pagination.Page = filter.Page;
-            dto.Pagination.TotalPages = (int)Math.Floor(totalPages);
-            dto.Pagination.Total = totalResults;
+
+            if (QueryWithoutPagination is not null)
+            {
+                var totalResults = await QueryWithoutPagination.CountAsync();
+                decimal totalPages = totalResults / filter.PageSize;
+
+                dto.Pagination.TotalPages = (int)Math.Floor(totalPages);
+                dto.Pagination.Total = totalResults;
+            }
 
             return dto;
         }
