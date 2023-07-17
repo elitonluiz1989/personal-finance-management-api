@@ -18,7 +18,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Extensions
             };
 
             if (transactionItem.Installment is Installment installment)
-                dto.Installment = installment.ToInstallmentWithBalanceDto();
+                dto.Installment = installment.ToInstallmentWithBalanceAndRemainingAmountDto();
 
             return dto;
         }

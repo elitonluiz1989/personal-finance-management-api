@@ -9,14 +9,14 @@ using PersonalFinanceManagement.Domain.Transactions.Filters;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Specifications
 {
-    public class TransactionWithTransactionItemsSpecification : Specification<Transaction, int, TransactionFilter, TransactionWithTransactionItemsDto>, ITransactionWithTransactionItemsSpecification
+    public class TransactionWithTransactionItemsSpecification : Specification<Transaction, int, TransactionFilter, TransactionForListingDto>, ITransactionWithTransactionItemsSpecification
     {
         public TransactionWithTransactionItemsSpecification(ITransactionRepository repository)
             : base(repository)
         {
         }
 
-        public override ISpecification<Transaction, int, TransactionFilter, TransactionWithTransactionItemsDto> WithFilter(
+        public override ISpecification<Transaction, int, TransactionFilter, TransactionForListingDto> WithFilter(
             TransactionFilter filter,
             int authenticatedUserId,
             bool isAdmin
@@ -25,13 +25,14 @@ namespace PersonalFinanceManagement.Domain.Transactions.Specifications
             return this;
         }
 
-        protected override IQueryable<TransactionWithTransactionItemsDto> GetQuery()
+        protected override IQueryable<TransactionForListingDto> GetQuery()
         {
             return Query
+                .Include(p => p.User)
                 .Include(p => p.Items)
                     .ThenInclude(p => p.Installment)
                         .ThenInclude(p => p.Balance)
-                .Select(s => s.ToTransactionWithTransactionItemsDto());
+                .Select(s => s.ToTransactionForListingDto());
         }
     }
 }

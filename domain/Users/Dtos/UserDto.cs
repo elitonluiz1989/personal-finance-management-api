@@ -1,4 +1,5 @@
-﻿using PersonalFinanceManagement.Domain.Users.Enums;
+﻿using PersonalFinanceManagement.Domain.Base.Extensions;
+using PersonalFinanceManagement.Domain.Users.Enums;
 
 namespace PersonalFinanceManagement.Domain.Users.Dtos
 {
@@ -9,5 +10,7 @@ namespace PersonalFinanceManagement.Domain.Users.Dtos
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public UserRoleEnum Role { get; set; }
+
+        public string RoleDescription => Role.GetDescription();
     }
 }

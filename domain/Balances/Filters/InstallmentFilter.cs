@@ -12,8 +12,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Filters
         public BalanceTypeEnum? BalanceType { get; set; }
         public int Reference { get; set; }
         public short Number { get; set; }
-        public InstallmentStatusEnum Status { get; set; }
+        public InstallmentStatusEnum[] Status { get; set; } = Array.Empty<InstallmentStatusEnum>();
         public decimal Amount { get; set; }
         public bool InstallmentToAddAtTransaction { get; set; }
+        public bool OnlyUnpaidInstallments { get; set; }
+        public int[] WithoutTheseInstallmentIds { get; set; } = Array.Empty<int>();
     }
 }

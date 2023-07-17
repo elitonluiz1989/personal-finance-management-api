@@ -12,6 +12,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
         public decimal Amount { get; set; }
+        public decimal AmountPaid { get; set; }
+        public decimal AmountRemaining { get; set; }
 
         public string ReferenceFormatted => Reference.ToMonthYear();
         public string StatusDescription => Status.GetDescription();

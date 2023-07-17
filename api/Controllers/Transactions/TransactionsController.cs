@@ -33,6 +33,19 @@ namespace PersonalFinanceManagement.Api.Controllers.Transactions
             return Ok(results);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(
+            int id,
+            [FromServices] ITransactionWithTransactionItemsSpecification specification
+        )
+        {
+            var result = await specification
+                .WithFilter(new TransactionFilter() { Id = id }, AuthenticatedUserId, IsAdmin)
+                .First();
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(
             TransactionStoreDto dto,

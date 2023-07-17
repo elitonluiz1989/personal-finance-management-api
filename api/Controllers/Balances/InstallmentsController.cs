@@ -24,13 +24,13 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         [HttpGet()]
         [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
         public async Task<IActionResult> Get(
-            [FromQuery] InstallmentFilter filters,
+            [FromQuery] InstallmentFilter filter,
             [FromServices] IInstallmentWithBalanceSpecification specification
         )
         {
             var results = await specification
-                .WithFilter(filters, AuthenticatedUserId, IsAdmin)
-                .WithPagination(filters)
+                .WithFilter(filter, AuthenticatedUserId, IsAdmin)
+                .WithPagination(filter)
                 .PagedList();
 
             return Ok(results);

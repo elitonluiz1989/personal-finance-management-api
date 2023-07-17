@@ -2,6 +2,7 @@
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Balances.Filters;
 using PersonalFinanceManagement.Domain.Base.Dtos;
@@ -77,11 +78,23 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             if (Filter.Number > 0)
                 Query = Query.Where(p => p.Number == filter.Number);
 
-            if (Filter.Status > 0)
-                Query = Query.Where(p => p.Status == p.Status);
+            if (Filter.Status.Any())
+                Query = Query.Where(p => Filter.Status.Contains(p.Status));
 
             if (Filter.Amount > 0)
                 Query = Query.Where(p => p.Amount == filter.Amount);
+
+            if (Filter.OnlyUnpaidInstallments) {
+                var unpaidStatus = new InstallmentStatusEnum[] {
+                    InstallmentStatusEnum.Created,
+                    InstallmentStatusEnum.PartiallyPaid
+                };
+
+                Query = Query.Where(p => unpaidStatus.Contains(p.Status));
+            }
+
+            if (Filter.WithoutTheseInstallmentIds.Any())
+                Query = Query.Where(p => !Filter.WithoutTheseInstallmentIds.Contains(p.Id));
 
             return this;
         }
@@ -102,7 +115,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
         {
             return Query
                 .Include(p => p.Balance)
-                .Select(s => InstalmentMappingsExtension.ToInstallmentWithBalanceDto(s));
+                .Include(p => p.TransactionItems)
+                .Select(s => InstalmentMappingsExtension.ToInstallmentWithBalanceAndRemainingAmountDto(s));
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using PersonalFinanceManagement.Domain.Transactions.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
+using PersonalFinanceManagement.Domain.Users.Entities;
+using PersonalFinanceManagement.Domain.Users.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Extensions
 {
@@ -17,9 +19,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Extensions
             };
         }
 
-        public static TransactionWithTransactionItemsDto ToTransactionWithTransactionItemsDto(this Transaction transaction)
+        public static TransactionForListingDto ToTransactionForListingDto(this Transaction transaction)
         {
-            var dto = new TransactionWithTransactionItemsDto()
+            var dto = new TransactionForListingDto()
             {
                 Id = transaction.Id,
                 UserId = transaction.UserId,
@@ -27,6 +29,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Extensions
                 Date = transaction.Date,
                 Amount = transaction.Amount
             };
+
+            if (transaction.User is User user)
+                dto.User = user.ToUserDto();
 
             if (transaction.Items.Any())
                 dto.Items = transaction

@@ -1,12 +1,13 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Transactions.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Balances.Extensions
 {
     public static class InstalmentMappingsExtension
     {
-        public static InstallmentWithBalanceDto ToInstallmentWithBalanceDto(this Installment installment)
+        public static InstallmentWithBalanceDto ToInstallmentWithBalanceAndRemainingAmountDto(this Installment installment)
         {
             var dto = new InstallmentWithBalanceDto()
             {
@@ -18,8 +19,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
                 Amount = installment.Amount
             };
 
-            if (installment.Balance is Balance balance)
-                dto.Balance = balance.ToBalanceSimplifiedDto();
+            BalanceHandler(installment, dto);
+            RemaingAmountHandler(installment, dto);
 
             return dto;
         }
@@ -36,13 +37,43 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
                 Amount = installment.Amount
             };
 
-            if (installment.TransactionItems.Any())
-                dto.Items = installment
-                    .TransactionItems
-                        .Select(ti => ti.TransactionItemWithTransactionDto())
-                            .ToList();
+            TransactionItemsHandler(installment, dto);
 
             return dto;
+        }
+
+        private static void BalanceHandler(Installment installment, InstallmentWithBalanceDto dto)
+        {
+            if (installment.Balance is not Balance balance)
+                return;
+
+            dto.Balance = balance.ToBalanceSimplifiedDto();
+        }
+
+        private static void TransactionItemsHandler(Installment installment, InstallmentWithTransactionItemsDto dto)
+        {
+            if (installment.TransactionItems.Any() is false)
+                return;
+
+            dto.Items = installment
+                .TransactionItems
+                    .Select(ti => ti.TransactionItemWithTransactionDto())
+                        .ToList();
+
+            RemaingAmountHandler(installment, dto);
+        }
+
+        private static void RemaingAmountHandler<TDto>(Installment installment, TDto dto)
+            where TDto : InstallmentDto
+        {
+            if (
+                installment.Status is not InstallmentStatusEnum.PartiallyPaid ||
+                installment.TransactionItems.Any() is false
+            )
+                return;
+
+            dto.AmountPaid = installment.TransactionItems.Sum(ti => ti.AmountPaid);
+            dto.AmountRemaining = installment.Amount - dto.AmountPaid;
         }
     }
 }

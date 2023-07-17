@@ -3,6 +3,7 @@ using PersonalFinanceManagement.Domain.Base.Specifications;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Dtos;
 using PersonalFinanceManagement.Domain.Users.Entities;
+using PersonalFinanceManagement.Domain.Users.Extensions;
 using PersonalFinanceManagement.Domain.Users.Filters;
 
 namespace PersonalFinanceManagement.Domain.Users.Specifications
@@ -36,14 +37,7 @@ namespace PersonalFinanceManagement.Domain.Users.Specifications
 
         protected override IQueryable<UserDto> GetQuery()
         {
-            return Query.Select(s => new UserDto()
-            {
-                Id = s.Id,
-                UserName = s.UserName,
-                Name = s.Name,
-                Email = s.Email,
-                Role = s.Role
-            });
+            return Query.Select(s => s.ToUserDto());
         }
     }
 }

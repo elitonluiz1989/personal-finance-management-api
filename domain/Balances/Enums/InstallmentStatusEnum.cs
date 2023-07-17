@@ -8,7 +8,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Enums
         Created = 1,
         [Description("Paid")]
         Paid,
-        [Description("PartiallyPaid")]
+        [Description("Partially Paid")]
         PartiallyPaid
     }
 }

@@ -5,7 +5,7 @@ using PersonalFinanceManagement.Domain.Transactions.Filters;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Contracts
 {
-    public interface ITransactionWithTransactionItemsSpecification : ISpecification<Transaction, int, TransactionFilter, TransactionWithTransactionItemsDto>
+    public interface ITransactionWithTransactionItemsSpecification : ISpecification<Transaction, int, TransactionFilter, TransactionForListingDto>
     {
     }
 }

@@ -1,7 +1,6 @@
 ﻿using PersonalFinanceManagement.Domain.Base.Dtos;
 using PersonalFinanceManagement.Domain.Base.Tools.Security;
 using PersonalFinanceManagement.Domain.Users.Enums;
-using System.Text.Json.Serialization;
 
 namespace PersonalFinanceManagement.Domain.Users.Dtos
 {
