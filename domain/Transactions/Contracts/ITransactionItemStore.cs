@@ -1,10 +1,11 @@
-﻿using PersonalFinanceManagement.Domain.Transactions.Dtos;
+﻿using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Transactions.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Contracts
 {
     public interface ITransactionItemStore
     {
-        Task Store(TransactionItemStoreDto dto, Transaction transaction);
+        Task Store(TransactionItemStoreDto dto, Transaction transaction, Installment installment);
     }
 }

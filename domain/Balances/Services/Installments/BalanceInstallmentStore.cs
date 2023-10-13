@@ -33,7 +33,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 
         private async Task CreateSingleInstallment(Balance balance)
         {
-            var installment = CreateInstallmentDto(balance.Date, balance.Amount);
+            var installment = CreateInstallmentDto(balance.Date, balance.Amount, number: 1, singleInstallment: true);
 
             await _installmentStore.Store(installment, balance);
         }
@@ -59,19 +59,19 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             }
         }
 
-        private static InstallmentStoreDto CreateInstallmentDto(DateTime balanceDate, decimal value, short number = 1)
+        private static InstallmentStoreDto CreateInstallmentDto(DateTime balanceDate, decimal value, short number, bool singleInstallment = false)
         {
             return new InstallmentStoreDto()
             {
-                Reference = GetReference(balanceDate, number),
+                Reference = GetReference(balanceDate, number, singleInstallment),
                 Number = number,
                 Amount = value
             };
         }
 
-        private static int GetReference(DateTime balanceDate, short number)
+        private static int GetReference(DateTime balanceDate, short number, bool singleInstallment)
         {
-            var referenceDate = balanceDate.AddMonths(number);
+            var referenceDate = singleInstallment ? balanceDate : balanceDate.AddMonths(number);
             var referenceString = referenceDate.ToString("yyyyMM");
 
             return Convert.ToInt32(referenceString);

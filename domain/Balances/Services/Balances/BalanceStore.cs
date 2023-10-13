@@ -32,6 +32,31 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
 
         public async Task<BalanceDto?> Store(BalanceStoreDto dto, bool fromRefinance = false)
         {
+            var balance = await StoreBalance(dto, fromRefinance);
+
+            return balance?.ToBalanceDto();
+        }
+
+        public async Task<Balance?> StoreFromTransaction(BalanceStoreDto dto)
+        {
+            var balance = await StoreBalance(dto, fromRefinance: false);
+
+            return balance;
+        }
+
+        protected async Task<Balance?> SetBalance(BalanceStoreDto dto, bool fromRefinance = false)
+        {
+            if (HasNotifications)
+                return null;
+
+            if (dto.IsRecorded)
+                return await UpdateBalance(dto, fromRefinance);
+
+            return await CreateBalance(dto);
+        }
+
+        private async Task<Balance?> StoreBalance(BalanceStoreDto dto, bool fromRefinance = false)
+        {
             if (ValidateDto(dto) is false)
                 return default;
 
@@ -50,21 +75,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             if (HasNotifications)
                 return default;
 
-            _unitOfWork.Commit();
-
-            return balance.ToBalanceDto();
-        }
-
-        protected async Task<Balance?> SetBalance(BalanceStoreDto dto, bool fromRefinance = false)
-        {
-            if (HasNotifications)
-                return null;
-
-            if (dto.IsRecorded)
-                return await UpdateBalance(dto, fromRefinance);
-
-            return await CreateBalance(dto);
-        }
+            return balance;
+        } 
 
         private async Task<Balance?> CreateBalance(BalanceStoreDto dto)
         {

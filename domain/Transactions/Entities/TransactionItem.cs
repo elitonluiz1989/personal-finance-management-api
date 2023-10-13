@@ -29,8 +29,13 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
                 .GreaterThan(0)
                 .When(p => Transaction is null);
 
+            Validator.RuleFor(p => Transaction)
+                .NotNull()
+                .When(p => InstallmentId.Equals(default));
+
             Validator.RuleFor(p => InstallmentId)
-                .GreaterThan(0);
+                .GreaterThan(0)
+                .When(p => Installment is null); ;
         }
     }
 }

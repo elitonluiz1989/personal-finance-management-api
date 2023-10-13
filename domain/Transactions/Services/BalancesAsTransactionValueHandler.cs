@@ -12,7 +12,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 {
     public class BalancesAsTransactionValueHandler : NotifiableService, IBalancesAsTransactionValueHandler
     {
-        private readonly ITransactionItemStorageHandler _transactiontemStorageHandler;
+        private readonly ITransactionItemStorageHandler _transactionItemStorageHandler;
         private readonly IBalanceRepository _balanceRepository;
 
         public BalancesAsTransactionValueHandler(
@@ -22,7 +22,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
         )
             : base(notificationService)
         {
-            _transactiontemStorageHandler = transactiontemStorageHandler;
+            _transactionItemStorageHandler = transactiontemStorageHandler;
             _balanceRepository = balanceRepository;
         }
 
@@ -104,7 +104,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 .SelectMany(b => b.Installments)
                 .ToList();
 
-            await _transactiontemStorageHandler.Handle(transactionItemStoradeDto, transaction, installments);
+            await _transactionItemStorageHandler.Handle(transactionItemStoradeDto, transaction, installments);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PersonalFinanceManagement.Domain.Base.Contracts;
+﻿using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
@@ -16,12 +17,12 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
         {
         }
 
-        public async Task Store(TransactionItemStoreDto dto, Transaction transaction)
+        public async Task Store(TransactionItemStoreDto dto, Transaction transaction, Installment installment)
         {
             if (ValidateDto(dto) is false)
                 return;
 
-            var transactionItem = await SetTransactionItem(dto, transaction);
+            var transactionItem = await SetTransactionItem(dto, transaction, installment);
 
             if (HasNotifications || transactionItem is null)
                 return;
@@ -32,7 +33,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             SaveEntity(transactionItem);
         }
 
-        private async Task<TransactionItem?> SetTransactionItem(TransactionItemStoreDto dto, Transaction transaction)
+        private async Task<TransactionItem?> SetTransactionItem(TransactionItemStoreDto dto, Transaction transaction, Installment installment)
         {
             var transactionItem = new TransactionItem();
 
@@ -45,7 +46,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             }
 
             transactionItem.Transaction = transaction;
-            transactionItem.InstallmentId = dto.InstallmentId;
+            transactionItem.Installment = installment;
             transactionItem.Type = dto.Type;
             transactionItem.PartiallyPaid = dto.PartiallyPaid;
             transactionItem.AmountPaid = dto.AmountPaid;

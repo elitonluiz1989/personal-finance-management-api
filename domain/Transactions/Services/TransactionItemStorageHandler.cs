@@ -35,14 +35,17 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             {
                 var transactionItemDto = CreateTransactionItemStoreDto(installment, dto.InstallmentAsTransactionAmount, ref amount);
 
-                await _transactionItemStore.Store(transactionItemDto, transaction);
+                await _transactionItemStore.Store(transactionItemDto, transaction, installment);
 
                 if (transactionItemDto.PartiallyPaid || HasNotifications)
                     break;
             }
 
+            if (HasNotifications)
+                return;
+
             if (amount > 0 && dto.CanGenerateCredit)
-                await CreateCreditBalance(dto, amount);
+                await CreateCreditBalance(dto, transaction, amount);
         }
 
         private static TransactionItemStoreDto CreateTransactionItemStoreDto(Installment installment, bool installmentAsTransactionAmount, ref decimal amount)
@@ -50,7 +53,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             var installmentAmount = installment.GetAmountToTransactions();
             var transactionItemDto = new TransactionItemStoreDto()
             {
-                InstallmentId = installment.Id,
                 PartiallyPaid = amount < installmentAmount,
                 Type = installmentAsTransactionAmount ?
                     TransactionItemTypeEnum.UsedAsTransactionAmount :
@@ -73,7 +75,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             return transactionItemDto;
         }
 
-        private async Task CreateCreditBalance(TransactionItemStorageDto dto, decimal remainingValue)
+        private async Task CreateCreditBalance(TransactionItemStorageDto dto, Transaction transaction, decimal remainingValue)
         {
             var balanceStoreDto = new BalanceStoreDto()
             {
@@ -85,7 +87,21 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 Financed = false
             };
 
-            await _balanceStore.Store(balanceStoreDto);
+            var balance = await _balanceStore.StoreFromTransaction(balanceStoreDto);
+
+            if (balance is null)
+            {
+                AddNotification("Error on creating credit balance");
+
+                return;
+            }
+
+
+            dto.CanGenerateCredit = false;
+            dto.InstallmentAsTransactionAmount = false;
+            dto.Amount = remainingValue;
+
+            await Handle(dto, transaction, balance.Installments);
         }
     }
 }
