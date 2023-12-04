@@ -38,7 +38,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             if (ValidateTransationItemsRecord(dto, transaction!))
                 await _transactionItemManager.Manage(dto, transaction!);
 
-            if (HasNotifications || ValidateEntity(transaction!) is false)
+            if (ValidateEntity(transaction!) is false)
                 return;
 
             _repository.Save(transaction!);
@@ -47,9 +47,21 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
         private async Task<Transaction?> SetTransaction(TransactionStoreDto dto)
         {
             if (dto.IsRecorded)
-                return await _repository.Find(dto.Id);
+                return await GetTransaction(dto);
 
             return await CreateTransation(dto);
+        }
+
+        private async Task<Transaction?> GetTransaction(TransactionStoreDto dto)
+        {
+            var transactions = await _repository.Find(dto.Id);
+
+            if (transactions is null)
+                return default;
+
+            transactions.Date = dto.Date;
+
+            return transactions;
         }
 
         private async Task<Transaction?> CreateTransation(TransactionStoreDto dto)
@@ -109,12 +121,10 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
         private bool ValidateTransationItemsRecord(TransactionStoreDto dto, Transaction transaction)
         {
-            var installmentsRequiredOnInsert = dto.IsRecorded is false && dto.InstallmentsIds.Any() is false;
-            var installmentsRequiredOnUpdate = dto.IsRecorded &&
-                (transaction.Amount != dto.Amount || transaction.Type != dto.Type) &&
-                dto.InstallmentsIds.Any() is false;
+            if (dto.IsRecorded)
+                return false;
 
-            if (installmentsRequiredOnInsert || installmentsRequiredOnUpdate)
+            if (dto.InstallmentsIds.Any() is false)
             {
                 AddNotification("The balance installments is required to procced with the transaction record.");
 
