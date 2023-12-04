@@ -42,13 +42,13 @@ namespace PersonalFinanceManagement.Domain.Base.Services
             return true;
         }
 
-        protected void SaveEntity(TEntity? entity)
+        protected TEntity? SaveEntity(TEntity? entity)
         {
             if (entity is null ||
                 HasNotifications is true)
-                return;
+                return default;
 
-            _repository.Save(entity);
+            return _repository.Save(entity);
         }
     }
 }

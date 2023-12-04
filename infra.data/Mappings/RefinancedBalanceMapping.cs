@@ -22,6 +22,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.Property(p => p.OriginalAmount)
                 .HasColumnOrder(3)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.OriginalFinanced)
@@ -38,6 +39,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.Property(p => p.Amount)
                 .HasColumnOrder(7)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.Financed)
@@ -48,7 +50,6 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnOrder(9);
 
             builder.Property(p => p.Active)
-                .HasDefaultValue(true)
                 .HasColumnOrder(10);
 
             builder.Property(p => p.CreatedAt)

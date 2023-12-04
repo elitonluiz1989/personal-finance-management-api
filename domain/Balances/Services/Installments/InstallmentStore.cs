@@ -2,6 +2,7 @@
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 
@@ -49,6 +50,21 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
                 return;
 
             SaveEntity(installment);
+        }
+
+        public void UpdateStatus(Installment installment, InstallmentStatusEnum status)
+        {
+            installment.Status = status;
+
+            _repository.Update(installment);
+        }
+
+        public void UpdateStatus(IEnumerable<Installment> installments, InstallmentStatusEnum status)
+        {
+            foreach (var installment in installments)
+            {
+                _repository.Update(installment);
+            }
         }
 
         private async Task<Installment?> SetInstallment(InstallmentStoreDto dto, Balance balance)

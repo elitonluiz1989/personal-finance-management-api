@@ -16,6 +16,6 @@ namespace PersonalFinanceManagement.Domain.Base.Contracts
         IQueryable<TEntity> Query();
         Task<IEnumerable<TEntity>> All();
         Task<TEntity?> Find(TKey id);
-        void Save(TEntity entity);
+        TEntity? Save(TEntity entity);
     }
 }

@@ -31,10 +31,11 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.Property(p => p.AmountPaid)
                 .HasColumnOrder(5)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.HasOne(p => p.Transaction)
-                .WithMany(o => o.Items)
+                .WithMany(o => o.TransactionItems)
                 .HasForeignKey(p => p.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -42,6 +43,8 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .WithMany(o => o.TransactionItems)
                 .HasForeignKey(p => p.InstallmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Ignore(p => p.TransactionResidues);
         }
     }
 }

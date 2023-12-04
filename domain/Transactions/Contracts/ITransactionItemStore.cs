@@ -6,6 +6,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Contracts
 {
     public interface ITransactionItemStore
     {
-        Task Store(TransactionItemStoreDto dto, Transaction transaction, Installment installment);
+        TransactionItem? Store(TransactionItem transactionItem);
+        Task<TransactionItem?> Store(TransactionItemStoreDto dto, Transaction transaction, Installment installment);
     }
 }

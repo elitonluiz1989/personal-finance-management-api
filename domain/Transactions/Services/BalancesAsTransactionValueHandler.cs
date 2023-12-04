@@ -95,10 +95,10 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             var transactionItemStoradeDto = new TransactionItemStorageDto()
             {
                 UserId = dto.UserId,
+                Type = TransactionItemTypeEnum.TransactionAmount,
                 Date = dto.Date,
                 Amount = dto.Amount,
-                CanGenerateCredit = false,
-                InstallmentAsTransactionAmount = true
+                CanGenerateCredit = false
             };
             var installments = balances
                 .SelectMany(b => b.Installments)

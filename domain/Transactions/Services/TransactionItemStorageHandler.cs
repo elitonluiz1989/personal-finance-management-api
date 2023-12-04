@@ -15,16 +15,19 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
     {
         private readonly ITransactionItemStore _transactionItemStore;
         private readonly IBalanceStore _balanceStore;
+        private readonly ITransactionResidueStore _transactionResidueStore;
 
         public TransactionItemStorageHandler(
             INotificationService notificationService,
             ITransactionItemStore transactionItemStore,
-            IBalanceStore balanceStore
+            IBalanceStore balanceStore,
+            ITransactionResidueStore transactionResidueStore
         )
             : base(notificationService)
         {
             _transactionItemStore = transactionItemStore;
             _balanceStore = balanceStore;
+            _transactionResidueStore = transactionResidueStore;
         }
 
         public async Task Handle(TransactionItemStorageDto dto, Transaction transaction, List<Installment> installments)
@@ -33,11 +36,15 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
             foreach (var installment in installments)
             {
-                var transactionItemDto = CreateTransactionItemStoreDto(installment, dto.InstallmentAsTransactionAmount, ref amount);
+                var transactionItemDto = CreateTransactionItemStoreDto(installment, dto.Type, ref amount);
+                var transactionItem = await _transactionItemStore.Store(transactionItemDto, transaction, installment);
 
-                await _transactionItemStore.Store(transactionItemDto, transaction, installment);
+                if (HasNotifications)
+                    break;
 
-                if (transactionItemDto.PartiallyPaid || HasNotifications)
+                HandleTransactionResidueItems(transactionItem!, installment.TransactionItems);
+
+                if (HasNotifications || transactionItem!.PartiallyPaid)
                     break;
             }
 
@@ -48,15 +55,41 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 await CreateCreditBalance(dto, transaction, amount);
         }
 
-        private static TransactionItemStoreDto CreateTransactionItemStoreDto(Installment installment, bool installmentAsTransactionAmount, ref decimal amount)
+        private void HandleTransactionResidueItems(TransactionItem currentTransactionItem, List<TransactionItem> transactionItems)
+        {
+            if (transactionItems is null || !transactionItems.Any())
+                return;
+
+            var transactionItemsWithResidue = transactionItems
+                .Where(ti =>
+                    ti.Type == TransactionItemTypeEnum.Residue &&
+                    ti.IsRecorded
+                )
+                .ToList();
+
+            if (!transactionItemsWithResidue.Any())
+                return;
+
+            foreach (var transactionItem in transactionItemsWithResidue)
+            {
+                _transactionResidueStore.Store(transactionItem, currentTransactionItem);
+
+                if (HasNotifications)
+                    break;
+            }
+        }
+
+        private static TransactionItemStoreDto CreateTransactionItemStoreDto(
+            Installment installment,
+            TransactionItemTypeEnum type,
+            ref decimal amount
+        )
         {
             var installmentAmount = installment.GetAmountToTransactions();
-            var transactionItemDto = new TransactionItemStoreDto()
+            var transactionItemDto = new TransactionItemStoreDto
             {
                 PartiallyPaid = amount < installmentAmount,
-                Type = installmentAsTransactionAmount ?
-                    TransactionItemTypeEnum.UsedAsTransactionAmount :
-                    TransactionItemTypeEnum.Standard
+                Type = type
             };
 
             if (transactionItemDto.PartiallyPaid)
@@ -67,7 +100,10 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             }
             else
             {
-                installment.Status = InstallmentStatusEnum.Paid;
+                if (type != TransactionItemTypeEnum.Residue) {
+                    installment.Status = InstallmentStatusEnum.Paid;
+                }
+
                 transactionItemDto.AmountPaid = installmentAmount;
                 amount -= installmentAmount;
             }
@@ -80,11 +116,12 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             var balanceStoreDto = new BalanceStoreDto()
             {
                 UserId = dto.UserId,
-                Name = $"Remaining payment balance of {dto.Date:dd/MM/yyyy}",
+                Name = $"Trasanction residue of {dto.Date:dd/MM/yyyy}",
                 Type = BalanceTypeEnum.Credit,
                 Date = dto.Date,
                 Amount = remainingValue,
-                Financed = false
+                Financed = false,
+                Residue = true
             };
 
             var balance = await _balanceStore.StoreFromTransaction(balanceStoreDto);
@@ -98,7 +135,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
 
             dto.CanGenerateCredit = false;
-            dto.InstallmentAsTransactionAmount = false;
+            dto.Type = TransactionItemTypeEnum.Residue;
             dto.Amount = remainingValue;
 
             await Handle(dto, transaction, balance.Installments);

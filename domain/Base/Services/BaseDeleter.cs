@@ -48,8 +48,17 @@ namespace PersonalFinanceManagement.Domain.Base.Services
             _repository.Delete(entity);
         }
 
-        protected abstract Task<TEntity?> Find(TKey id);
+        protected virtual async Task<TEntity?> Find(TKey id)
+        {
+            return await _repository.Find(id);
+        }
 
-        protected abstract void Validate(IEntity? entity);
+        protected virtual void Validate(TEntity? entity)
+        {
+            if (entity is not null)
+                return;
+            
+            _notificationService.AddNotification($"{nameof(TEntity)} is null");
+        }
     }
 }

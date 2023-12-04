@@ -3,8 +3,7 @@ using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Contracts
 {
-    public interface ITransactionRepository : IRepository<Transaction, int>
+    public interface ITransactionDeleter : IBaseDeleter<Transaction, int>
     {
-        Task<Transaction?> GetTransactionWithTransactionItem(int id);
     }
 }

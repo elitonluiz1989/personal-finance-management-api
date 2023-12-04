@@ -29,9 +29,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Specifications
         {
             return Query
                 .Include(p => p.User)
-                .Include(p => p.Items)
+                .Include(p => p.TransactionItems)
                     .ThenInclude(p => p.Installment)
-                        .ThenInclude(p => p.Balance)
+                        .ThenInclude(p => p!.Balance)
                 .Select(s => s.ToTransactionForListingDto());
         }
     }

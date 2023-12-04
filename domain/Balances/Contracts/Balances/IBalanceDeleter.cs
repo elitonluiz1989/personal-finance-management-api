@@ -5,5 +5,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Contracts.Balances
 {
     public interface IBalanceDeleter : IBaseDeleter<Balance, int>
     {
+        void Delete(Balance? balance, bool allowDeleteResidue);
     }
 }

@@ -24,6 +24,7 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories.Balances
             return await Query()
                 .Include(i => i.Balance)
                 .Include(i => i.TransactionItems)
+                    .ThenInclude(i => i.Transaction)
                 .Where(i => 
                     ids.Contains(i.Id) &&
                     i.Status != InstallmentStatusEnum.Paid &&

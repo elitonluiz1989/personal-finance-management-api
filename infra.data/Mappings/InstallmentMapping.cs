@@ -31,6 +31,7 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.Property(p => p.Amount)
                 .HasColumnOrder(5)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.DeletedAt)

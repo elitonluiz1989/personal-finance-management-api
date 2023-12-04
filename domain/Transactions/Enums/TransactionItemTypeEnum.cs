@@ -3,6 +3,7 @@
     public enum TransactionItemTypeEnum
     {
         Standard = 1,
-        UsedAsTransactionAmount
+        Residue,
+        TransactionAmount
     }
 }

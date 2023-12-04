@@ -13,9 +13,10 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             modelBuilder.Entity<Balance>(new BalanceMapping().Configure);
             modelBuilder.Entity<Installment>(new InstallmentMapping().Configure);
+            modelBuilder.Entity<RefinancedBalance>(new RefinancedBalanceMapping().Configure);
             modelBuilder.Entity<Transaction>(new TransactionMapping().Configure);
             modelBuilder.Entity<TransactionItem>(new TransactionItemMapping().Configure);
-            modelBuilder.Entity<RefinancedBalance>(new RefinancedBalanceMapping().Configure);
+            modelBuilder.Entity<TransactionResidue>(new TransactionResidueMapping().Configure);
         }
     }
 }

@@ -32,16 +32,16 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
             var transaction = await SetTransaction(dto);
 
-            if (ValidateNullableObject(transaction) is false || transaction is null)
+            if (ValidateNullableObject(transaction) is false)
                 return;
 
-            if (ValidateTransationItemsRecord(dto, transaction))
-                await _transactionItemManager.Manage(dto, transaction);
+            if (ValidateTransationItemsRecord(dto, transaction!))
+                await _transactionItemManager.Manage(dto, transaction!);
 
-            if (HasNotifications || ValidateEntity(transaction) is false || transaction is null)
+            if (HasNotifications || ValidateEntity(transaction!) is false)
                 return;
 
-            _repository.Save(transaction);
+            _repository.Save(transaction!);
         }
 
         private async Task<Transaction?> SetTransaction(TransactionStoreDto dto)

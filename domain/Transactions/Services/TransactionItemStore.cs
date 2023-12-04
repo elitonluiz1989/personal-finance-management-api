@@ -17,20 +17,30 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
         {
         }
 
-        public async Task Store(TransactionItemStoreDto dto, Transaction transaction, Installment installment)
+        public TransactionItem? Store(TransactionItem transactionItem)
+        {
+            if (transactionItem is null)
+                return default;
+
+            if (ValidateEntity(transactionItem) is false)
+                return default;
+
+            SaveEntity(transactionItem);
+
+            return transactionItem;
+        }
+
+        public async Task<TransactionItem?> Store(TransactionItemStoreDto dto, Transaction transaction, Installment installment)
         {
             if (ValidateDto(dto) is false)
-                return;
+                return default;
 
             var transactionItem = await SetTransactionItem(dto, transaction, installment);
 
-            if (HasNotifications || transactionItem is null)
-                return;
+            if (HasNotifications)
+                return default;
 
-            if (ValidateEntity(transactionItem) is false)
-                return;
-
-            SaveEntity(transactionItem);
+            return Store(transactionItem!);
         }
 
         private async Task<TransactionItem?> SetTransactionItem(TransactionItemStoreDto dto, Transaction transaction, Installment installment)

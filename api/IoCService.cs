@@ -52,12 +52,16 @@ namespace PersonalFinanceManagement.Api
 
             services.AddScoped<ITransactionStore, TransactionStore>();
             services.AddScoped<ITransactionItemStore, TransactionItemStore>();
+            services.AddScoped<ITransactionResidueStore, TransactionResidueStore>();
             services.AddScoped<ITransactionItemManager, TransactionItemManager>();
             services.AddScoped<IBalancesAsTransactionValueHandler, BalancesAsTransactionValueHandler>();
             services.AddScoped<ITransactionItemStorageHandler, TransactionItemStorageHandler>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionItemRepository, TransactionItemRepository>();
+            services.AddScoped<ITransactionResidueRepository, TransactionResidueRepository>();
             services.AddScoped<ITransactionWithTransactionItemsSpecification, TransactionWithTransactionItemsSpecification>();
+            services.AddScoped<ITransactionDeleter, TransactionDeleter>();
+            services.AddScoped<ITransactionItemDeleter, TransactionItemDeleter>();
         }
     }
 }

@@ -59,5 +59,19 @@ namespace PersonalFinanceManagement.Api.Controllers.Transactions
 
             return ResponseWithCommit();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(
+            int id,
+            [FromServices] ITransactionDeleter deleter
+        )
+        {
+            await deleter.Delete(id);
+
+            if (HasNotifications())
+                return ResponseWithNotifications();
+
+            return ResponseWithCommit();
+        }
     }
 }

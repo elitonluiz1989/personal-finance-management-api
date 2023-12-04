@@ -12,12 +12,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
 {
     public class BalanceStore : Store<Balance, int>, IBalanceStore
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly IUserRepository _userRepository;
         private readonly IBalanceInstallmentStore _balanceInstallmentStoreService;
 
         public BalanceStore(
-            IUnitOfWork unitOfWork,
             INotificationService notificationService,
             IBalanceRepository repository,
             IUserRepository userRepository,
@@ -25,7 +23,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
         )
             : base(notificationService, repository)
         {
-            _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _balanceInstallmentStoreService = balanceInstallmentStoreService;
         }
@@ -93,7 +90,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
                 Date = dto.Date,
                 Amount = dto.Amount,
                 Financed = dto.Financed,
-                InstallmentsNumber = dto.InstallmentsNumberValidate
+                InstallmentsNumber = dto.InstallmentsNumberValidate,
+                Residue = dto.Residue
             };
         }
 

@@ -24,7 +24,7 @@ namespace PersonalFinanceManagement.Infra.Data.Contexts
             ConnectionString = connectionString;
 
             services.AddDbContext<DefaultDBContext>();
-            services.AddScoped(typeof(IDBContext), provider => provider.GetService<DefaultDBContext>());
+            services.AddScoped(typeof(IDBContext), provider => provider.GetService<DefaultDBContext>()!);
         }
 
         public static void InitializeDatabase(IServiceProvider provider)

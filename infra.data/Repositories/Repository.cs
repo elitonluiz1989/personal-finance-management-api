@@ -84,15 +84,17 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
             return await query.FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
-        public void Save(TEntity entity)
+        public TEntity? Save(TEntity entity)
         {
             if (entity.WithRegistrationDates)
                 ((IEntityWithRegistrationDates)entity).SetRegistrationDates();
 
             if (entity.IsRecorded)
-                return;
+                return default;
 
             Insert(entity);
+
+            return entity;
         }
 
         private static bool VerifyIfIsSoftDelete(TEntity entity)

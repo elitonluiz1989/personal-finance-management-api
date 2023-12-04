@@ -13,6 +13,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public decimal Amount { get; set; }
         public bool Financed { get; set; }
         public short InstallmentsNumber { get; set; }
+        public  bool Residue { get; set; }
 
         [JsonIgnore]
         public short InstallmentsNumberValidate => Financed ? InstallmentsNumber : (short)1;

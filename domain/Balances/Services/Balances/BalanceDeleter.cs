@@ -9,6 +9,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
     public class BalanceDeleter : BaseDeleter<Balance, int, IBalanceRepository>, IBalanceDeleter
     {
         private readonly IInstallmentDeleter _installmentDeleter;
+        private bool _allowDeleteResidue = false;
 
         public BalanceDeleter(
             INotificationService notificationService,
@@ -28,7 +29,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
                 return;
 
             if (balance.Installments?.Any() is true)
-                _installmentDeleter.Delete(balance.Installments);
+                _installmentDeleter.Delete(balance.Installments, _allowDeleteResidue);
 
 
             if (_notificationService.HasNotifications())
@@ -37,12 +38,19 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
             _repository.Delete(balance);
         }
 
+        public void Delete(Balance? balance, bool allowDeleteResidue)
+        {
+            _allowDeleteResidue = allowDeleteResidue;
+
+            Delete(balance);
+        }
+
         protected override async Task<Balance?> Find(int id)
         {
             return await _repository.FindWithTransactions(id);
         }
 
-        protected override void Validate(IEntity? entity)
+        protected override void Validate(Balance? entity)
         {
             if (entity is not Balance balance)
             {
@@ -51,8 +59,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Balances
                 return;
             }
 
-            if (balance.Installments?.Any(i => i.TransactionItems?.Any() is true) is true)
-                _notificationService.AddNotification("The balance has transactions and cannot to be deleted.");
+            if (balance.HasTransactions && _allowDeleteResidue is false)
+            {
+                _notificationService.AddNotification(
+                    "The balance has transactions and cannot to be deleted."
+                );
+            }
         }
     }
 }

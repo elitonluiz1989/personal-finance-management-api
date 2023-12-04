@@ -15,23 +15,26 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public decimal Amount { get; set; }
         public bool Financed { get; set; }
         public short InstallmentsNumber { get; set; }
+        public bool Residue { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpadtedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
-        public bool Closed => VerifyIfClosed();
+        public bool Closed =>
+            Installments?.All(i => i.Active is false) ?? false;
+
+        public bool HasTransactions =>
+            Installments?.Any(i => i.HasTransactions) ?? false;
 
         public virtual User? User { get; set; }
         public virtual List<Installment> Installments { get; set; } = new List<Installment>();
         public virtual List<RefinancedBalance> RefinancedBalances { get; set; } = new List<RefinancedBalance>();
 
-        private bool? _closed;
-
         public void SetRegistrationDates()
         {
             if (IsRecorded)
             {
-                UpadtedAt = DateTime.Now;
+                UpdatedAt = DateTime.Now;
             }
             else
             {
@@ -90,23 +93,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
             Validator.RuleFor<int>(p => InstallmentsNumber)
                 .GreaterThan(0)
                 .When(p => Financed is true);
-        }
-
-        private bool VerifyIfClosed()
-        {
-            if (_closed.HasValue is false)
-            {
-                if (Installments?.Any() is false)
-                {
-                    _closed = false;
-                }
-                else
-                {
-                    _closed = Installments?.All(i => i.Active is false) ?? false;
-                }
-            }
-
-            return _closed.Value;
         }
     }
 }

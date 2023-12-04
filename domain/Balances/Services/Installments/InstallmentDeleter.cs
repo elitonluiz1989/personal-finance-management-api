@@ -8,6 +8,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 {
     public class InstallmentDeleter : BaseDeleter<Installment, int, IInstallmentRepository>, IInstallmentDeleter
     {
+        private bool _allowDeleteResidue = false;
+
         public InstallmentDeleter(
             INotificationService notificationService,
             IInstallmentRepository repository
@@ -16,12 +18,26 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
         {
         }
 
+        public void Delete(IEnumerable<Installment> installment, bool allowDeleteResisdue)
+        {
+            _allowDeleteResidue = allowDeleteResisdue;
+
+            Delete(installment);
+        }
+
+        public void Delete(Installment? installment, bool allowDeleteResisdue)
+        {
+            _allowDeleteResidue = allowDeleteResisdue;
+
+            Delete(installment);
+        }
+
         protected override async Task<Installment?> Find(int id)
         {
             return await _repository.FindWithTransactionItems(id);
         }
 
-        protected override void Validate(IEntity? entity)
+        protected override void Validate(Installment? entity)
         {
             if (entity is not Installment installment)
             {
@@ -30,8 +46,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
                 return;
             }
 
-            if (installment.TransactionItems?.Any() is true)
-                _notificationService.AddNotification($"The installment of {installment.Reference.ToMonthYear()} has transactions and cannot to be deleted.");
+            if (installment.HasTransactions && _allowDeleteResidue is false)
+                _notificationService.AddNotification(
+                    $"The installment of {installment.Reference.ToMonthYear()} has transactions and cannot to be deleted."
+                );
         }
     }
 }

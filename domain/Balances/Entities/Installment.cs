@@ -16,6 +16,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public DateTime? DeletedAt { get; set; }
 
         public bool Active => Status != InstallmentStatusEnum.Paid;
+        public bool HasTransactions => TransactionItems?.Any() ?? false;
 
         public virtual Balance? Balance { get; set; }
         public virtual List<TransactionItem> TransactionItems { get; set; } = new();
@@ -33,7 +34,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
         public decimal GetAmountToTransactions()
         {
             var totalPartiallyPaid = TransactionItems
-                ?.Where(i => i.PartiallyPaid)
+                ?.Where(i => i.PartiallyPaid && i.Transaction?.DeletedAt is null)
                 ?.Sum(i => i.AmountPaid) ?? 0;
 
             if (totalPartiallyPaid > 0)

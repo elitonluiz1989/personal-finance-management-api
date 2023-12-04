@@ -14,18 +14,5 @@ namespace PersonalFinanceManagement.Domain.Users.Services
             : base(notificationService, repository)
         {
         }
-
-        protected override async Task<User?> Find(int id)
-        {
-            return await _repository.Find(id);
-        }
-
-        protected override void Validate(IEntity? entity)
-        {
-            if (entity is User)
-                return;
-
-            _notificationService.AddNotification($"{nameof(entity)} is null");
-        }
     }
 }

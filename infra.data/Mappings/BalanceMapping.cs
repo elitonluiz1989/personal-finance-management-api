@@ -32,26 +32,30 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
 
             builder.Property(p => p.Amount)
                 .HasColumnOrder(5)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.Financed)
                 .HasColumnOrder(6)
-                .HasDefaultValue(false)
                 .IsRequired();
 
             builder.Property(p => p.InstallmentsNumber)
                 .HasColumnOrder(7);
 
-            builder.Property(p => p.CreatedAt)
+            builder.Property(p => p.Residue)
                 .HasColumnOrder(8)
                 .IsRequired();
 
-            builder.Property(p => p.UpadtedAt)
+            builder.Property(p => p.CreatedAt)
                 .HasColumnOrder(9)
+                .IsRequired();
+
+            builder.Property(p => p.UpdatedAt)
+                .HasColumnOrder(10)
                 .IsRequired(false);
 
             builder.Property(p => p.DeletedAt)
-                .HasColumnOrder(10)
+                .HasColumnOrder(11)
                 .IsRequired(false);
 
             builder.HasOne(p => p.User)

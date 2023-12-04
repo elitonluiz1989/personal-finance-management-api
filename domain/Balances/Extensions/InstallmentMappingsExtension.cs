@@ -5,7 +5,7 @@ using PersonalFinanceManagement.Domain.Transactions.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Balances.Extensions
 {
-    public static class InstalmentMappingsExtension
+    public static class InstallmentMappingsExtension
     {
         public static InstallmentWithBalanceDto ToInstallmentWithBalanceAndRemainingAmountDto(this Installment installment)
         {

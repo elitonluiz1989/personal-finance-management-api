@@ -14,7 +14,10 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
         public decimal AmountPaid { get; set; }
 
         public virtual Transaction? Transaction { get; set; }
+        public virtual List<TransactionResidue> TransactionResidues { get; set; } = new();
         public virtual Installment? Installment { get; set; }
+
+        public bool IsResidue => Type == TransactionItemTypeEnum.Residue;
 
         protected override void SetValitionRules()
         {
@@ -35,7 +38,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
 
             Validator.RuleFor(p => InstallmentId)
                 .GreaterThan(0)
-                .When(p => Installment is null); ;
+                .When(p => Installment is null);
         }
     }
 }

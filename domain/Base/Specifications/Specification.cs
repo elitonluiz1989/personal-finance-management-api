@@ -21,6 +21,7 @@ namespace PersonalFinanceManagement.Domain.Base.Specifications
         {
             Repository = repository;
             Query = Repository.Query();
+            QueryWithoutPagination = Query;
         }
 
         public abstract ISpecification<TEntity, TKey, TFilter, TResult> WithFilter(TFilter filter, int authenticatedUserId, bool isAdmin);
@@ -45,7 +46,6 @@ namespace PersonalFinanceManagement.Domain.Base.Specifications
 
             var amountSkipped = page * filter.PageSize;
 
-            QueryWithoutPagination = Query;
             Query = Query.Skip(amountSkipped).Take(filter.PageSize);
 
             return this;

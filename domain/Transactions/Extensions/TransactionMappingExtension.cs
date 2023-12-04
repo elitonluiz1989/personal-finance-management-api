@@ -33,9 +33,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Extensions
             if (transaction.User is User user)
                 dto.User = user.ToUserDto();
 
-            if (transaction.Items.Any())
+            if (transaction.TransactionItems.Any())
                 dto.Items = transaction
-                    .Items
+                    .TransactionItems
                         .Select(ti => ti.ToTransactionItemWithInstallmentDto())
                             .ToList();
 

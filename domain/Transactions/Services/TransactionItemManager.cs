@@ -5,6 +5,7 @@ using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
+using PersonalFinanceManagement.Domain.Transactions.Enums;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Services
 {
@@ -35,8 +36,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             if (Validate(dto, transaction) is false)
                 return;
 
-            DeleteExistingItems(transaction);
-
             var installments = await GetInstallments(dto.InstallmentsIds, dto.UserId);
 
             if (HasNotifications)
@@ -50,6 +49,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             var transactionItemStorageDto = new TransactionItemStorageDto()
             {
                 UserId = dto.UserId,
+                Type = TransactionItemTypeEnum.Standard,
                 Date = dto.Date,
                 Amount = transaction.Amount,
                 CanGenerateCredit = !dto.UseBalancesAsValue
@@ -64,14 +64,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 return false;
 
             return true;
-        }
-
-        private void DeleteExistingItems(Transaction transacation)
-        {
-            if (transacation.Items.Any() is false)
-                return;
-
-            _transactionItemRepository.Delete(transacation.Items);
         }
 
         private async Task<List<Installment>> GetInstallments(int[] installmentsIds, int userId)

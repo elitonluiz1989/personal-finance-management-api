@@ -13,21 +13,17 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpadtedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
         public virtual User? User { get; set; }
-        public virtual List<TransactionItem> Items { get; set; } = new();
-
-        public Transaction()
-        {
-        }
+        public virtual List<TransactionItem> TransactionItems { get; set; } = new();
 
         public void SetRegistrationDates()
         {
             if (IsRecorded)
             {
-                UpadtedAt = DateTime.Now;
+                UpdatedAt = DateTime.Now;
             }
             else
             {

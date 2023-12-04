@@ -116,7 +116,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             return Query
                 .Include(p => p.Balance)
                 .Include(p => p.TransactionItems)
-                .Select(s => InstalmentMappingsExtension.ToInstallmentWithBalanceAndRemainingAmountDto(s));
+                    .ThenInclude(p => p.Transaction)
+                .Select(s => InstallmentMappingsExtension.ToInstallmentWithBalanceAndRemainingAmountDto(s));
         }
     }
 }
