@@ -71,10 +71,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 
         private static int GetReference(DateTime balanceDate, short number, bool singleInstallment)
         {
-            var referenceDate = singleInstallment ? balanceDate : balanceDate.AddMonths(number);
-            var referenceString = referenceDate.ToString("yyyyMM");
+            var reference = singleInstallment ? balanceDate : balanceDate.AddMonths(number);
 
-            return Convert.ToInt32(referenceString);
+            return Convert.ToInt32(reference.ToString("yyyyMM"));
         }
 
         private static (decimal amount, decimal remainingAmount) GetFinancedValue(decimal balanceAmount, short installmentsNumber)

@@ -2,6 +2,7 @@
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Entities
@@ -10,7 +11,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
     {
         public int UserId { get; set; }
         public string Name { get; set; } = string.Empty;
-        public BalanceTypeEnum Type { get; set; }
+        public CommonTypeEnum Type { get; set; }
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public bool Financed { get; set; }

@@ -19,7 +19,9 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     UserName = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Password = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Role = table.Column<short>(type: "smallint", nullable: false)
+                    Role = table.Column<short>(type: "smallint", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefeshTokenExperitionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -36,11 +38,12 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Financed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Financed = table.Column<bool>(type: "bit", nullable: false),
                     InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
+                    Residue = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpadtedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -63,9 +66,10 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Reference = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpadtedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -89,7 +93,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     Reference = table.Column<int>(type: "int", nullable: false),
                     Number = table.Column<short>(type: "smallint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
@@ -111,16 +115,16 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BalanceId = table.Column<int>(type: "int", nullable: false),
                     OriginalDate = table.Column<DateTime>(type: "date", nullable: false),
-                    OriginalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OriginalAmount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     OriginalFinanced = table.Column<bool>(type: "bit", nullable: false),
                     OriginalInstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
                     Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     Financed = table.Column<bool>(type: "bit", nullable: false),
                     InstallmentsNumber = table.Column<short>(type: "smallint", nullable: false),
-                    Active = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -135,7 +139,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         name: "FK_RefinancedBalances_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -148,7 +153,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     InstallmentId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
                     PartiallyPaid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    AmountPaid = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    AmountPaid = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -163,6 +168,32 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         name: "FK_TransactionItems_Transactions_TransactionId",
                         column: x => x.TransactionId,
                         principalTable: "Transactions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TransactionResidue",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TransactionItemOriginId = table.Column<int>(type: "int", nullable: false),
+                    TransactionItemId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TransactionResidue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TransactionResidue_TransactionItems_TransactionItemId",
+                        column: x => x.TransactionItemId,
+                        principalTable: "TransactionItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TransactionResidue_TransactionItems_TransactionItemOriginId",
+                        column: x => x.TransactionItemOriginId,
+                        principalTable: "TransactionItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -198,6 +229,17 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 column: "TransactionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TransactionResidue_TransactionItemId",
+                table: "TransactionResidue",
+                column: "TransactionItemId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionResidue_TransactionItemOriginId",
+                table: "TransactionResidue",
+                column: "TransactionItemOriginId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_UserId",
                 table: "Transactions",
                 column: "UserId");
@@ -219,6 +261,9 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "RefinancedBalances");
+
+            migrationBuilder.DropTable(
+                name: "TransactionResidue");
 
             migrationBuilder.DropTable(
                 name: "TransactionItems");

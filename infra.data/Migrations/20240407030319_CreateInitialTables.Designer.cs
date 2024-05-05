@@ -12,8 +12,8 @@ using PersonalFinanceManagement.Infra.Data.Contexts;
 namespace PersonalFinanceManagement.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultDBContext))]
-    [Migration("20231204025011_CreateTransactionResidueTable")]
-    partial class CreateTransactionResidueTable
+    [Migration("20240407030319_CreateInitialTables")]
+    partial class CreateInitialTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -210,11 +210,11 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)")
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(6);
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("date")
@@ -222,7 +222,11 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(7);
+                        .HasColumnOrder(8);
+
+                    b.Property<int>("Reference")
+                        .HasColumnType("int")
+                        .HasColumnOrder(4);
 
                     b.Property<int>("Type")
                         .HasColumnType("int")
@@ -230,7 +234,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(7);
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")

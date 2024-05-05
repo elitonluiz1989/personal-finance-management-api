@@ -6,7 +6,7 @@ using PersonalFinanceManagement.Domain.Transactions.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Filters;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 
-namespace PersonalFinanceManagement.Api.Controllers.Transactions
+namespace PersonalFinanceManagement.Api.Controllers
 {
     public class TransactionsController : BaseApiController
     {

@@ -1,5 +1,6 @@
 ﻿using PersonalFinanceManagement.Api.Services;
 using PersonalFinanceManagement.Application.Contracts;
+using PersonalFinanceManagement.Application.Services;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Contracts.RefinanceBalances;
@@ -9,6 +10,8 @@ using PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances;
 using PersonalFinanceManagement.Domain.Balances.Specifications;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
+using PersonalFinanceManagement.Domain.Management.Contracts;
+using PersonalFinanceManagement.Domain.Management.Specifications;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Services;
 using PersonalFinanceManagement.Domain.Transactions.Specifications;
@@ -42,7 +45,7 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<IBalanceDeleter, BalanceDeleter>();
 
             services.AddScoped<IInstallmentRepository, InstallmentRepository>();
-            services.AddScoped<IInstallmentWithBalanceSpecification, InstallmentWithBalanceSpecification>();
+            services.AddScoped<IInstallmentWithBalanceAndTransactionsSpecification, InstallmentWithBalanceAndTransactionsSpecification>();
             services.AddScoped<IInstallmentStore, InstallmentStore>();
             services.AddScoped<IInstallmentDeleter, InstallmentDeleter>();
             services.AddScoped<IBalanceInstallmentStore, BalanceInstallmentStore>();
@@ -62,6 +65,9 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<ITransactionWithTransactionItemsSpecification, TransactionWithTransactionItemsSpecification>();
             services.AddScoped<ITransactionDeleter, TransactionDeleter>();
             services.AddScoped<ITransactionItemDeleter, TransactionItemDeleter>();
+
+            services.AddScoped<IManagementService, ManagementService>();
+            services.AddScoped<IManagementSpecification, ManagementSpecification>();
         }
     }
 }

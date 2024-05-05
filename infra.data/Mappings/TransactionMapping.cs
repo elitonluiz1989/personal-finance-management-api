@@ -24,21 +24,25 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasColumnType("date")
                 .IsRequired();
 
-            builder.Property(p => p.Amount)
+            builder.Property(p => p.Reference)
                 .HasColumnOrder(4)
+                .IsRequired();
+
+            builder.Property(p => p.Amount)
+                .HasColumnOrder(5)
                 .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.CreatedAt)
-                .HasColumnOrder(5)
+                .HasColumnOrder(6)
                 .IsRequired();
 
             builder.Property(p => p.UpdatedAt)
-                .HasColumnOrder(6)
+                .HasColumnOrder(7)
                 .IsRequired(false);
 
             builder.Property(p => p.DeletedAt)
-                .HasColumnOrder(7)
+                .HasColumnOrder(8)
                 .IsRequired(false);
         }
     }

@@ -5,7 +5,7 @@ using PersonalFinanceManagement.Application.Contracts;
 using PersonalFinanceManagement.Application.Dtos.Authentication;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 
-namespace PersonalFinanceManagement.Api.Controllers.Auth
+namespace PersonalFinanceManagement.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -56,9 +56,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
                 .NotNull()
                 .When(p => BalanceId <= 0);
 
-            Validator.RuleFor(p => Reference)
-                .GreaterThan(0);
-
             Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
         }

@@ -7,7 +7,7 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
-namespace PersonalFinanceManagement.Api.Controllers.Balances
+namespace PersonalFinanceManagement.Api.Controllers
 {
     public class InstallmentsController : BaseApiController
     {
@@ -25,7 +25,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         [RolesAuthorized(UserRoleEnum.Administrator, UserRoleEnum.User)]
         public async Task<IActionResult> Get(
             [FromQuery] InstallmentFilter filter,
-            [FromServices] IInstallmentWithBalanceSpecification specification
+            [FromServices] IInstallmentWithBalanceAndTransactionsSpecification specification
         )
         {
             var results = await specification

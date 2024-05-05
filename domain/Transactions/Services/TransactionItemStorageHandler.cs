@@ -3,6 +3,7 @@ using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
@@ -117,7 +118,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             {
                 UserId = dto.UserId,
                 Name = $"Trasanction residue of {dto.Date:dd/MM/yyyy}",
-                Type = BalanceTypeEnum.Credit,
+                Type = CommonTypeEnum.Credit,
                 Date = dto.Date,
                 Amount = remainingValue,
                 Financed = false,

@@ -1,7 +1,8 @@
 ﻿using FluentValidation;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
-using PersonalFinanceManagement.Domain.Transactions.Enums;
+using PersonalFinanceManagement.Domain.Base.Enums;
+using PersonalFinanceManagement.Domain.Base.Extensions;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Entities
@@ -9,8 +10,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
     public class Transaction : Entity<int>, IEntityWithRegistrationDates, IEntityWithSoftDelete
     {
         public int UserId { get; set; }
-        public TransactionTypeEnum Type { get; set; }
-        public DateTime Date { get; set; }
+        public CommonTypeEnum Type { get; set; }
+        public DateTime Date { get => _data; set => DateHandler(value); }
+        public int Reference { get; private set; }
         public decimal Amount { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
@@ -18,6 +20,8 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
 
         public virtual User? User { get; set; }
         public virtual List<TransactionItem> TransactionItems { get; set; } = new();
+
+        private DateTime _data;
 
         public void SetRegistrationDates()
         {
@@ -58,6 +62,12 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
 
             Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
+        }
+
+        private void DateHandler(DateTime date)
+        {
+            _data = date;
+            Reference = date.ToReference();
         }
     }
 }

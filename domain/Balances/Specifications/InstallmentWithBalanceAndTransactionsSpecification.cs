@@ -10,15 +10,15 @@ using PersonalFinanceManagement.Domain.Base.Specifications;
 
 namespace PersonalFinanceManagement.Domain.Balances.Specifications
 {
-    public class InstallmentWithBalanceSpecification : Specification<Installment, int, InstallmentFilter, InstallmentWithBalanceDto>, IInstallmentWithBalanceSpecification
+    public class InstallmentWithBalanceAndTransactionsSpecification : Specification<Installment, int, InstallmentFilter, InstallmentWithBalanceDto>, IInstallmentWithBalanceAndTransactionsSpecification
     {
-        public InstallmentWithBalanceSpecification(IInstallmentRepository repository)
+        public InstallmentWithBalanceAndTransactionsSpecification(IInstallmentRepository repository)
             : base(repository)
         {
             Filter = new InstallmentFilter();
         }
 
-        public override IInstallmentWithBalanceSpecification WithFilter(InstallmentFilter filter, int authenticatedUserId, bool isAdmin)
+        public override IInstallmentWithBalanceAndTransactionsSpecification WithFilter(InstallmentFilter filter, int authenticatedUserId, bool isAdmin)
         {
             Filter = filter;
 
@@ -72,8 +72,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 );
             }
 
-            if (Filter.Reference > 0)
-                Query = Query.Where(p => p.Reference == filter.Reference);
+            /*if (!Filter.Reference.IsInvalid())
+                Query = Query.Where(p => p.Reference == filter.Reference);*/
 
             if (Filter.Number > 0)
                 Query = Query.Where(p => p.Number == filter.Number);
@@ -81,8 +81,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             if (Filter.Status.Any())
                 Query = Query.Where(p => Filter.Status.Contains(p.Status));
 
-            if (Filter.Amount > 0)
-                Query = Query.Where(p => p.Amount == filter.Amount);
+            /*if (Filter.Amount.IsInvalid())
+                Query = Query.Where(p => p.Amount == filter.Amount);*/
 
             if (Filter.OnlyUnpaidInstallments) {
                 var unpaidStatus = new InstallmentStatusEnum[] {
@@ -97,6 +97,13 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 Query = Query.Where(p => !Filter.WithoutTheseInstallmentIds.Contains(p.Id));
 
             return this;
+        }
+
+        public override async Task<IEnumerable<InstallmentWithBalanceDto>> List()
+        {
+            var query = GetQuery();
+
+            return await query.ToListAsync();
         }
 
         public override async Task<PagedResultsDto<InstallmentWithBalanceDto>> PagedList()

@@ -8,7 +8,7 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
-namespace PersonalFinanceManagement.Api.Controllers.Balances
+namespace PersonalFinanceManagement.Api.Controllers
 {
     public class BalancesController : BaseApiController
     {

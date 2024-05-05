@@ -7,7 +7,7 @@ using PersonalFinanceManagement.Domain.Users.Dtos;
 using PersonalFinanceManagement.Domain.Users.Enums;
 using PersonalFinanceManagement.Domain.Users.Filters;
 
-namespace PersonalFinanceManagement.Api.Controllers.Users
+namespace PersonalFinanceManagement.Api.Controllers
 {
     public class UsersController : BaseApiController
     {
@@ -46,7 +46,7 @@ namespace PersonalFinanceManagement.Api.Controllers.Users
 
             if (HasNotifications())
                 return ResponseWithNotifications();
-            
+
             return ResponseWithCommit();
         }
 

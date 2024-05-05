@@ -1,7 +1,8 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Entities;
-using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
+using PersonalFinanceManagement.Domain.Base.Enums;
+using PersonalFinanceManagement.Domain.Base.Extensions;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
@@ -43,7 +44,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             return balancesAmount;
         }
 
-        private async Task<List<Balance>> GetBalances(int[] balancesIds, int userId, TransactionTypeEnum transactionType)
+        private async Task<List<Balance>> GetBalances(int[] balancesIds, int userId, CommonTypeEnum transactionType)
         {
             var results = await _balanceRepository.ListWithInstallmentsByIds(balancesIds, userId);
             var balances = results.Where(b => b.Closed is false).ToList();
@@ -53,7 +54,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             return balances;
         }
 
-        private bool Validate(List<Balance> balances, int[] balancesIds, TransactionTypeEnum transactionType)
+        private bool Validate(List<Balance> balances, int[] balancesIds, CommonTypeEnum transactionType)
         {
             if (balances is null || balances.Any() is false)
             {
@@ -62,13 +63,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 return false;
             }
 
-            var transactionTypeToBalanceType = transactionType == TransactionTypeEnum.Credit ? BalanceTypeEnum.Credit : BalanceTypeEnum.Debt;
-
-            if (balances.Any(b => b.Type == transactionTypeToBalanceType))
+            if (balances.Any(b => b.Type == transactionType))
             {
-                var typeDescription = transactionTypeToBalanceType == BalanceTypeEnum.Credit ? "Credit" : "Debt";
-
-                AddNotification($"Some types of reported balances are not compatible with {typeDescription} transactions.");
+                AddNotification($"Some types of reported balances are not compatible with {transactionType.GetDescription().ToLower()} transactions.");
 
                 return false;
             }

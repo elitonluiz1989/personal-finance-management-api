@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Api.Attributes;
 using PersonalFinanceManagement.Api.Controllers.Base;
-using PersonalFinanceManagement.Domain.Balances.Contracts.RefinanceBalances;
-using PersonalFinanceManagement.Domain.Balances.Dtos;
+using PersonalFinanceManagement.Application.Contracts;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
-namespace PersonalFinanceManagement.Api.Controllers.Balances
+namespace PersonalFinanceManagement.Api.Controllers
 {
-    public class RefinancedBalancesController : BaseApiController
+    [ApiController]
+    public class ManagementController : BaseApiController
     {
-        public RefinancedBalancesController(
+        public ManagementController(
             IHttpContextAccessor httpContextAccessor,
             INotificationService notificationService,
             IUnitOfWork unitOfWork,
@@ -21,19 +21,16 @@ namespace PersonalFinanceManagement.Api.Controllers.Balances
         {
         }
 
-        [HttpPost]
+        [HttpGet("{reference}")]
         [RolesAuthorized(UserRoleEnum.Administrator)]
-        public async Task<IActionResult> Post(
-            [FromBody] RefinancedBalanceStoreDto dto,
-            [FromServices] IRefinancedBalanceStore store
+        public async Task<IActionResult> Manage(
+            int reference,
+            [FromServices] IManagementService service
         )
         {
-            await store.Store(dto, AuthenticatedUserId);
+            var results = await service.List(reference, AuthenticatedUserId, IsAdmin);
 
-            if (HasNotifications())
-                return ResponseWithNotifications();
-
-            return ResponseWithCommit();
+            return Ok(results);
         }
     }
 }

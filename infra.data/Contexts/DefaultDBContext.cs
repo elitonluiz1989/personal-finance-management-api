@@ -30,7 +30,7 @@ namespace PersonalFinanceManagement.Infra.Data.Contexts
         public static void InitializeDatabase(IServiceProvider provider)
         {
             var context = provider.CreateScope().ServiceProvider.GetRequiredService<DefaultDBContext>();
-            context.Database.Migrate();
+            context.Database.EnsureCreated();
         }
 
         public static async Task Seed(IServiceProvider provider, IConfiguration? configuration)
