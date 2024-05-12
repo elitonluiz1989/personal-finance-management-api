@@ -1,4 +1,6 @@
-﻿namespace PersonalFinanceManagement.Domain.Balances.Dtos
+﻿using PersonalFinanceManagement.Domain.Users.Dtos;
+
+namespace PersonalFinanceManagement.Domain.Balances.Dtos
 {
     public record BalanceDto : BalanceSimplifiedDto
     {
@@ -6,6 +8,7 @@
         public decimal Amount { get; set; }
         public bool Financed { get; set; }
         public bool Closed { get; set; }
+        public UserBasicDto? User { get; set; }
         public List<InstallmentWithTransactionItemsDto> Installments { get; set; } = new();
     }
 }

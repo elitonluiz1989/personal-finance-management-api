@@ -53,6 +53,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
         {
             return Query
                 .Include(p => p.Installments)
+                .Include(p => p.User)
                 .Select(s => s.ToBalanceDto());
         }
     }

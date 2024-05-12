@@ -1,5 +1,7 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Users.Entities;
+using PersonalFinanceManagement.Domain.Users.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Balances.Extensions
 {
@@ -19,6 +21,11 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
                 InstallmentsNumber = balance.InstallmentsNumber,
                 Closed = balance.Closed
             };
+
+            if (balance.User is User user)
+            {
+                balanceDto.User = user.ToUserBasicDto();
+            }
 
             if (balance.Installments.Any())
                 balanceDto.Installments = balance
