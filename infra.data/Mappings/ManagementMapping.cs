@@ -1,54 +1,43 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PersonalFinanceManagement.Domain.Transactions.Entities;
+using PersonalFinanceManagement.Domain.Managements.Entities;
 
 namespace PersonalFinanceManagement.Infra.Data.Mappings
 {
-    internal class TransactionMapping : BaseMapping<Transaction, int>, IEntityTypeConfiguration<Transaction>
+    internal class ManagementMapping : BaseMapping<Management, int>, IEntityTypeConfiguration<Management>
     {
-        public void Configure(EntityTypeBuilder<Transaction> builder)
+        public void Configure(EntityTypeBuilder<Management> builder)
         {
-            builder.ToTable("Transactions");
-
             BaseConfigure(builder);
 
             builder.Property(p => p.UserId)
                 .HasColumnOrder(1);
 
-            builder.Property(p => p.Type)
+            builder.Property(p => p.Reference)
                 .HasColumnOrder(2)
                 .IsRequired();
 
-            builder.Property(p => p.Date)
+            builder.Property(p => p.InitialAmount)
                 .HasColumnOrder(3)
-                .HasColumnType("date")
-                .IsRequired();
-
-            builder.Property(p => p.Reference)
-                .HasColumnOrder(4)
+                .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.Amount)
-                .HasColumnOrder(5)
+                .HasColumnOrder(4)
                 .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.CreatedAt)
-                .HasColumnOrder(6)
+                .HasColumnOrder(5)
                 .IsRequired();
 
             builder.Property(p => p.UpdatedAt)
-                .HasColumnOrder(7)
+                .HasColumnOrder(6)
                 .IsRequired(false);
 
             builder.Property(p => p.DeletedAt)
                 .HasColumnOrder(8)
                 .IsRequired(false);
-
-            builder.HasOne(p => p.Management)
-                .WithMany(p => p.Transactions)
-                .HasForeignKey(p => p.ManagementId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
+﻿using Microsoft.EntityFrameworkCore;
+using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
+using PersonalFinanceManagement.Domain.Managements.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 {
@@ -20,6 +22,24 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             : base(notificationService, repository)
         {
             _balanceRepository = balanceRepository;
+        }
+
+        public void Store(Installment? installment)
+        {
+            if (ValidateEntity(installment) is false)
+                return;
+
+            SaveEntity(installment);
+        }
+
+        public async Task Store(InstallmentStoreDto dto, Balance balance)
+        {
+            if (ValidateDto(dto) is false)
+                return;
+
+            var installment = await SetInstallment(dto, balance);
+
+            Store(installment);
         }
 
         public async Task Store(InstallmentStoreDto dto)
@@ -39,17 +59,32 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             await Store(dto, balance);
         }
 
-        public async Task Store(InstallmentStoreDto dto, Balance balance)
+        public void Store(Installment? installment, Management management)
         {
-            if (ValidateDto(dto) is false)
+            if (installment is null)
                 return;
 
-            var installment = await SetInstallment(dto, balance);
+            installment.Management = management;
 
-            if (ValidateEntity(installment) is false)
+            Store(installment);
+        }
+
+        public async Task Store(int[] installmentsIds, Management management)
+        {
+            if (installmentsIds is null || installmentsIds.Length == 0)
                 return;
 
-            SaveEntity(installment);
+            var installments = await _repository.Query()
+                .Where(p => installmentsIds.Contains(p.Id))
+                .ToListAsync();
+
+            foreach (var installment in installments)
+            {
+                Store(installment, management);
+
+                if (HasNotifications)
+                    return;
+            }
         }
 
         public void UpdateStatus(Installment installment, InstallmentStatusEnum status)

@@ -16,32 +16,40 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
             builder.Property(p => p.BalanceId)
                 .HasColumnOrder(1);
 
-            builder.Property(p => p.Reference)
-                .HasColumnOrder(2)
-                .IsRequired();
+            builder.Property(p => p.ManagementId)
+                .HasColumnOrder(2);
 
-            builder.Property(p => p.Number)
+            builder.Property(p => p.Reference)
                 .HasColumnOrder(3)
                 .IsRequired();
 
-            builder.Property(p => p.Status)
+            builder.Property(p => p.Number)
                 .HasColumnOrder(4)
+                .IsRequired();
+
+            builder.Property(p => p.Status)
+                .HasColumnOrder(5)
                 .HasDefaultValue(InstallmentStatusEnum.Created)
                 .IsRequired();
 
             builder.Property(p => p.Amount)
-                .HasColumnOrder(5)
+                .HasColumnOrder(6)
                 .HasPrecision(10, 2)
                 .IsRequired();
 
             builder.Property(p => p.DeletedAt)
-                .HasColumnOrder(6)
+                .HasColumnOrder(7)
                 .IsRequired(false);
 
             builder.HasOne(p => p.Balance)
                 .WithMany(o => o.Installments)
                 .HasForeignKey(p => p.BalanceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(p => p.Management)
+                .WithMany(p => p.Installments)
+                .HasForeignKey(p => p.ManagementId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Ignore(p => p.Active);
         }

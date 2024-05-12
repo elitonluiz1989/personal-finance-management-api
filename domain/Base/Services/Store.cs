@@ -32,7 +32,7 @@ namespace PersonalFinanceManagement.Domain.Base.Services
             if (ValidateNullableObject(entity) is false)
                 return false;
 
-            if (entity?.Validate() is false)
+            if (entity!.Validate() is false)
             {
                 NotificationService.AddNotification(entity.Errors);
 

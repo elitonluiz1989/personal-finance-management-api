@@ -10,8 +10,9 @@ using PersonalFinanceManagement.Domain.Balances.Services.RefinancedBalances;
 using PersonalFinanceManagement.Domain.Balances.Specifications;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
-using PersonalFinanceManagement.Domain.Management.Contracts;
-using PersonalFinanceManagement.Domain.Management.Specifications;
+using PersonalFinanceManagement.Domain.Managements.Contracts;
+using PersonalFinanceManagement.Domain.Managements.Services;
+using PersonalFinanceManagement.Domain.Managements.Specifications;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Services;
 using PersonalFinanceManagement.Domain.Transactions.Specifications;
@@ -20,6 +21,7 @@ using PersonalFinanceManagement.Domain.Users.Services;
 using PersonalFinanceManagement.Domain.Users.Specifications;
 using PersonalFinanceManagement.Infra.Data.Helpers;
 using PersonalFinanceManagement.Infra.Data.Repositories.Balances;
+using PersonalFinanceManagement.Infra.Data.Repositories.Managements;
 using PersonalFinanceManagement.Infra.Data.Repositories.Transactions;
 using PersonalFinanceManagement.Infra.Data.Repositories.Users;
 
@@ -68,6 +70,8 @@ namespace PersonalFinanceManagement.Api
 
             services.AddScoped<IManagementService, ManagementService>();
             services.AddScoped<IManagementSpecification, ManagementSpecification>();
+            services.AddScoped<IManagementRepository, ManagementRepository>();
+            services.AddScoped<IManagementStore, ManagementStore>();
         }
     }
 }

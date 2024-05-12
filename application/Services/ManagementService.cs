@@ -1,5 +1,5 @@
 ﻿using PersonalFinanceManagement.Application.Contracts;
-using PersonalFinanceManagement.Domain.Management.Contracts;
+using PersonalFinanceManagement.Domain.Managements.Contracts;
 
 namespace PersonalFinanceManagement.Application.Services
 {

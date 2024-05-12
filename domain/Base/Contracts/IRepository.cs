@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PersonalFinanceManagement.Domain.Base.Entites;
+﻿using PersonalFinanceManagement.Domain.Base.Entites;
 
 namespace PersonalFinanceManagement.Domain.Base.Contracts
 {

@@ -1,4 +1,4 @@
-﻿namespace PersonalFinanceManagement.Domain.Management.Contracts
+﻿namespace PersonalFinanceManagement.Domain.Managements.Contracts
 {
     public interface IManagementSpecification
     {

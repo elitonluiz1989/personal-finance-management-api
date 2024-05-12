@@ -1,6 +1,6 @@
 ﻿using PersonalFinanceManagement.Domain.Users.Dtos;
 
-namespace PersonalFinanceManagement.Domain.Management.Dtos
+namespace PersonalFinanceManagement.Domain.Managements.Dtos
 {
     public record ManagementDto
     {

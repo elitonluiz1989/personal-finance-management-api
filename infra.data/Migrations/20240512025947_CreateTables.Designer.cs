@@ -12,8 +12,8 @@ using PersonalFinanceManagement.Infra.Data.Contexts;
 namespace PersonalFinanceManagement.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultDBContext))]
-    [Migration("20240407030319_CreateInitialTables")]
-    partial class CreateInitialTables
+    [Migration("20240512025947_CreateTables")]
+    partial class CreateTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -99,7 +99,7 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)")
-                        .HasColumnOrder(5);
+                        .HasColumnOrder(6);
 
                     b.Property<int>("BalanceId")
                         .HasColumnType("int")
@@ -107,25 +107,31 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2")
-                        .HasColumnOrder(6);
+                        .HasColumnOrder(7);
+
+                    b.Property<int?>("ManagementId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
 
                     b.Property<short>("Number")
                         .HasColumnType("smallint")
-                        .HasColumnOrder(3);
+                        .HasColumnOrder(4);
 
                     b.Property<int>("Reference")
                         .HasColumnType("int")
-                        .HasColumnOrder(2);
+                        .HasColumnOrder(3);
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(1)
-                        .HasColumnOrder(4);
+                        .HasColumnOrder(5);
 
                     b.HasKey("Id");
 
                     b.HasIndex("BalanceId");
+
+                    b.HasIndex("ManagementId");
 
                     b.ToTable("Installments", (string)null);
                 });
@@ -198,6 +204,52 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.ToTable("RefinancedBalances", (string)null);
                 });
 
+            modelBuilder.Entity("PersonalFinanceManagement.Domain.Managements.Entities.Management", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(0);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnOrder(4);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(5);
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(8);
+
+                    b.Property<decimal>("InitialAmount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)")
+                        .HasColumnOrder(3);
+
+                    b.Property<int>("Reference")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(6);
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Management");
+                });
+
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Transactions.Entities.Transaction", b =>
                 {
                     b.Property<int>("Id")
@@ -224,6 +276,9 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnOrder(8);
 
+                    b.Property<int?>("ManagementId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Reference")
                         .HasColumnType("int")
                         .HasColumnOrder(4);
@@ -241,6 +296,8 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .HasColumnOrder(1);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ManagementId");
 
                     b.HasIndex("UserId");
 
@@ -391,7 +448,14 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PersonalFinanceManagement.Domain.Managements.Entities.Management", "Management")
+                        .WithMany("Installments")
+                        .HasForeignKey("ManagementId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Balance");
+
+                    b.Navigation("Management");
                 });
 
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.RefinancedBalance", b =>
@@ -413,13 +477,31 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("PersonalFinanceManagement.Domain.Managements.Entities.Management", b =>
+                {
+                    b.HasOne("PersonalFinanceManagement.Domain.Users.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Transactions.Entities.Transaction", b =>
                 {
+                    b.HasOne("PersonalFinanceManagement.Domain.Managements.Entities.Management", "Management")
+                        .WithMany("Transactions")
+                        .HasForeignKey("ManagementId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("PersonalFinanceManagement.Domain.Users.Entities.User", "User")
                         .WithMany("Transactions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Management");
 
                     b.Navigation("User");
                 });
@@ -472,6 +554,13 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Balances.Entities.Installment", b =>
                 {
                     b.Navigation("TransactionItems");
+                });
+
+            modelBuilder.Entity("PersonalFinanceManagement.Domain.Managements.Entities.Management", b =>
+                {
+                    b.Navigation("Installments");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("PersonalFinanceManagement.Domain.Transactions.Entities.Transaction", b =>

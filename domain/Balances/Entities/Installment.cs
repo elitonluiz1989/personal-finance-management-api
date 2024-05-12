@@ -2,6 +2,7 @@
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
+using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Entities
@@ -9,6 +10,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
     public class Installment : Entity<int>, IEntityWithSoftDelete
     {
         public int BalanceId { get; set; }
+        public int? ManagementId { get; set; }
         public int Reference { get; set; }
         public short Number { get; set; }
         public InstallmentStatusEnum Status { get; set; }
@@ -20,6 +22,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
         public virtual Balance? Balance { get; set; }
         public virtual List<TransactionItem> TransactionItems { get; set; } = new();
+        public virtual Management? Management { get; set; }
 
         public Installment()
         {

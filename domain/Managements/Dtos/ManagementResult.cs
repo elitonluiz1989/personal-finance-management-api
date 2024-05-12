@@ -1,8 +1,8 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Enums;
-using PersonalFinanceManagement.Domain.Management.Enums;
+using PersonalFinanceManagement.Domain.Managements.Enums;
 
-namespace PersonalFinanceManagement.Domain.Management.Dtos
+namespace PersonalFinanceManagement.Domain.Managements.Dtos
 {
     public record ManagementResult
     {

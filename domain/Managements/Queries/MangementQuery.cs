@@ -1,12 +1,12 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
-using PersonalFinanceManagement.Domain.Management.Dtos;
-using PersonalFinanceManagement.Domain.Management.Enums;
+using PersonalFinanceManagement.Domain.Managements.Enums;
+using PersonalFinanceManagement.Domain.Managements.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
-namespace PersonalFinanceManagement.Domain.Management.Queries
+namespace PersonalFinanceManagement.Domain.Managements.Queries
 {
     public static class MangementQuery
     {

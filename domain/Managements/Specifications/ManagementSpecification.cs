@@ -3,13 +3,13 @@ using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Base.Extensions;
-using PersonalFinanceManagement.Domain.Management.Contracts;
-using PersonalFinanceManagement.Domain.Management.Dtos;
-using PersonalFinanceManagement.Domain.Management.Enums;
+using PersonalFinanceManagement.Domain.Managements.Enums;
+using PersonalFinanceManagement.Domain.Managements.Contracts;
+using PersonalFinanceManagement.Domain.Managements.Dtos;
 using PersonalFinanceManagement.Domain.Users.Dtos;
-using Query = PersonalFinanceManagement.Domain.Management.Queries.MangementQuery;
+using Query = PersonalFinanceManagement.Domain.Managements.Queries.MangementQuery;
 
-namespace PersonalFinanceManagement.Domain.Management.Specifications
+namespace PersonalFinanceManagement.Domain.Managements.Specifications
 {
     public class ManagementSpecification : IManagementSpecification
     {
@@ -23,7 +23,7 @@ namespace PersonalFinanceManagement.Domain.Management.Specifications
         public async Task<object> List(int reference)
         {
             var results = new List<ManagementDto>();
-            await RemainingValueHandler(reference, results);
+            //await RemainingValueHandler(reference, results);
             await ManagementItemsHandler(reference, results);
 
             return results;
@@ -33,12 +33,19 @@ namespace PersonalFinanceManagement.Domain.Management.Specifications
         {
             DateTime referenceDate = reference.ToDateTime();
             int previousReference = referenceDate.AddMonths(-1).ToReference();
-            
+
             List<ManagementResult> remainingInstallments = await Query
                 .GetRemainingInstallmentQuery(previousReference, _context)
                 .ToListAsync();
-            IEnumerable<IGrouping<UserBasicDto, ManagementResult>> groupedValues = 
-                GetManagementGroup(remainingInstallments);
+            List<ManagementResult> installments = await Query
+                .GetInstallmentQuery(previousReference, _context)
+                .ToListAsync();
+            List<ManagementResult> transactions = await Query
+                .GetTransactionQuery(previousReference, _context)
+                .ToListAsync();
+            IEnumerable<ManagementResult> union = installments.Union(transactions);
+            IEnumerable<IGrouping<UserBasicDto, ManagementResult>> groupedValues =
+                GetManagementGroup(union);
 
             foreach (var group in groupedValues)
             {
@@ -50,11 +57,6 @@ namespace PersonalFinanceManagement.Domain.Management.Specifications
                     .Sum(p => p.Amount);
                 decimal remainingValue = creditRemaningValue - debitRemaningValue;
 
-                if (remainingValue == 0)
-                {
-                    continue;
-                }
-
                 ManagementDto management = CreateManagementDto(group.Key);
                 management.Items = new List<ManagementItemDto>
                 {
@@ -63,7 +65,7 @@ namespace PersonalFinanceManagement.Domain.Management.Specifications
                         Reference = previousReference,
                         Type = remainingValue > 0 ? CommonTypeEnum.Credit : CommonTypeEnum.Debt,
                         ManagementType = ManagementItemTypeEnum.RemainingValue,
-                        Description = $"Remaming value of {previousReference.ToMonthYear()}",
+                        Description = $"Initial value",
                         Amount = Math.Abs(remainingValue)
                     }
                 };

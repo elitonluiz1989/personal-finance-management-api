@@ -1,5 +1,7 @@
-﻿using PersonalFinanceManagement.Domain.Base.Contracts;
+﻿using Microsoft.EntityFrameworkCore;
+using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
+using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
@@ -25,6 +27,14 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             _userRepository = userRepository;
         }
 
+        public void Store(Transaction transaction)
+        {
+            if (ValidateEntity(transaction) is false)
+                return;
+
+            _repository.Save(transaction!);
+        }
+
         public async Task Store(TransactionStoreDto dto)
         {
             if (ValidateDto(dto) is false)
@@ -38,10 +48,32 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             if (ValidateTransationItemsRecord(dto, transaction!))
                 await _transactionItemManager.Manage(dto, transaction!);
 
-            if (ValidateEntity(transaction!) is false)
+            Store(transaction!);
+        }
+
+        public void Store(Transaction transaction, Management management)
+        {
+            transaction.Management = management;
+
+            Store(transaction);
+        }
+
+        public async Task Store(int[] transactionsIds, Management management)
+        {
+            if (transactionsIds is null  || transactionsIds.Length == 0)
                 return;
 
-            _repository.Save(transaction!);
+            var transactions = await _repository.Query()
+                .Where(p => transactionsIds.Contains(p.Id))
+                .ToListAsync();
+
+            foreach (var transaction in transactions)
+            {
+                Store(transaction, management);
+
+                if (HasNotifications)
+                    return;
+            }
         }
 
         private async Task<Transaction?> SetTransaction(TransactionStoreDto dto)
@@ -78,35 +110,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
                 Date = dto.Date,
                 Amount = dto.Amount
             };
-        }
-
-        private async Task<Transaction?> UpdateTransaction(TransactionStoreDto dto)
-        {
-            var transaction = await _repository.Find(dto.Id);
-
-            if (ValidateNullableObject(transaction) is false || transaction is null)
-                return default;
-
-            if (dto.UserId != transaction.UserId)
-            {
-                var user = await GetUser(dto.UserId);
-
-                if (HasNotifications)
-                    return default;
-
-                transaction.User = user;
-            }
-
-            if (dto.Type != transaction.Type)
-                transaction.Type = dto.Type;
-
-            if (dto.Date != transaction.Date)
-                transaction.Date = dto.Date;
-
-            if (dto.Amount != transaction.Amount)
-                transaction.Amount = dto.Amount;
-
-            return transaction;
         }
 
         private async Task<User?> GetUser(int userId)

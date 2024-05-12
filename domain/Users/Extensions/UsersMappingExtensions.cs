@@ -16,5 +16,14 @@ namespace PersonalFinanceManagement.Domain.Users.Extensions
                 Role = user.Role
             };
         }
+
+        public static UserBasicDto ToUserBasicDto(this User user)
+        {
+            return new UserBasicDto()
+            {
+                Id = user.Id,
+                Name = user.Name
+            };
+        }
     }
 }

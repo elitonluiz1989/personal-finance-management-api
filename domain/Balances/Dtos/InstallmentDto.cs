@@ -1,4 +1,5 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
+using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Base.Extensions;
 
 namespace PersonalFinanceManagement.Domain.Balances.Dtos
@@ -13,7 +14,7 @@ namespace PersonalFinanceManagement.Domain.Balances.Dtos
         public decimal Amount { get; set; }
         public decimal AmountPaid { get; set; }
         public decimal AmountRemaining { get; set; }
-        public string ReferenceFormatted => Reference.ToString("MM/yyyy");
+        public string ReferenceFormatted => Reference.ToMonthYear();
         public string StatusDescription => Status.GetDescription();
     }
 }

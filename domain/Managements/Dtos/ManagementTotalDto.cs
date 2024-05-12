@@ -1,6 +1,6 @@
 ﻿using PersonalFinanceManagement.Domain.Base.Enums;
 
-namespace PersonalFinanceManagement.Domain.Management.Dtos
+namespace PersonalFinanceManagement.Domain.Managements.Dtos
 {
     public class ManagementTotalDto
     {
@@ -25,7 +25,7 @@ namespace PersonalFinanceManagement.Domain.Management.Dtos
 
             var total = debtAmount - creditAmount;
 
-            return total;
+            return Math.Abs(total);
 
         }
     }

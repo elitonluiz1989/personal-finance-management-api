@@ -1,4 +1,4 @@
-﻿namespace PersonalFinanceManagement.Domain.Management.Enums
+﻿namespace PersonalFinanceManagement.Domain.Managements.Enums
 {
     public enum ManagementItemTypeEnum
     {

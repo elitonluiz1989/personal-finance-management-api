@@ -1,30 +1,25 @@
 ﻿using FluentValidation;
+using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
-using PersonalFinanceManagement.Domain.Base.Enums;
-using PersonalFinanceManagement.Domain.Base.Extensions;
-using PersonalFinanceManagement.Domain.Managements.Entities;
+using PersonalFinanceManagement.Domain.Transactions.Entities;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
-namespace PersonalFinanceManagement.Domain.Transactions.Entities
+namespace PersonalFinanceManagement.Domain.Managements.Entities
 {
-    public class Transaction : Entity<int>, IEntityWithRegistrationDates, IEntityWithSoftDelete
+    public class Management : Entity<int>, IEntityWithRegistrationDates, IEntityWithSoftDelete
     {
         public int UserId { get; set; }
-        public int? ManagementId { get; set; }
-        public CommonTypeEnum Type { get; set; }
-        public DateTime Date { get => _data; set => DateHandler(value); }
-        public int Reference { get; private set; }
+        public int Reference { get; set; }
+        public decimal InitialAmount { get; set; }
         public decimal Amount { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
 
         public virtual User? User { get; set; }
-        public virtual List<TransactionItem> TransactionItems { get; set; } = new();
-        public virtual Management? Management { get; set; }
-
-        private DateTime _data;
+        public virtual List<Installment> Installments { get; set; } = new();
+        public virtual List<Transaction> Transactions { get; set; } = new();
 
         public void SetRegistrationDates()
         {
@@ -35,7 +30,7 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
             else
             {
                 CreatedAt = DateTime.Now;
-            }            
+            }
         }
 
         public void SetAsDeleted()
@@ -56,21 +51,11 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
                 .NotNull()
                 .When(p => UserId <= 0);
 
-            Validator.RuleFor(p => Type)
-                .IsInEnum();
-
-            Validator.RuleFor(p => Date)
-                .NotNull()
-                .NotEqual(default(DateTime));
+            Validator.RuleFor(p => InitialAmount)
+                .GreaterThan(0);
 
             Validator.RuleFor(p => Amount)
                 .GreaterThan(0);
-        }
-
-        private void DateHandler(DateTime date)
-        {
-            _data = date;
-            Reference = date.ToReference();
         }
     }
 }
