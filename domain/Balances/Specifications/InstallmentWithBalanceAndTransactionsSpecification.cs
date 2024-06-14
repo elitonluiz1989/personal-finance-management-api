@@ -72,8 +72,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 );
             }
 
-            /*if (!Filter.Reference.IsInvalid())
-                Query = Query.Where(p => p.Reference == filter.Reference);*/
+            if (Filter.Reference > 0)
+                Query = Query.Where(p => p.Reference == filter.Reference);
 
             if (Filter.Number > 0)
                 Query = Query.Where(p => p.Number == filter.Number);
@@ -81,8 +81,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             if (Filter.Status.Any())
                 Query = Query.Where(p => Filter.Status.Contains(p.Status));
 
-            /*if (Filter.Amount.IsInvalid())
-                Query = Query.Where(p => p.Amount == filter.Amount);*/
+            if (Filter.Amount > 0)
+                Query = Query.Where(p => p.Amount == filter.Amount);
 
             if (Filter.OnlyUnpaidInstallments) {
                 var unpaidStatus = new InstallmentStatusEnum[] {
@@ -124,6 +124,10 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
                 .Include(p => p.Balance)
                 .Include(p => p.TransactionItems)
                     .ThenInclude(p => p.Transaction)
+                .OrderBy(p => p.Number)
+                    .ThenBy(p => p.Balance!.Date)
+                    .ThenBy(p => p.Balance!.Name)
+                    .ThenBy(p => p.Id)
                 .Select(s => InstallmentMappingsExtension.ToInstallmentWithBalanceAndRemainingAmountDto(s));
         }
     }

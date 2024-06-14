@@ -28,10 +28,12 @@ namespace PersonalFinanceManagement.Domain.Balances.Extensions
             }
 
             if (balance.Installments.Any())
+            {
                 balanceDto.Installments = balance
                     .Installments
                         .Select(i => i.ToInstallmentWithTransactionItemsDto())
                             .ToList();
+            }
 
             return balanceDto;
         }

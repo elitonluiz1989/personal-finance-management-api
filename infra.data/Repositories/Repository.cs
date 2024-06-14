@@ -42,7 +42,7 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
         {
             if (VerifyIfIsSoftDelete(entity))
             {
-                SetAsDeleted(entity);
+                Repository<TEntity, TKey>.SetAsDeleted(entity);
 
                 return;
             }
@@ -58,7 +58,7 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
             {
                 foreach (var entity in entities)
                 {
-                    SetAsDeleted(entity);
+                    Repository<TEntity, TKey>.SetAsDeleted(entity);
                 }
 
                 return;
@@ -102,7 +102,7 @@ namespace PersonalFinanceManagement.Infra.Data.Repositories
             return entity.IsRecorded && entity.WithSoftDelete;
         }
 
-        private void SetAsDeleted(TEntity entity)
+        private static void SetAsDeleted(TEntity entity)
         {
             ((IEntityWithSoftDelete)entity).SetAsDeleted();
         }

@@ -1,7 +1,9 @@
-﻿namespace PersonalFinanceManagement.Domain.Managements.Contracts
+﻿using PersonalFinanceManagement.Domain.Managements.Dtos;
+
+namespace PersonalFinanceManagement.Domain.Managements.Contracts
 {
     public interface IManagementSpecification
     {
-        Task<object> List(int reference);
+        Task<List<ManagementDto>> Get(int reference);
     }
 }

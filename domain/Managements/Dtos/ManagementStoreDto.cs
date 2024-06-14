@@ -5,7 +5,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Dtos
     public record ManagementStoreDto : RecordedDto<int>
     {
         public int UserId { get; set; }
-        public int Reference { get; private set; }
+        public int Reference { get; set; }
         public decimal InitialAmount { get; set; }
         public decimal Amount { get; set; }
         public int[] InstallmentsIds { get; set; } = Array.Empty<int>();

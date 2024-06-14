@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersonalFinanceManagement.Api.Attributes;
 using PersonalFinanceManagement.Api.Controllers.Base;
-using PersonalFinanceManagement.Application.Contracts;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
-using PersonalFinanceManagement.Domain.Managements.Dtos;
+using PersonalFinanceManagement.Domain.Managements.Filters;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
@@ -27,21 +26,21 @@ namespace PersonalFinanceManagement.Api.Controllers
         [RolesAuthorized(UserRoleEnum.Administrator)]
         public async Task<IActionResult> Manage(
             int reference,
-            [FromServices] IManagementService service
+            [FromServices] IManagementSpecification specification
         )
         {
-            var results = await service.List(reference, AuthenticatedUserId, IsAdmin);
+            var results = await specification.Get(reference);
 
             return Ok(results);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(
-            ManagementStoreDto dto,
+            [FromBody] ManagementStoreFilter filter,
             [FromServices] IManagementStore store
         )
         {
-            await store.Store(dto);
+            await store.Store(filter);
 
             if (HasNotifications())
                 return ResponseWithNotifications();

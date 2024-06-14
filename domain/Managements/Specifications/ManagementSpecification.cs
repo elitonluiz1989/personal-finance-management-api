@@ -2,80 +2,23 @@
 using PersonalFinanceManagement.Domain.Balances.Extensions;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Enums;
-using PersonalFinanceManagement.Domain.Base.Extensions;
-using PersonalFinanceManagement.Domain.Managements.Enums;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
 using PersonalFinanceManagement.Domain.Managements.Dtos;
+using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Users.Dtos;
 using Query = PersonalFinanceManagement.Domain.Managements.Queries.MangementQuery;
 
 namespace PersonalFinanceManagement.Domain.Managements.Specifications
 {
-    public class ManagementSpecification : IManagementSpecification
+    public class ManagementSpecification : ManagementBaseSpecificationBase, IManagementSpecification
     {
-        protected readonly IDBContext _context;
-
-        public ManagementSpecification(IDBContext context)
+        public ManagementSpecification(IDBContext context) : base(context)
         {
-            _context = context;
         }
 
-        public async Task<object> List(int reference)
+        public async Task<List<ManagementDto>> Get(int reference)
         {
             var results = new List<ManagementDto>();
-            //await RemainingValueHandler(reference, results);
-            await ManagementItemsHandler(reference, results);
-
-            return results;
-        }
-
-        private async Task RemainingValueHandler(int reference, List<ManagementDto> results)
-        {
-            DateTime referenceDate = reference.ToDateTime();
-            int previousReference = referenceDate.AddMonths(-1).ToReference();
-
-            List<ManagementResult> remainingInstallments = await Query
-                .GetRemainingInstallmentQuery(previousReference, _context)
-                .ToListAsync();
-            List<ManagementResult> installments = await Query
-                .GetInstallmentQuery(previousReference, _context)
-                .ToListAsync();
-            List<ManagementResult> transactions = await Query
-                .GetTransactionQuery(previousReference, _context)
-                .ToListAsync();
-            IEnumerable<ManagementResult> union = installments.Union(transactions);
-            IEnumerable<IGrouping<UserBasicDto, ManagementResult>> groupedValues =
-                GetManagementGroup(union);
-
-            foreach (var group in groupedValues)
-            {
-                decimal creditRemaningValue = group
-                    .Where(p => p.Type == CommonTypeEnum.Credit)
-                    .Sum(p => p.Amount);
-                decimal debitRemaningValue = group
-                    .Where(p => p.Type == CommonTypeEnum.Debt)
-                    .Sum(p => p.Amount);
-                decimal remainingValue = creditRemaningValue - debitRemaningValue;
-
-                ManagementDto management = CreateManagementDto(group.Key);
-                management.Items = new List<ManagementItemDto>
-                {
-                    new()
-                    {
-                        Reference = previousReference,
-                        Type = remainingValue > 0 ? CommonTypeEnum.Credit : CommonTypeEnum.Debt,
-                        ManagementType = ManagementItemTypeEnum.RemainingValue,
-                        Description = $"Initial value",
-                        Amount = Math.Abs(remainingValue)
-                    }
-                };
-
-                results.Add(management);
-            }
-        }
-
-        private async Task ManagementItemsHandler(int reference, List<ManagementDto> results)
-        {
             List<ManagementResult> installments = await Query
                 .GetInstallmentQuery(reference, _context)
                 .ToListAsync();
@@ -83,28 +26,37 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                 .GetTransactionQuery(reference, _context)
                 .ToListAsync();
             IEnumerable<ManagementResult> union = installments.Union(transactions);
-            IEnumerable<IGrouping<UserBasicDto, ManagementResult>> groupedValues =
+            IEnumerable<IGrouping<UserBasicDto, ManagementResult>> data =
                 GetManagementGroup(union);
+            List<Management> previousManagements = await GetPreviousManagements(reference);
+            List<Management> managements = await GetManagements(reference);
 
-            if (groupedValues.Count() == 0)
+            if (!data.Any())
             {
-                return;
+                return results;
             }
 
-            foreach (var innerGroup in groupedValues)
+            foreach (var item in data)
             {
                 ManagementDto management = GetManagementResult(
                     results,
-                    innerGroup.Key
+                    item.Key,
+                    managements
                 );
 
-                foreach (var item in innerGroup)
+                InitalAmountHandler(management, previousManagements);
+
+                foreach (var subItem in item)
                 {
-                    ManagementItemDto managementItem = CreateManagementItemDto(item);
+                    ManagementItemDto managementItem = CreateManagementItemDto(subItem);
 
                     management.Items.Add(managementItem);
                 }
+
+                management.Total = new ManagementTotalDto(management.Items);
             }
+
+            return results;
         }
 
         private static IEnumerable<IGrouping<UserBasicDto, ManagementResult>> GetManagementGroup(
@@ -118,7 +70,11 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             });
         }
 
-        private static ManagementDto GetManagementResult(List<ManagementDto> results, UserBasicDto user)
+        private static ManagementDto GetManagementResult(
+            List<ManagementDto> results,
+            UserBasicDto user,
+            List<Management> managements
+        )
         {
             ManagementDto? management = results.FirstOrDefault(p =>
                 p.User is not null &&
@@ -131,6 +87,10 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             }
 
             ManagementDto newManagement = CreateManagementDto(user);
+            newManagement.Id = managements
+                .Where(p =>p.UserId == user.Id)
+                .Select(p => p.Id)
+                .FirstOrDefault();
 
             results.Add(newManagement);
 
@@ -156,9 +116,40 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                 RecordId = item.Id,
                 Reference = item.Reference,
                 Type = item.Type,
-                ManagementType = item.ManagementType,
+                Date = item.Date,
                 Description = item.Description,
                 Amount = item.Amount
+            };
+        }
+
+        private static void InitalAmountHandler(ManagementDto dto, List<Management> previousManagements)
+        {
+            Management? previousManagement = GetUserManagement(previousManagements, dto!.User!.Id);
+
+            if (previousManagement is null)
+                return;
+
+            if (previousManagement.Amount == 0)
+                return;
+
+            ManagementItemDto managementItem = CreateInitialAmountDto(previousManagement);
+
+            dto.Items.Add(managementItem);
+        }
+
+        private static ManagementItemDto CreateInitialAmountDto(Management management)
+        {
+            CommonTypeEnum type = management.Amount < 0
+                ? CommonTypeEnum.Debt
+                : CommonTypeEnum.Credit;
+
+            return new ManagementItemDto
+            {
+                Reference = management.Reference,
+                Type = type,
+                Date = management.Reference.ToDateTime().ToShortDateString(),
+                Description = "Initial amount",
+                Amount = Math.Abs(management.Amount)
             };
         }
     }

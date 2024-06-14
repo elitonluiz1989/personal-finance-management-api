@@ -2,8 +2,7 @@
 {
     public enum ManagementItemTypeEnum
     {
-        Installment = 1,
-        Transaction,
-        RemainingValue
+        Installment,
+        Transaction
     }
 }

@@ -1,6 +1,5 @@
 ﻿using PersonalFinanceManagement.Api.Services;
 using PersonalFinanceManagement.Application.Contracts;
-using PersonalFinanceManagement.Application.Services;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Contracts.RefinanceBalances;
@@ -68,8 +67,8 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<ITransactionDeleter, TransactionDeleter>();
             services.AddScoped<ITransactionItemDeleter, TransactionItemDeleter>();
 
-            services.AddScoped<IManagementService, ManagementService>();
             services.AddScoped<IManagementSpecification, ManagementSpecification>();
+            services.AddScoped<IManagementStoreSpecification, ManagementStoreSpecification>();
             services.AddScoped<IManagementRepository, ManagementRepository>();
             services.AddScoped<IManagementStore, ManagementStore>();
         }

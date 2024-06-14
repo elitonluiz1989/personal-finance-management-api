@@ -50,12 +50,6 @@ namespace PersonalFinanceManagement.Domain.Managements.Entities
             Validator.RuleFor(p => User)
                 .NotNull()
                 .When(p => UserId <= 0);
-
-            Validator.RuleFor(p => InitialAmount)
-                .GreaterThan(0);
-
-            Validator.RuleFor(p => Amount)
-                .GreaterThan(0);
         }
     }
 }

@@ -54,6 +54,9 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             return Query
                 .Include(p => p.Installments)
                 .Include(p => p.User)
+                .OrderBy(p => p.Date)
+                    .ThenBy(p => p.Name)
+                    .ThenBy(p => p.Id)
                 .Select(s => s.ToBalanceDto());
         }
     }

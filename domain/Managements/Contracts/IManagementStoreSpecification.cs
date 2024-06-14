@@ -3,9 +3,8 @@ using PersonalFinanceManagement.Domain.Managements.Filters;
 
 namespace PersonalFinanceManagement.Domain.Managements.Contracts
 {
-    public interface IManagementStore
+    public interface IManagementStoreSpecification
     {
-        Task Store(ManagementStoreDto dto);
-        Task Store(ManagementStoreFilter filter);
+        Task<List<ManagementStoreDto>> Get(ManagementStoreFilter filter);
     }
 }

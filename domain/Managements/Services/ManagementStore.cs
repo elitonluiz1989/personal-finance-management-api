@@ -4,6 +4,7 @@ using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
 using PersonalFinanceManagement.Domain.Managements.Dtos;
 using PersonalFinanceManagement.Domain.Managements.Entities;
+using PersonalFinanceManagement.Domain.Managements.Filters;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Entities;
@@ -12,12 +13,14 @@ namespace PersonalFinanceManagement.Domain.Managements.Services
 {
     public class ManagementStore : Store<Management, int>, IManagementStore
     {
+        private readonly IManagementStoreSpecification _specification;
         private readonly IInstallmentStore _installmentStore;
         private readonly ITransactionStore _transactionStore;
         private readonly IUserRepository _userRepository;
 
         public ManagementStore(
             INotificationService notificationService,
+            IManagementStoreSpecification specification,
             IInstallmentStore installmentStore,
             ITransactionStore transactionStore,
             IManagementRepository repository,
@@ -25,6 +28,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Services
         )
             : base(notificationService, repository)
         {
+            _specification = specification;
             _installmentStore = installmentStore;
             _transactionStore = transactionStore;
             _userRepository = userRepository;
@@ -54,6 +58,19 @@ namespace PersonalFinanceManagement.Domain.Managements.Services
                 return;
 
             _repository.Save(management!);
+        }
+
+        public async Task Store(ManagementStoreFilter filter)
+        {
+            List<ManagementStoreDto> results = await _specification.Get(filter);
+
+            foreach (var dto in results)
+            {
+                await Store(dto);
+
+                if (HasNotifications)
+                    return;
+            }
         }
 
         private async Task<Management?> SetFinancialManagement(ManagementStoreDto dto)
