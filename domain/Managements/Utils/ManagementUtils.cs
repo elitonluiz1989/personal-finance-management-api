@@ -24,7 +24,9 @@ namespace PersonalFinanceManagement.Domain.Managements.Utils
             }
         }
 
-        internal static (CommonTypeEnum Type, decimal Amount) CalculateReferenceAmount(List<ManagementItemAmountDto> items)
+        internal static (CommonTypeEnum Type, decimal Amount) CalculateReferenceAmount(
+            List<ManagementItemAmountDto> items
+        )
         {
             decimal debtAmount = items
                 .Where(p => p.Type == CommonTypeEnum.Debt)

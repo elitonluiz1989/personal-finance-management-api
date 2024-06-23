@@ -5,6 +5,7 @@ using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
 using PersonalFinanceManagement.Domain.Managements.Dtos;
 using PersonalFinanceManagement.Domain.Managements.Entities;
+using PersonalFinanceManagement.Domain.Managements.Enums;
 using PersonalFinanceManagement.Domain.Users.Dtos;
 using Query = PersonalFinanceManagement.Domain.Managements.Queries.MangementQuery;
 
@@ -38,25 +39,40 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
 
             foreach (var item in data)
             {
-                ManagementDto management = GetManagementResult(
+                Management management = GetUserManagement(managements, item.Key.Id) ?? new();
+                ManagementDto dto = GetManagementDto(
                     results,
                     item.Key,
-                    managements
+                    management.Id
                 );
 
-                InitalAmountHandler(management, previousManagements);
+                InitalAmountHandler(dto, previousManagements);
 
                 foreach (var subItem in item)
                 {
                     ManagementItemDto managementItem = CreateManagementItemDto(subItem);
 
-                    management.Items.Add(managementItem);
+                    dto.Items.Add(managementItem);
                 }
 
-                management.Total = new ManagementTotalDto(management.Items);
+                dto.Total = new ManagementTotalDto(dto.Items);
+                dto.Status = GetStatus(management, dto.Total);
             }
 
             return results;
+        }
+
+        private static ManagementStatusEnum GetStatus(Management management, ManagementTotalDto total)
+        {
+            if (management.Id == 0)
+                return ManagementStatusEnum.Unsaved;
+
+            decimal totalTreated = total.Type == CommonTypeEnum.Debt ? total.Value * -1 : total.Value;
+
+            if (management.Amount == totalTreated)
+                return ManagementStatusEnum.Updated;
+
+            return ManagementStatusEnum.Outdated;
         }
 
         private static IEnumerable<IGrouping<UserBasicDto, ManagementResult>> GetManagementGroup(
@@ -70,10 +86,10 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             });
         }
 
-        private static ManagementDto GetManagementResult(
+        private static ManagementDto GetManagementDto(
             List<ManagementDto> results,
             UserBasicDto user,
-            List<Management> managements
+           int managementId
         )
         {
             ManagementDto? management = results.FirstOrDefault(p =>
@@ -87,10 +103,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             }
 
             ManagementDto newManagement = CreateManagementDto(user);
-            newManagement.Id = managements
-                .Where(p =>p.UserId == user.Id)
-                .Select(p => p.Id)
-                .FirstOrDefault();
+            newManagement.Id = managementId;
 
             results.Add(newManagement);
 
