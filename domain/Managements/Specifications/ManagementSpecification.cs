@@ -29,13 +29,14 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             IEnumerable<ManagementResult> union = installments.Union(transactions);
             IEnumerable<IGrouping<UserBasicDto, ManagementResult>> data =
                 GetManagementGroup(union);
-            List<Management> previousManagements = await GetPreviousManagements(reference);
-            List<Management> managements = await GetManagements(reference);
 
             if (!data.Any())
             {
                 return results;
             }
+
+            List<Management> previousManagements = await GetPreviousManagements(reference);
+            List<Management> managements = await GetManagements(reference);
 
             foreach (var item in data)
             {
@@ -129,6 +130,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                 RecordId = item.Id,
                 Reference = item.Reference,
                 Type = item.Type,
+                ManagementType = item.ManagementType,
                 Date = item.Date,
                 Description = item.Description,
                 Amount = item.Amount
