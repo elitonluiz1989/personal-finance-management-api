@@ -127,7 +127,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
         {
             return new ManagementItemDto
             {
-                RecordId = item.Id,
+                Id = item.Id,
                 Reference = item.Reference,
                 Type = item.Type,
                 ManagementType = item.ManagementType,
