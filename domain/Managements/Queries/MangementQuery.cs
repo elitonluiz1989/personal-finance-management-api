@@ -20,7 +20,8 @@ namespace PersonalFinanceManagement.Domain.Managements.Queries
                 join i in context.Set<Installment>()
                     on b.Id equals i.BalanceId
                 where
-                    i.Reference == reference
+                    i.Reference == reference &&
+                    !b.Residue
                 select new ManagementResult
                 {
                     Id = i.Id,
@@ -32,7 +33,8 @@ namespace PersonalFinanceManagement.Domain.Managements.Queries
                     Description = $"{b.Name} {i.Number}/{b.InstallmentsNumber}",
                     Amount = i.Amount,
                     UserId = u.Id,
-                    UserName = u.Name
+                    UserName = u.Name,
+                    CreatedAt = b.CreatedAt
                 };
         }
 
@@ -76,7 +78,8 @@ namespace PersonalFinanceManagement.Domain.Managements.Queries
                     Description = t.Type.GetDescription(),
                     Amount = t.Amount,
                     UserId = u.Id,
-                    UserName = u.Name
+                    UserName = u.Name,
+                    CreatedAt = t.CreatedAt
                 };
 
             return query;

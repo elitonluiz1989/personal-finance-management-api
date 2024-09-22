@@ -26,7 +26,9 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             List<ManagementResult> transactions = await Query
                 .GetTransactionQuery(reference, _context)
                 .ToListAsync();
-            IEnumerable<ManagementResult> union = installments.Union(transactions);
+            IEnumerable<ManagementResult> union = installments.Union(transactions)
+                .OrderBy(p => p.Date)
+                    .ThenBy(p => p.CreatedAt);
             IEnumerable<IGrouping<UserBasicDto, ManagementResult>> data =
                 GetManagementGroup(union);
 

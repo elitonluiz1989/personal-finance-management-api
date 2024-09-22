@@ -14,16 +14,16 @@ namespace PersonalFinanceManagement.Domain.Managements.Dtos
 
         private decimal Calculate(List<ManagementItemDto> items)
         {
-            var debtAmount = items
+            decimal debtAmount = items
                 .Where(p => p.Type == CommonTypeEnum.Debt)
                 .Sum(p => p.Amount);
-            var creditAmount = items
+            decimal creditAmount = items
                 .Where(p => p.Type == CommonTypeEnum.Credit)
                 .Sum(p => p.Amount);
 
             Type = debtAmount > creditAmount ? CommonTypeEnum.Debt : CommonTypeEnum.Credit;
 
-            var total = debtAmount - creditAmount;
+            decimal total = debtAmount - creditAmount;
 
             return Math.Abs(total);
 

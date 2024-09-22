@@ -22,6 +22,9 @@ namespace PersonalFinanceManagement.Domain.Transactions.Specifications
             bool isAdmin
         )
         {
+            if (filter.Id > 0)
+                Query = Query.Where(p => p.Id == filter.Id);
+
             return this;
         }
 

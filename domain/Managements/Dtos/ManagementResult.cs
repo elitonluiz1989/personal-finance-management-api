@@ -1,6 +1,7 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Managements.Enums;
+using System.Text.Json.Serialization;
 
 namespace PersonalFinanceManagement.Domain.Managements.Dtos
 {
@@ -16,5 +17,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Dtos
         public decimal Amount { get; set; }
         public int UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
+        [JsonIgnore]
+        public DateTime CreatedAt { get; set; }
     }
 }
