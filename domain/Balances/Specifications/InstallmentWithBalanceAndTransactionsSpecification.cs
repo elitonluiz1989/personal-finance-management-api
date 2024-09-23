@@ -73,7 +73,13 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             }
 
             if (Filter.Reference > 0)
-                Query = Query.Where(p => p.Reference == filter.Reference);
+            {
+                if (Filter.ReferenceAndBellow)
+                    Query = Query.Where(p => p.Reference <= filter.Reference);
+
+                if (!Filter.ReferenceAndBellow)
+                    Query = Query.Where(p => p.Reference == filter.Reference);
+            }
 
             if (Filter.Number > 0)
                 Query = Query.Where(p => p.Number == filter.Number);
@@ -84,14 +90,8 @@ namespace PersonalFinanceManagement.Domain.Balances.Specifications
             if (Filter.Amount > 0)
                 Query = Query.Where(p => p.Amount == filter.Amount);
 
-            if (Filter.OnlyUnpaidInstallments) {
-                var unpaidStatus = new InstallmentStatusEnum[] {
-                    InstallmentStatusEnum.Created,
-                    InstallmentStatusEnum.PartiallyPaid
-                };
-
-                Query = Query.Where(p => unpaidStatus.Contains(p.Status));
-            }
+            if (Filter.OnlyUnpaidInstallments)
+                Query = Query.Where(p => p.Status != InstallmentStatusEnum.Paid);
 
             if (Filter.WithoutTheseInstallmentIds.Any())
                 Query = Query.Where(p => !Filter.WithoutTheseInstallmentIds.Contains(p.Id));

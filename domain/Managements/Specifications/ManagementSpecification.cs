@@ -20,6 +20,9 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
         public async Task<List<ManagementDto>> Get(int reference)
         {
             var results = new List<ManagementDto>();
+            List<ManagementRemainingValueResult> remainingValue = await Query
+                .GetRemainingValueQuery(reference, _context)
+                .ToListAsync();
             List<ManagementResult> installments = await Query
                 .GetInstallmentQuery(reference, _context)
                 .ToListAsync();
@@ -49,7 +52,10 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                     management.Id
                 );
 
-                InitalAmountHandler(dto, previousManagements);
+                IEnumerable<ManagementRemainingValueResult> userRemainingValue = remainingValue.Where(p => p.UserId == item.Key.Id);
+
+                if (userRemainingValue.Any())
+                    dto.RemainingValue = new ManagementRemainingValueDto(userRemainingValue, reference);
 
                 foreach (var subItem in item)
                 {
@@ -58,7 +64,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                     dto.Items.Add(managementItem);
                 }
 
-                dto.Total = new ManagementTotalDto(dto.Items);
+                dto.Total = new ManagementTotalDto(dto.Items, dto.RemainingValue);
                 dto.Status = GetStatus(management, dto.Total);
             }
 

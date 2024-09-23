@@ -1,4 +1,5 @@
 ﻿using PersonalFinanceManagement.Domain.Balances.Entities;
+using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Extensions;
 using PersonalFinanceManagement.Domain.Managements.Dtos;
@@ -83,6 +84,43 @@ namespace PersonalFinanceManagement.Domain.Managements.Queries
                 };
 
             return query;
+        }
+
+        public static IQueryable<ManagementRemainingValueResult> GetRemainingValueQuery(int reference, IDBContext context)
+        {
+            var transactionItemQuery =
+                from t in context.Set<Transaction>()
+                join ti in context.Set<TransactionItem>()
+                    on t.Id equals ti.TransactionId
+                group ti
+                by ti.InstallmentId
+                into grp
+                select new
+                {
+                    InstallmentId = grp.Key,
+                    AmountPaid = grp.Sum(p => p.AmountPaid)
+                };
+            return
+                from u in context.Set<User>()
+                join b in context.Set<Balance>()
+                    on u.Id equals b.UserId
+                join i in context.Set<Installment>()
+                    on b.Id equals i.BalanceId
+                join til in transactionItemQuery
+                    on i.Id equals til.InstallmentId into tit
+                from ti in tit.DefaultIfEmpty()
+                where
+                    i.Reference < reference &&
+                    i.Status != InstallmentStatusEnum.Paid
+                select new ManagementRemainingValueResult
+                {
+                    Type = b.Type,
+                    ManagementType = ManagementItemTypeEnum.RemainingValue,
+                    Amount = i.Amount,
+                    AmountPaid = ti.AmountPaid,
+                    UserId = u.Id,
+                    UserName = u.Name
+                };
         }
 
         public static IQueryable<ManagementStoreResult> GetTransactionToStoreQuery(

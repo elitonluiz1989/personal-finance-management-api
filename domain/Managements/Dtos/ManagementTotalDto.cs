@@ -5,14 +5,22 @@ namespace PersonalFinanceManagement.Domain.Managements.Dtos
     public class ManagementTotalDto
     {
         public CommonTypeEnum Type { get; private set; }
-        public decimal Value { get; init; }
+        public decimal Value { get; private set; }
 
-        public ManagementTotalDto(List<ManagementItemDto> items)
+        public ManagementTotalDto(List<ManagementItemDto> items, ManagementRemainingValueDto? remainingValue)
         {
-            Value = Calculate(items);
+            DataHandler(items, remainingValue);
         }
 
-        private decimal Calculate(List<ManagementItemDto> items)
+        private void DataHandler(List<ManagementItemDto> items, ManagementRemainingValueDto? remainingValue)
+        {
+            decimal total = CaculateTotal(items, remainingValue);
+
+            Type = total > 0 ? CommonTypeEnum.Debt : CommonTypeEnum.Credit;
+            Value = Math.Abs(total);
+        }
+
+        private static decimal CaculateTotal(List<ManagementItemDto> items, ManagementRemainingValueDto? remainingValue)
         {
             decimal debtAmount = items
                 .Where(p => p.Type == CommonTypeEnum.Debt)
@@ -21,12 +29,16 @@ namespace PersonalFinanceManagement.Domain.Managements.Dtos
                 .Where(p => p.Type == CommonTypeEnum.Credit)
                 .Sum(p => p.Amount);
 
-            Type = debtAmount > creditAmount ? CommonTypeEnum.Debt : CommonTypeEnum.Credit;
+            if (remainingValue is not null)
+            {
+                if (remainingValue.IsCredit)
+                    creditAmount += remainingValue.Value;
+                else
+                    debtAmount += remainingValue.Value;
+            }
 
             decimal total = debtAmount - creditAmount;
-
-            return Math.Abs(total);
-
+            return total;
         }
     }
 }
