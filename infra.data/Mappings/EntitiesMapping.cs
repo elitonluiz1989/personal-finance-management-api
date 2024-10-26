@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalFinanceManagement.Domain.Balances.Entities;
-using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
@@ -18,7 +17,6 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
             modelBuilder.Entity<Transaction>(new TransactionMapping().Configure);
             modelBuilder.Entity<TransactionItem>(new TransactionItemMapping().Configure);
             modelBuilder.Entity<TransactionResidue>(new TransactionResidueMapping().Configure);
-            modelBuilder.Entity<Management>(new ManagementMapping().Configure);
         }
     }
 }

@@ -1,20 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PersonalFinanceManagement.Domain.Balances.Extensions;
+﻿using System.Collections.Immutable;
+using Microsoft.EntityFrameworkCore;
 using PersonalFinanceManagement.Domain.Base.Contracts;
-using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
 using PersonalFinanceManagement.Domain.Managements.Dtos;
-using PersonalFinanceManagement.Domain.Managements.Entities;
-using PersonalFinanceManagement.Domain.Managements.Enums;
 using PersonalFinanceManagement.Domain.Users.Dtos;
 using Query = PersonalFinanceManagement.Domain.Managements.Queries.MangementQuery;
 
 namespace PersonalFinanceManagement.Domain.Managements.Specifications
 {
-    public class ManagementSpecification : ManagementBaseSpecificationBase, IManagementSpecification
+    public class ManagementSpecification : IManagementSpecification
     {
-        public ManagementSpecification(IDBContext context) : base(context)
+        private readonly IDBContext _context;
+
+        public ManagementSpecification(IDBContext context)
         {
+            _context = context;
         }
 
         public async Task<List<ManagementDto>> Get(int reference)
@@ -32,30 +32,19 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             IEnumerable<ManagementResult> union = installments.Union(transactions)
                 .OrderBy(p => p.Date)
                     .ThenBy(p => p.CreatedAt);
-            IEnumerable<IGrouping<UserBasicDto, ManagementResult>> data =
-                GetManagementGroup(union);
+            var data = GetManagementGroup(union).ToImmutableArray();
 
-            if (!data.Any())
-            {
+            if (data.Length == 0)
                 return results;
-            }
-
-            List<Management> previousManagements = await GetPreviousManagements(reference);
-            List<Management> managements = await GetManagements(reference);
 
             foreach (var item in data)
             {
-                Management management = GetUserManagement(managements, item.Key.Id) ?? new();
                 ManagementDto dto = GetManagementDto(
                     results,
-                    item.Key,
-                    management.Id
+                    item.Key
                 );
 
-                IEnumerable<ManagementRemainingValueResult> userRemainingValue = remainingValue.Where(p => p.UserId == item.Key.Id);
-
-                if (userRemainingValue.Any())
-                    dto.RemainingValue = new ManagementRemainingValueDto(userRemainingValue, reference);
+                dto.RemainingValue = RemainingValueHandle(reference, item.Key.Id, remainingValue);
 
                 foreach (var subItem in item)
                 {
@@ -65,23 +54,30 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                 }
 
                 dto.Total = new ManagementTotalDto(dto.Items, dto.RemainingValue);
-                dto.Status = GetStatus(management, dto.Total);
             }
 
             return results;
         }
 
-        private static ManagementStatusEnum GetStatus(Management management, ManagementTotalDto total)
+        private static ManagementRemainingValueDto? RemainingValueHandle(
+            int reference,
+            int userId,
+            List<ManagementRemainingValueResult> remainingValue
+        )
         {
-            if (management.Id == 0)
-                return ManagementStatusEnum.Unsaved;
+            IEnumerable<ManagementRemainingValueResult> userRemainingValue = remainingValue
+                .Where(p => p.UserId == userId)
+                .ToImmutableArray();
 
-            decimal totalTreated = total.Type == CommonTypeEnum.Debt ? total.Value * -1 : total.Value;
+            if (!userRemainingValue.Any())
+                return default;
+            
+            var renamingValue = new ManagementRemainingValueDto(userRemainingValue, reference);
 
-            if (management.Amount == totalTreated)
-                return ManagementStatusEnum.Updated;
-
-            return ManagementStatusEnum.Outdated;
+            if (renamingValue.Value == 0)
+                return default;
+            
+            return renamingValue;
         }
 
         private static IEnumerable<IGrouping<UserBasicDto, ManagementResult>> GetManagementGroup(
@@ -97,8 +93,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
 
         private static ManagementDto GetManagementDto(
             List<ManagementDto> results,
-            UserBasicDto user,
-           int managementId
+            UserBasicDto user
         )
         {
             ManagementDto? management = results.FirstOrDefault(p =>
@@ -112,7 +107,6 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
             }
 
             ManagementDto newManagement = CreateManagementDto(user);
-            newManagement.Id = managementId;
 
             results.Add(newManagement);
 
@@ -142,37 +136,6 @@ namespace PersonalFinanceManagement.Domain.Managements.Specifications
                 Date = item.Date,
                 Description = item.Description,
                 Amount = item.Amount
-            };
-        }
-
-        private static void InitalAmountHandler(ManagementDto dto, List<Management> previousManagements)
-        {
-            Management? previousManagement = GetUserManagement(previousManagements, dto!.User!.Id);
-
-            if (previousManagement is null)
-                return;
-
-            if (previousManagement.Amount == 0)
-                return;
-
-            ManagementItemDto managementItem = CreateInitialAmountDto(previousManagement);
-
-            dto.Items.Add(managementItem);
-        }
-
-        private static ManagementItemDto CreateInitialAmountDto(Management management)
-        {
-            CommonTypeEnum type = management.Amount < 0
-                ? CommonTypeEnum.Debt
-                : CommonTypeEnum.Credit;
-
-            return new ManagementItemDto
-            {
-                Reference = management.Reference,
-                Type = type,
-                Date = management.Reference.ToDateTime().ToShortDateString(),
-                Description = "Initial amount",
-                Amount = Math.Abs(management.Amount)
             };
         }
     }

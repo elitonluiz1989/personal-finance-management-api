@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PersonalFinanceManagement.Infra.Data.Migrations
 {
-    public partial class CreateTables : Migration
+    public partial class CreateInitialTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -58,26 +58,53 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Management",
+                name: "Transactions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "date", nullable: false),
                     Reference = table.Column<int>(type: "int", nullable: false),
-                    InitialAmount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ManagementId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Installments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BalanceId = table.Column<int>(type: "int", nullable: false),
+                    ManagementId = table.Column<int>(type: "int", nullable: true),
+                    Reference = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<short>(type: "smallint", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
+                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Management", x => x.Id);
+                    table.PrimaryKey("PK_Installments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Management_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        name: "FK_Installments_Balances_BalanceId",
+                        column: x => x.BalanceId,
+                        principalTable: "Balances",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -116,70 +143,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Installments",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BalanceId = table.Column<int>(type: "int", nullable: false),
-                    ManagementId = table.Column<int>(type: "int", nullable: true),
-                    Reference = table.Column<int>(type: "int", nullable: false),
-                    Number = table.Column<short>(type: "smallint", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
-                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Installments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Installments_Balances_BalanceId",
-                        column: x => x.BalanceId,
-                        principalTable: "Balances",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Installments_Management_ManagementId",
-                        column: x => x.ManagementId,
-                        principalTable: "Management",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Transactions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "date", nullable: false),
-                    Reference = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ManagementId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Transactions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Transactions_Management_ManagementId",
-                        column: x => x.ManagementId,
-                        principalTable: "Management",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Transactions_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -248,16 +211,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 column: "BalanceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Installments_ManagementId",
-                table: "Installments",
-                column: "ManagementId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Management_UserId",
-                table: "Management",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RefinancedBalances_BalanceId",
                 table: "RefinancedBalances",
                 column: "BalanceId");
@@ -287,11 +240,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
                 name: "IX_TransactionResidue_TransactionItemOriginId",
                 table: "TransactionResidue",
                 column: "TransactionItemOriginId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Transactions_ManagementId",
-                table: "Transactions",
-                column: "ManagementId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_UserId",
@@ -330,9 +278,6 @@ namespace PersonalFinanceManagement.Infra.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Balances");
-
-            migrationBuilder.DropTable(
-                name: "Management");
 
             migrationBuilder.DropTable(
                 name: "Users");

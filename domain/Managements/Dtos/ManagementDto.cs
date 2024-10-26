@@ -6,7 +6,6 @@ namespace PersonalFinanceManagement.Domain.Managements.Dtos
 {
     public record ManagementDto : RecordedDto<int>
     {
-        public ManagementStatusEnum Status { get; set; }
         public UserDto? User { get; set; }
         public ManagementRemainingValueDto? RemainingValue { get; set; }
         public List<ManagementItemDto> Items { get; set; } = new();

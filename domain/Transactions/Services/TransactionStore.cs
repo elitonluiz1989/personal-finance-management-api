@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
-using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Dtos;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
@@ -27,14 +26,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
             _userRepository = userRepository;
         }
 
-        public void Store(Transaction transaction)
-        {
-            if (ValidateEntity(transaction) is false)
-                return;
-
-            _repository.Save(transaction!);
-        }
-
         public async Task Store(TransactionStoreDto dto)
         {
             if (ValidateDto(dto) is false)
@@ -47,33 +38,11 @@ namespace PersonalFinanceManagement.Domain.Transactions.Services
 
             if (ValidateTransationItemsRecord(dto, transaction!))
                 await _transactionItemManager.Manage(dto, transaction!);
-
-            Store(transaction!);
-        }
-
-        public void Store(Transaction transaction, Management management)
-        {
-            transaction.Management = management;
-
-            Store(transaction);
-        }
-
-        public async Task Store(int[] transactionsIds, Management management)
-        {
-            if (transactionsIds is null  || transactionsIds.Length == 0)
+            
+            if (ValidateEntity(transaction) is false)
                 return;
 
-            var transactions = await _repository.Query()
-                .Where(p => transactionsIds.Contains(p.Id))
-                .ToListAsync();
-
-            foreach (var transaction in transactions)
-            {
-                Store(transaction, management);
-
-                if (HasNotifications)
-                    return;
-            }
+            _repository.Save(transaction!);
         }
 
         private async Task<Transaction?> SetTransaction(TransactionStoreDto dto)

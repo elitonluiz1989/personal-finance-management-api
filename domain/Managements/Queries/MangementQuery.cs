@@ -4,7 +4,6 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Extensions;
 using PersonalFinanceManagement.Domain.Managements.Dtos;
 using PersonalFinanceManagement.Domain.Managements.Enums;
-using PersonalFinanceManagement.Domain.Managements.Filters;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
@@ -38,29 +37,7 @@ namespace PersonalFinanceManagement.Domain.Managements.Queries
                     CreatedAt = b.CreatedAt
                 };
         }
-
-        public static IQueryable<ManagementStoreResult> GetInstallmentToStoreQuery(
-            ManagementStoreFilter filter,
-            IDBContext context
-        )
-        {
-            return
-                from b in context.Set<Balance>()
-                join i in context.Set<Installment>()
-                    on b.Id equals i.BalanceId
-                where
-                    i.Reference == filter.Reference &&
-                    (!filter.UserId.HasValue || b.UserId == filter.UserId)
-                select new ManagementStoreResult
-                {
-                    Id = i.Id,
-                    Type = b.Type,
-                    ManagementType = ManagementItemTypeEnum.Installment,
-                    Amount = i.Amount,
-                    UserId = b.UserId
-                };
-        }
-
+        
         public static IQueryable<ManagementResult> GetTransactionQuery(int reference, IDBContext context)
         {
             var query =
@@ -120,26 +97,6 @@ namespace PersonalFinanceManagement.Domain.Managements.Queries
                     AmountPaid = ti.AmountPaid,
                     UserId = u.Id,
                     UserName = u.Name
-                };
-        }
-
-        public static IQueryable<ManagementStoreResult> GetTransactionToStoreQuery(
-            ManagementStoreFilter filter,
-            IDBContext context
-        )
-        {
-            return
-                from t in context.Set<Transaction>()
-                where
-                    t.Reference == filter.Reference &&
-                    (!filter.UserId.HasValue || t.UserId == filter.UserId)
-                select new ManagementStoreResult
-                {
-                    Id = t.Id,
-                    Type = t.Type,
-                    ManagementType = ManagementItemTypeEnum.Transaction,
-                    Amount = t.Amount,
-                    UserId = t.UserId
                 };
         }
     }

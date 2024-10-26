@@ -1,12 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
+﻿using PersonalFinanceManagement.Domain.Balances.Contracts.Balances;
 using PersonalFinanceManagement.Domain.Balances.Contracts.Installments;
 using PersonalFinanceManagement.Domain.Balances.Dtos;
 using PersonalFinanceManagement.Domain.Balances.Entities;
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
-using PersonalFinanceManagement.Domain.Managements.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
 {
@@ -57,34 +55,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Services.Installments
             }
 
             await Store(dto, balance);
-        }
-
-        public void Store(Installment? installment, Management management)
-        {
-            if (installment is null)
-                return;
-
-            installment.Management = management;
-
-            Store(installment);
-        }
-
-        public async Task Store(int[] installmentsIds, Management management)
-        {
-            if (installmentsIds is null || installmentsIds.Length == 0)
-                return;
-
-            var installments = await _repository.Query()
-                .Where(p => installmentsIds.Contains(p.Id))
-                .ToListAsync();
-
-            foreach (var installment in installments)
-            {
-                Store(installment, management);
-
-                if (HasNotifications)
-                    return;
-            }
         }
 
         public void UpdateStatus(Installment installment, InstallmentStatusEnum status)

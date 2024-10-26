@@ -3,7 +3,6 @@ using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
 using PersonalFinanceManagement.Domain.Base.Enums;
 using PersonalFinanceManagement.Domain.Base.Extensions;
-using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Users.Entities;
 
 namespace PersonalFinanceManagement.Domain.Transactions.Entities
@@ -22,7 +21,6 @@ namespace PersonalFinanceManagement.Domain.Transactions.Entities
 
         public virtual User? User { get; set; }
         public virtual List<TransactionItem> TransactionItems { get; set; } = new();
-        public virtual Management? Management { get; set; }
 
         private DateTime _data;
 

@@ -10,7 +10,6 @@ using PersonalFinanceManagement.Domain.Balances.Specifications;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Services;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
-using PersonalFinanceManagement.Domain.Managements.Services;
 using PersonalFinanceManagement.Domain.Managements.Specifications;
 using PersonalFinanceManagement.Domain.Transactions.Contracts;
 using PersonalFinanceManagement.Domain.Transactions.Services;
@@ -20,7 +19,6 @@ using PersonalFinanceManagement.Domain.Users.Services;
 using PersonalFinanceManagement.Domain.Users.Specifications;
 using PersonalFinanceManagement.Infra.Data.Helpers;
 using PersonalFinanceManagement.Infra.Data.Repositories.Balances;
-using PersonalFinanceManagement.Infra.Data.Repositories.Managements;
 using PersonalFinanceManagement.Infra.Data.Repositories.Transactions;
 using PersonalFinanceManagement.Infra.Data.Repositories.Users;
 
@@ -68,9 +66,6 @@ namespace PersonalFinanceManagement.Api
             services.AddScoped<ITransactionItemDeleter, TransactionItemDeleter>();
 
             services.AddScoped<IManagementSpecification, ManagementSpecification>();
-            services.AddScoped<IManagementStoreSpecification, ManagementStoreSpecification>();
-            services.AddScoped<IManagementRepository, ManagementRepository>();
-            services.AddScoped<IManagementStore, ManagementStore>();
         }
     }
 }

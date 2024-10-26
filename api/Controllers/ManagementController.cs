@@ -3,7 +3,6 @@ using PersonalFinanceManagement.Api.Attributes;
 using PersonalFinanceManagement.Api.Controllers.Base;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Managements.Contracts;
-using PersonalFinanceManagement.Domain.Managements.Filters;
 using PersonalFinanceManagement.Domain.Users.Contracts;
 using PersonalFinanceManagement.Domain.Users.Enums;
 
@@ -32,20 +31,6 @@ namespace PersonalFinanceManagement.Api.Controllers
             var results = await specification.Get(reference);
 
             return Ok(results);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Post(
-            [FromBody] ManagementStoreFilter filter,
-            [FromServices] IManagementStore store
-        )
-        {
-            await store.Store(filter);
-
-            if (HasNotifications())
-                return ResponseWithNotifications();
-
-            return ResponseWithCommit();
         }
     }
 }

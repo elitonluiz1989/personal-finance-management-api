@@ -2,7 +2,6 @@
 using PersonalFinanceManagement.Domain.Balances.Enums;
 using PersonalFinanceManagement.Domain.Base.Contracts;
 using PersonalFinanceManagement.Domain.Base.Entites;
-using PersonalFinanceManagement.Domain.Managements.Entities;
 using PersonalFinanceManagement.Domain.Transactions.Entities;
 
 namespace PersonalFinanceManagement.Domain.Balances.Entities
@@ -22,7 +21,6 @@ namespace PersonalFinanceManagement.Domain.Balances.Entities
 
         public virtual Balance? Balance { get; set; }
         public virtual List<TransactionItem> TransactionItems { get; set; } = new();
-        public virtual Management? Management { get; set; }
 
         public Installment()
         {

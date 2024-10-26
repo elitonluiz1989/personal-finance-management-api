@@ -46,11 +46,6 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
                 .HasForeignKey(p => p.BalanceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(p => p.Management)
-                .WithMany(p => p.Installments)
-                .HasForeignKey(p => p.ManagementId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.Ignore(p => p.Active);
         }
     }

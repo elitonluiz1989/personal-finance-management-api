@@ -44,11 +44,6 @@ namespace PersonalFinanceManagement.Infra.Data.Mappings
             builder.Property(p => p.DeletedAt)
                 .HasColumnOrder(8)
                 .IsRequired(false);
-
-            builder.HasOne(p => p.Management)
-                .WithMany(p => p.Transactions)
-                .HasForeignKey(p => p.ManagementId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
